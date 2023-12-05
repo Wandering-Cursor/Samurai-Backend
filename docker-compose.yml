@@ -1,0 +1,69 @@
+version: '3.7'
+
+services:
+  # Django application
+  web:
+    build:
+      context: .
+      dockerfile: backend.dockerfile
+    volumes:
+      - appData:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
+  # PostgreSQL database
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgresData:/var/lib/postgresql/data
+
+  # Redis server
+  redis:
+    image: "redis:latest"
+    volumes:
+      - redisData:/data
+
+  # Celery worker
+  worker:
+    build:
+      context: .
+      dockerfile: worker.dockerfile
+    volumes:
+      - appData:/app
+    depends_on:
+      - db
+      - redis
+  
+  beat:
+    build:
+      context: .
+      dockerfile: beat.dockerfile
+    volumes:
+      - appData:/app
+    depends_on:
+      - db
+      - redis
+
+  # Swagger UI for documentation
+  swagger:
+    image: swaggerapi/swagger-ui
+    environment:
+      - URL=${BASE_URL}/docs/swagger.json
+    ports:
+      - "8080:8080"
+
+volumes:
+  appData:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+  postgresData:
+  redisData:
