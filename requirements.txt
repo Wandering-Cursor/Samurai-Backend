@@ -9,3 +9,5 @@ psycopg==3.1.14
 psycopg2==2.9.9
 python-decouple==3.8
 gunicorn==21.2.0
+djangorestframework-simplejwt[crypto]==5.3.1
+django-cors-headers==4.3.1

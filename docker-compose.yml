@@ -51,13 +51,13 @@ services:
       - db
       - redis
 
-  # Swagger UI for documentation
-  swagger:
-    image: swaggerapi/swagger-ui
-    environment:
-      - URL=${BASE_URL}/docs/swagger.json
-    ports:
-      - "8080:8080"
+  # Swagger UI for documentation; Disabled for now
+  # swagger:
+  #   image: swaggerapi/swagger-ui
+  #   environment:
+  #     - URL=${BASE_URL}/swagger.json
+  #   ports:
+  #     - "8080:8080"
 
 volumes:
   appData:
