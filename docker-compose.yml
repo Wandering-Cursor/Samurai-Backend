@@ -7,7 +7,9 @@ services:
       context: .
       dockerfile: backend.dockerfile
     volumes:
-      - appData:/app
+      - type: bind
+        source: ./
+        target: /app
     ports:
       - "8000:8000"
     depends_on:
@@ -36,7 +38,9 @@ services:
       context: .
       dockerfile: worker.dockerfile
     volumes:
-      - appData:/app
+      - type: bind
+        source: ./
+        target: /app
     depends_on:
       - db
       - redis
@@ -46,7 +50,9 @@ services:
       context: .
       dockerfile: beat.dockerfile
     volumes:
-      - appData:/app
+      - type: bind
+        source: ./
+        target: /app
     depends_on:
       - db
       - redis
@@ -60,10 +66,5 @@ services:
   #     - "8080:8080"
 
 volumes:
-  appData:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
   postgresData:
   redisData:
