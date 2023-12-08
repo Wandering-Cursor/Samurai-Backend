@@ -12,6 +12,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: Stop containers
+      run: docker compose -f "docker-compose.yml" down
+
     - name: Create env file
       run: |
         echo "${{ secrets.ENV_FILE }}" > .env
