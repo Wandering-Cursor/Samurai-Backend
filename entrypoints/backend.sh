@@ -9,8 +9,6 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py collectstatic --noinput
 
-chown -r $USER ./
-
 USE_GUNICORN=$(grep -oP '(?<=USE_GUNICORN=).*' ../.env | tr -d '\r')
 
 if [ "$USE_GUNICORN" = "True" ]; then
