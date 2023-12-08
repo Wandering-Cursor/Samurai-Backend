@@ -11,11 +11,9 @@ python manage.py collectstatic --noinput
 
 chown -r $USER ./
 
-DEBUG=$(grep -oP '(?<=DEBUG=).*' ../.env | tr -d '\r')
+USE_GUNICORN=$(grep -oP '(?<=USE_GUNICORN=).*' ../.env | tr -d '\r')
 
-echo "DEBUG=$DEBUG"
-
-if [ "$DEBUG" = "True" ]; then
+if [ "$USE_GUNICORN" = "True" ]; then
     echo "Starting backend server in debug mode..."
     python manage.py runserver 0.0.0.0:8000
 else
