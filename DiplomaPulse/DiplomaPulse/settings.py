@@ -11,6 +11,8 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default=[], cast=lambda v: [s.strip() for s in v.split(",")])
 
+STATIC_ROOT = config("STATIC_ROOT", default=f"{BASE_DIR}/staticfiles")
+
 
 django_apps = [
     "django.contrib.admin",
@@ -140,7 +142,6 @@ SWAGGER_SETTINGS = {
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
