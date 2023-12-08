@@ -9,6 +9,8 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py collectstatic --noinput
 
+chown -r $USER ./
+
 DEBUG=$(grep -oP '(?<=DEBUG=).*' ../.env | tr -d '\r')
 
 echo "DEBUG=$DEBUG"
