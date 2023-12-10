@@ -11,7 +11,11 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default=[], cast=lambda v: [s.strip() for s in v.split(",")])
 
+CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default=[], cast=lambda v: [s.strip() for s in v.split(",")])
+
 STATIC_ROOT = config("STATIC_ROOT", default=f"{BASE_DIR}/staticfiles")
+
+BASE_URL = config("BASE_URL", default="http://localhost:8000")
 
 
 django_apps = [
@@ -49,11 +53,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
-]
-
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:8000",
-    "http://127.0.0.1:8080",
 ]
 
 if DEBUG:
