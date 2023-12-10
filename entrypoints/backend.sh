@@ -12,9 +12,9 @@ python manage.py collectstatic --noinput
 USE_GUNICORN=$(grep -oP '(?<=USE_GUNICORN=).*' ../.env | tr -d '\r')
 
 if [ "$USE_GUNICORN" = "True" ]; then
-    echo "Starting backend server in production mode..."
-    gunicorn --certfile=$CERTFILE_PATH --keyfile=$KEYFILE_PATH DiplomaPulse.wsgi:application --bind 0.0.0.0:443
+    echo "Starting backend server with Gunicorn..."
+    gunicorn DiplomaPulse.wsgi:application --bind 0.0.0.0:8000
 else
-    echo "Starting backend server in debug mode..."
+    echo "Starting backend server with Django..."
     python manage.py runserver 0.0.0.0:8000
 fi
