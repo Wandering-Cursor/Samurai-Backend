@@ -20,7 +20,7 @@ jobs:
     - name: Create secret files
       run: |
         echo "${{ secrets.ENV_FILE }}" > .env
-        echo "${{ secrets.NGINX_FILE }}" > docker-compose.yml
+        echo "${{ secrets.NGINX_FILE }}" > nginx.conf
     
     - name: List files
       run: ls -la
