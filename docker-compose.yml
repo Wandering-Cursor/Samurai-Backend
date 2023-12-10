@@ -65,6 +65,7 @@ services:
       - web
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
+      - /logs:/logs
 
 volumes:
   postgresData:
