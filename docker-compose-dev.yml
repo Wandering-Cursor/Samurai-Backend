@@ -10,8 +10,7 @@ services:
         source: ./
         target: /app
     ports:
-      - "8000:8000" # HTTP requests
-      - "8001:8001" # Websocket requests
+      - "8000:8000"
     depends_on:
       - db
       - redis
@@ -53,16 +52,6 @@ services:
     depends_on:
       - db
       - redis
-
-  nginx:
-    build:
-      context: .
-      dockerfile: nginx.dockerfile
-    ports:
-      - "80:80"
-      - "443:443"
-    depends_on:
-      - web
 
 volumes:
   postgresData:
