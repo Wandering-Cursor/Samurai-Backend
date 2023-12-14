@@ -21,7 +21,8 @@ class DecoratedTokenObtainPairView(TokenObtainPairView):
     @swagger_auto_schema(
         responses={
             status.HTTP_200_OK: TokenObtainPairResponseSerializer,
-        }
+        },
+        tags=["token"],
     )
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)

@@ -12,4 +12,9 @@ urlpatterns = [
         view=views.token.refresh_token_view.DecoratedTokenRefreshView.as_view(),
         name="token_refresh",
     ),
+    path(
+        route="sign-up/",
+        view=views.account.sign_up.SignUpView.as_view(),
+        name="sign_up",
+    ),
 ]

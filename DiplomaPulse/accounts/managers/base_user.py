@@ -1,4 +1,10 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from django.contrib.auth.models import BaseUserManager
+
+if TYPE_CHECKING:
+    from ..models.base_user import BaseUser
 
 
 class UserManager(BaseUserManager):
@@ -13,3 +19,6 @@ class UserManager(BaseUserManager):
         user.save()
 
         return user
+
+    def get_user_by_registration_code(self, registration_code) -> "BaseUser | None":
+        return self.filter(registration_code=registration_code).first()
