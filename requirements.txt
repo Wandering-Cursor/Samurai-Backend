@@ -5,9 +5,10 @@ drf-yasg==1.21.7
 celery[redis]==5.3.6
 djangorestframework==3.14.0
 redis==5.0.1
-psycopg==3.1.14
+psycopg==3.1.15
 psycopg2==2.9.9
 python-decouple==3.8
 gunicorn==21.2.0
 djangorestframework-simplejwt[crypto]==5.3.1
 django-cors-headers==4.3.1
+pydantic==2.5.2
