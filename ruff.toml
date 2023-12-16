@@ -1,0 +1,15 @@
+target-version = "py312"
+
+exclude = [
+    "migrations"
+]
+
+line-length = 100
+
+[lint]
+select = ["E", "F", "UP"]
+
+[format]
+quote-style = "double"
+indent-style = "tab"
+docstring-code-format = true

@@ -5,5 +5,5 @@ from accounts.models import Faculty
 
 @admin.register(Faculty)
 class FacultyAdmin(admin.ModelAdmin):
-    class Meta:
-        model = Faculty
+	class Meta:
+		model = Faculty
