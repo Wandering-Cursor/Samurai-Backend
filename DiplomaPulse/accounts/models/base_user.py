@@ -64,3 +64,7 @@ class BaseUser(AbstractUser, BaseModel):
         if self.content_type:
             return self.content_type.get_object_for_this_type(pk=self.pk)
         return self
+
+    class Meta:
+        verbose_name = _("Base User")
+        verbose_name_plural = _("base users")

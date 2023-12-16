@@ -38,13 +38,20 @@ class SignUpSerializer(serializers.Serializer):
     ) -> BaseUser | BaseUserShortInfoSerializer:
         user_entity = validated_data["user"]
 
-        # We generate default email, but we need to set it to an actual one
-        user_entity.email = validated_data["email"]
-        user_entity.set_password(validated_data["password"])
-        # Removing registration code, so it cannot be used again
-        user_entity.registration_code = None
+        user_with_email = BaseUser.objects.filter(email=validated_data["email"]).first()
+        if user_with_email:
+            # Safety precaution
+            # We do not want to let anyone know that this email is already in use
+            # So we just return the same response as if the user was created
+            user_entity = user_with_email
+        else:
+            # We generate default email, but we need to set it to an actual one
+            user_entity.email = validated_data["email"]
+            user_entity.set_password(validated_data["password"])
+            # Removing registration code, so it cannot be used again
+            user_entity.registration_code = None
 
-        user_entity.save()
+            user_entity.save()
 
         result = user_entity
         if return_representation:

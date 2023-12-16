@@ -5,4 +5,7 @@ from accounts.models import BaseUser
 
 @admin.register(BaseUser)
 class BaseUserAdmin(admin.ModelAdmin):
-    pass
+    exclude = ["password"]
+
+    class Meta:
+        model = BaseUser

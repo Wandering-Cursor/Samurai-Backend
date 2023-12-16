@@ -5,7 +5,7 @@ cd DiplomaPulse
 
 echo "Starting backend server..."
 
-#python manage.py makemigrations
+python manage.py makemigrations
 python manage.py migrate
 python manage.py collectstatic --noinput
 
