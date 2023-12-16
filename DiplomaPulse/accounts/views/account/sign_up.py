@@ -1,12 +1,12 @@
-from accounts.serializers.account.base_user import BaseUserShortInfoSerializer
-from accounts.serializers.account.sign_up import SignUpSerializer
-from accounts.serializers.errors.account.sign_up import SignUpErrorSerializer
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from accounts.serializers.account.base_user import BaseUserShortInfoSerializer
+from accounts.serializers.account.sign_up import SignUpSerializer
+from accounts.serializers.errors.account.sign_up import SignUpErrorSerializer
 from DiplomaPulse.views import PublicApiView
 
 

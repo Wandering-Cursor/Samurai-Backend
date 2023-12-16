@@ -1,10 +1,10 @@
-from accounts.serializers.account.account_info import AccountInfoSerializer, AllUsersInfoSerializer
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from accounts.serializers.account.account_info import AccountInfoSerializer, AllUsersInfoSerializer
 from DiplomaPulse.views import AuthenticatedApiView
 
 

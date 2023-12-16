@@ -2,11 +2,12 @@
 
 import uuid
 
-import accounts.models.base_user
 import django.db.models.deletion
 import django.utils.timezone
 from django.conf import settings
 from django.db import migrations, models
+
+import accounts.models.base_user
 
 
 class Migration(migrations.Migration):

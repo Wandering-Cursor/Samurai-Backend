@@ -1,5 +1,6 @@
-from accounts.models import Overseer
 from django.contrib import admin
+
+from accounts.models import Overseer
 
 from .base_user import BaseUserAdmin
 

@@ -1,5 +1,6 @@
-from accounts.models import Student
 from django.contrib import admin
+
+from accounts.models import Student
 
 from .base_user import BaseUserAdmin
 

@@ -1,8 +1,9 @@
 from typing import TypedDict
 
-from accounts.models.base_user import BaseUser
 from django.db import transaction
 from rest_framework import serializers
+
+from accounts.models.base_user import BaseUser
 
 from ..errors.account.sign_up import RegistrationCodeNotFound
 from .base_user import BaseUserShortInfoSerializer
