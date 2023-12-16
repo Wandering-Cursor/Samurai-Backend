@@ -17,4 +17,9 @@ urlpatterns = [
         view=views.account.sign_up.SignUpView.as_view(),
         name="sign_up",
     ),
+    path(
+        route="account-info/",
+        view=views.account.account_info.AccountInfoView.as_view(),
+        name="account_info",
+    ),
 ]

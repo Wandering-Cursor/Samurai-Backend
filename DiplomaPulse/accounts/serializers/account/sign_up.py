@@ -3,23 +3,14 @@ from typing import TypedDict
 from rest_framework import serializers, exceptions
 from accounts.models.base_user import BaseUser
 
+from .base_user import BaseUserShortInfoSerializer
+
 
 class ValidatedData(TypedDict):
     email: str
     password: str
     registration_code: str
     user: BaseUser
-
-
-class BaseUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BaseUser
-        fields = [
-            "id",
-            "email",
-            "first_name",
-            "last_name",
-        ]
 
 
 class SignUpSerializer(serializers.Serializer):
@@ -44,7 +35,7 @@ class SignUpSerializer(serializers.Serializer):
         self,
         validated_data: ValidatedData,
         return_representation: bool = False,
-    ) -> BaseUser | BaseUserSerializer:
+    ) -> BaseUser | BaseUserShortInfoSerializer:
         user_entity = validated_data["user"]
 
         # We generate default email, but we need to set it to an actual one
@@ -57,6 +48,6 @@ class SignUpSerializer(serializers.Serializer):
 
         result = user_entity
         if return_representation:
-            result = BaseUserSerializer(instance=user_entity)
+            result = BaseUserShortInfoSerializer(instance=user_entity)
 
         return result

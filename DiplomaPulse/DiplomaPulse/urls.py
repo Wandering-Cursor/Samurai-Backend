@@ -30,10 +30,18 @@ static_patterns = static(
     settings.STATIC_URL,
     document_root=settings.STATIC_ROOT,
 )
+media_patterns = static(
+    settings.MEDIA_URL,
+    document_root=settings.MEDIA_ROOT,
+)
 
-django_patterns = [
-    path("admin/", admin.site.urls),
-] + static_patterns
+django_patterns = (
+    [
+        path("admin/", admin.site.urls),
+    ]
+    + static_patterns
+    + media_patterns
+)
 
 swagger_patterns = [
     path("swagger<format>/", schema_view.without_ui(cache_timeout=0), name="schema-json"),

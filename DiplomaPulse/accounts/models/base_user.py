@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.crypto import get_random_string
 from uuid import uuid4
+from django.contrib.contenttypes.models import ContentType
 
 from .base import BaseModel
 from ..managers import UserManager
@@ -45,3 +46,21 @@ class BaseUser(AbstractUser, BaseModel):
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
     objects: UserManager = UserManager()
+
+    content_type = models.ForeignKey(
+        ContentType,
+        editable=False,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.content_type:
+            self.content_type = ContentType.objects.get_for_model(self.__class__)
+        super().save(*args, **kwargs)
+
+    @property
+    def concrete(self):
+        if self.content_type:
+            return self.content_type.get_object_for_this_type(pk=self.pk)
+        return self

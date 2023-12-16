@@ -5,7 +5,9 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
 from DiplomaPulse.views import PublicApiView
-from accounts.serializers.account.sign_up import BaseUserSerializer, SignUpSerializer
+from accounts.serializers.account.sign_up import SignUpSerializer
+from accounts.serializers.account.base_user import BaseUserShortInfoSerializer
+from accounts.serializers.errors.account.sign_up import SignUpErrorSerializer
 
 
 class SignUpView(PublicApiView):
@@ -18,20 +20,11 @@ class SignUpView(PublicApiView):
         responses={
             status.HTTP_201_CREATED: openapi.Response(
                 description="User was created successfully. Returning some information about the user.",
-                schema=BaseUserSerializer,
+                schema=BaseUserShortInfoSerializer,
             ),
             status.HTTP_404_NOT_FOUND: openapi.Response(
                 description="Invalid registration code was supplied. Could not find a user assigned to it.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        "registration_code": openapi.Schema(
-                            type=openapi.TYPE_STRING,
-                            default="Invalid registration code",
-                            description="Description of the error with the registration code",
-                        )
-                    },
-                ),
+                schema=SignUpErrorSerializer,
             ),
         },
         tags=["account"],

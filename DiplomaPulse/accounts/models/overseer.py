@@ -9,6 +9,4 @@ if TYPE_CHECKING:
 
 
 class Overseer(BaseUser):
-    faculty: "Faculty" = models.ForeignKey(
-        "Faculty", on_delete=models.CASCADE, related_name="overseers"
-    )
+    faculty: "Faculty" = models.ForeignKey("Faculty", on_delete=models.CASCADE, related_name="overseers")

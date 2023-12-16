@@ -14,6 +14,7 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS", default=[], cast=lambda v: [s.strip() fo
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default=[], cast=lambda v: [s.strip() for s in v.split(",")])
 
 STATIC_ROOT = config("STATIC_ROOT", default=f"{BASE_DIR}/staticfiles")
+MEDIA_ROOT = config("MEDIA_ROOT", default=f"{BASE_DIR}/media")
 
 BASE_URL = config("BASE_URL", default="http://localhost:8000")
 
@@ -141,6 +142,7 @@ SWAGGER_SETTINGS = {
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
 STATIC_URL = "static/"
+MEDIA_URL = "media/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
