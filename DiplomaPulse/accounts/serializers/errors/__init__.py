@@ -1,6 +1,5 @@
 from . import account
 
-
 __all__ = [
-    account.__name__,
+	account.__name__,
 ]

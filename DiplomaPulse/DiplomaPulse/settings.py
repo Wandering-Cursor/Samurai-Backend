@@ -9,10 +9,22 @@ SECRET_KEY = config("SECRET_KEY")
 
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default=[], cast=lambda v: [s.strip() for s in v.split(",")])
-CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default=[], cast=lambda v: [s.strip() for s in v.split(",")])
+ALLOWED_HOSTS = config(
+	"ALLOWED_HOSTS",
+	default=[],
+	cast=lambda v: [s.strip() for s in v.split(",")],
+)
+CSRF_TRUSTED_ORIGINS = config(
+	"CSRF_TRUSTED_ORIGINS",
+	default=[],
+	cast=lambda v: [s.strip() for s in v.split(",")],
+)
 
-CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default=[], cast=lambda v: [s.strip() for s in v.split(",")])
+CORS_ALLOWED_ORIGINS = config(
+	"CORS_ALLOWED_ORIGINS",
+	default=[],
+	cast=lambda v: [s.strip() for s in v.split(",")],
+)
 
 STATIC_ROOT = config("STATIC_ROOT", default=f"{BASE_DIR}/staticfiles")
 MEDIA_ROOT = config("MEDIA_ROOT", default=f"{BASE_DIR}/media")
@@ -21,75 +33,75 @@ BASE_URL = config("BASE_URL", default="http://localhost:8000")
 
 
 django_apps = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
+	"django.contrib.admin",
+	"django.contrib.auth",
+	"django.contrib.contenttypes",
+	"django.contrib.sessions",
+	"django.contrib.messages",
+	"django.contrib.staticfiles",
 ]
 external_apps = [
-    "rest_framework",
-    "rest_framework_simplejwt",
-    "drf_yasg",
-    "corsheaders",
+	"rest_framework",
+	"rest_framework_simplejwt",
+	"drf_yasg",
+	"corsheaders",
 ]
 
 internal_apps = [
-    "core",
-    "accounts",
-    "administration",
-    "communication",
-    "students",
+	"core",
+	"accounts",
+	"administration",
+	"communication",
+	"students",
 ]
 
 
 INSTALLED_APPS = django_apps + internal_apps + external_apps
 
 MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware",
+	"django.middleware.security.SecurityMiddleware",
+	"django.contrib.sessions.middleware.SessionMiddleware",
+	"django.middleware.csrf.CsrfViewMiddleware",
+	"django.contrib.auth.middleware.AuthenticationMiddleware",
+	"django.contrib.messages.middleware.MessageMiddleware",
+	"django.middleware.clickjacking.XFrameOptionsMiddleware",
+	"corsheaders.middleware.CorsMiddleware",
+	"django.middleware.common.CommonMiddleware",
 ]
 
 if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
+	CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = "DiplomaPulse.urls"
 
 TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
+	{
+		"BACKEND": "django.template.backends.django.DjangoTemplates",
+		"DIRS": [],
+		"APP_DIRS": True,
+		"OPTIONS": {
+			"context_processors": [
+				"django.template.context_processors.debug",
+				"django.template.context_processors.request",
+				"django.contrib.auth.context_processors.auth",
+				"django.contrib.messages.context_processors.messages",
+			],
+		},
+	},
 ]
 
 WSGI_APPLICATION = "DiplomaPulse.wsgi.application"
 
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD", default=""),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT"),
-    }
+	"default": {
+		"ENGINE": "django.db.backends.postgresql",
+		"NAME": config("DB_NAME"),
+		"USER": config("DB_USER"),
+		"PASSWORD": config("DB_PASSWORD", default=""),
+		"HOST": config("DB_HOST"),
+		"PORT": config("DB_PORT"),
+	}
 }
 
 CELERY_BROKER_URL = config("CELERY_BROKER_URL")
@@ -97,18 +109,18 @@ CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND")
 
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+	{
+		"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+	},
+	{
+		"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+	},
+	{
+		"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+	},
+	{
+		"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+	},
 ]
 
 
@@ -127,16 +139,18 @@ USE_TZ = True
 # Django REST Framework
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
+	"DEFAULT_AUTHENTICATION_CLASSES": (
+		"rest_framework_simplejwt.authentication.JWTAuthentication",
+	),
 }
 
 # Swagger (drf_yasg) settings
 
 SWAGGER_SETTINGS = {
-    "USE_SESSION_AUTH": False,
-    "SECURITY_DEFINITIONS": {
-        "Token": {"type": "apiKey", "name": "Authorization", "in": "header"},
-    },
+	"USE_SESSION_AUTH": False,
+	"SECURITY_DEFINITIONS": {
+		"Token": {"type": "apiKey", "name": "Authorization", "in": "header"},
+	},
 }
 
 # Static files (CSS, JavaScript, Images)
