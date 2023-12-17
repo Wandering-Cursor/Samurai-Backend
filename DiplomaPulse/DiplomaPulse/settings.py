@@ -153,6 +153,41 @@ SWAGGER_SETTINGS = {
 	},
 }
 
+LOGGING = {
+	"version": 1,
+	"disable_existing_loggers": False,
+	"formatters": {
+		"app": {
+			"format": "%(asctime)s [%(levelname)-8s] (%(module)s.%(funcName)s) %(message)s",
+			"datefmt": "%Y-%m-%d %H:%M:%S",
+		},
+	},
+	"handlers": {
+		"default": {
+			"level": "INFO",
+			"class": "logging.handlers.RotatingFileHandler",
+			"filename": "/var/log/django.log",
+			"formatter": "app",
+			"maxBytes": 1024 * 1024 * 10,
+			"backupCount": 10,
+		},
+		"request_handler": {
+			"level": "INFO",
+			"class": "logging.handlers.RotatingFileHandler",
+			"filename": "/var/log/django_request.log",
+			"formatter": "app",
+			"maxBytes": 1024 * 1024 * 10,
+			"backupCount": 10,
+		},
+	},
+	"loggers": {
+		"django": {"handlers": ["default"], "level": "INFO", "propagate": True},
+		"django.request": {"handlers": ["request_handler"], "level": "DEBUG", "propagate": True},
+	},
+	"root": {"level": "INFO", "handlers": ["default"]},
+}
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
