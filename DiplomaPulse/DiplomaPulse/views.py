@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -20,4 +22,5 @@ class PublicApiView(BaseApiView):
 
 class MainPageView(PublicApiView):
 	def get(self, request):
+		logging.info("Main Page was called")
 		return Response({"text": "Hello, world!"})
