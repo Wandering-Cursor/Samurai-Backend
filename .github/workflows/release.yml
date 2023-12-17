@@ -15,16 +15,16 @@ jobs:
                 include:
                     -
                         dockerfile: backend.dockerfile
-                        tag: ghcr.io/Wandering-Cursor/samurai-backend
+                        tag: ghcr.io/wandering-cursor/samurai-backend
                     -
                         dockerfile: beat.dockerfile
-                        tag: ghcr.io/Wandering-Cursor/samurai-beat
+                        tag: ghcr.io/wandering-cursor/samurai-beat
                     -
                         dockerfile: worker.dockerfile
-                        tag: ghcr.io/Wandering-Cursor/samurai-worker
+                        tag: ghcr.io/wandering-cursor/samurai-worker
                     -
                         dockerfile: nginx.dockerfile
-                        tag: ghcr.io/Wandering-Cursor/samurai-nginx
+                        tag: ghcr.io/wandering-cursor/samurai-nginx
         steps:
             -
                 name: Checkout
