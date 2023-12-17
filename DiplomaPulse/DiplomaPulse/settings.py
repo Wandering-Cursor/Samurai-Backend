@@ -166,7 +166,7 @@ LOGGING = {
 		"default": {
 			"level": "INFO",
 			"class": "logging.handlers.RotatingFileHandler",
-			"filename": "/var/log/django.log",
+			"filename": "/logs/django.log",
 			"formatter": "app",
 			"maxBytes": 1024 * 1024 * 10,
 			"backupCount": 10,
@@ -174,7 +174,7 @@ LOGGING = {
 		"request_handler": {
 			"level": "INFO",
 			"class": "logging.handlers.RotatingFileHandler",
-			"filename": "/var/log/django_request.log",
+			"filename": "/logs/django_request.log",
 			"formatter": "app",
 			"maxBytes": 1024 * 1024 * 10,
 			"backupCount": 10,
