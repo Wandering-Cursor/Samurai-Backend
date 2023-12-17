@@ -1,6 +1,9 @@
 #!/bin/bash
 set -x  # Enable debugging output
 set -e  # Stop if any error occurs
+
+mkdir -p /logs
+
 cd DiplomaPulse
 
 echo "Starting backend server..."
