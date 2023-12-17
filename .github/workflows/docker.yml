@@ -1,8 +1,10 @@
 name: Run Docker Compose
 on:
-  push:
-    branches:
-    - main
+  workflow_run:
+    workflows: ["Create Docker Image for release"]
+    types:
+      - completed
+  workflow_dispatch:
 
 jobs:
   docker:

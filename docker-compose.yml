@@ -9,6 +9,9 @@ services:
       - type: bind
         source: ./
         target: /app
+      - type: bind
+        source: /var/log/
+        target: /var/log/
     ports:
       - "8000:8000" # HTTP requests
       - "8001:8001" # Websocket requests
@@ -38,6 +41,9 @@ services:
       - type: bind
         source: ./
         target: /app
+      - type: bind
+        source: /var/log/
+        target: /var/log/
     depends_on:
       - db
       - redis
@@ -50,6 +56,9 @@ services:
       - type: bind
         source: ./
         target: /app
+      - type: bind
+        source: /var/log/
+        target: /var/log/
     depends_on:
       - db
       - redis
