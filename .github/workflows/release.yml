@@ -40,10 +40,10 @@ jobs:
                     username: ${{ github.actor }}
                     password: ${{ secrets.GITHUB_TOKEN }}
             -
-                name: Create secret files
+                name: Create secret files (Empty for now. Relace with real ones in production)
                 run: |
-                    echo "${{ secrets.ENV_FILE }}" > .env
-                    echo "${{ secrets.NGINX_FILE }}" > nginx.conf
+                    echo "" > .env
+                    echo "" > nginx.conf
             -
                 name: Build and push the images
                 uses: docker/build-push-action@v4
