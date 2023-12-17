@@ -32,25 +32,7 @@ cd *Repository Name*
 touch .env
 ```
 
-4. Fill the file with the following variables
-```bash
-SECRET_KEY=*secret key*
-DEBUG=*debug mode*
-ALLOWED_HOSTS=*allowed hosts*
-DB_NAME=*database name*
-DB_USER=*database user*
-DB_PASSWORD=*database password*
-DB_HOST=db
-DB_PORT=5432
-REDIS_HOST=redis
-REDIS_PORT=6379
-EMAIL_HOST=*email host*
-EMAIL_PORT=*email port*
-EMAIL_HOST_USER=*email host user*
-EMAIL_HOST_PASSWORD=*email host password*
-EMAIL_USE_TLS=*email use tls*
-EMAIL_USE_SSL=*email use ssl*
-```
+4. Fill the file according to the example.env file
 
 5. Run the project
 ```bash
