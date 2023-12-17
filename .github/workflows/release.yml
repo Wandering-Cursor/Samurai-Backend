@@ -8,6 +8,9 @@ on:
 jobs:
     build:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
         # Setup matrix for dockerfiles
         strategy:
             fail-fast: false
@@ -36,6 +39,11 @@ jobs:
                     registry: ghcr.io
                     username: ${{ github.actor }}
                     password: ${{ secrets.GITHUB_TOKEN }}
+            -
+                name: Create secret files
+                run: |
+                    echo "${{ secrets.ENV_FILE }}" > .env
+                    echo "${{ secrets.NGINX_FILE }}" > nginx.conf
             -
                 name: Build and push the images
                 uses: docker/build-push-action@v4
