@@ -1,13 +1,17 @@
 from rest_framework import serializers
 
+from ...enums import AccountTypeEnum
 from ...models import BaseUser, Faculty, Group, Overseer, Student, Teacher
 
 
 class BaseUserInfoSerializer(serializers.ModelSerializer):
+	account_type = serializers.CharField(default=AccountTypeEnum.BASE.value, read_only=True)
+
 	class Meta:
 		model = BaseUser
 		fields = [
 			"id",
+			"account_type",
 			"email",
 			"first_name",
 			"last_name",
@@ -41,6 +45,7 @@ class GroupInfoSerializer(serializers.ModelSerializer):
 
 
 class StudentInfoSerializer(BaseUserInfoSerializer):
+	account_type = serializers.CharField(default=AccountTypeEnum.STUDENT.value, read_only=True)
 	group = GroupInfoSerializer(read_only=True)
 
 	class Meta(BaseUserInfoSerializer.Meta):
@@ -52,6 +57,8 @@ class StudentInfoSerializer(BaseUserInfoSerializer):
 
 
 class TeacherInfoSerializer(BaseUserInfoSerializer):
+	account_type = serializers.CharField(default=AccountTypeEnum.TEACHER.value, read_only=True)
+
 	class Meta(BaseUserInfoSerializer.Meta):
 		model = Teacher
 		fields = BaseUserInfoSerializer.Meta.fields + [
@@ -62,6 +69,8 @@ class TeacherInfoSerializer(BaseUserInfoSerializer):
 
 
 class OverseerInfoSerializer(BaseUserInfoSerializer):
+	account_type = serializers.CharField(default=AccountTypeEnum.OVERSEER.value, read_only=True)
+
 	class Meta(BaseUserInfoSerializer.Meta):
 		model = Overseer
 		fields = BaseUserInfoSerializer.Meta.fields + [
