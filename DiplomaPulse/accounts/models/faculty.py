@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from django.db import models
 
-from .base import BaseModel
+from ._base import BaseModel
 
 if TYPE_CHECKING:
 	from .group import Group
