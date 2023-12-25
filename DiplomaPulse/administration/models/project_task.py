@@ -8,8 +8,18 @@ from ._base import BaseModel
 class Task(BaseModel):
 	id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
 	order = models.PositiveIntegerField()
-	name = models.CharField(max_length=255)
-	description = models.TextField()
+	name = models.CharField(
+		max_length=255,
+		help_text="Внутрішня назва, її бачать лише адміністратори",
+	)
+	public_name = models.CharField(
+		max_length=255,
+		default="Назва завдання",
+		help_text="Назва, яку бачать користувачі",
+	)
+	description = models.TextField(
+		help_text="Опис завдання, який бачать користувачі",
+	)
 	reviewer = models.ForeignKey(
 		"accounts.Teacher",
 		on_delete=models.SET_NULL,
@@ -20,7 +30,7 @@ class Task(BaseModel):
 	due_date = models.DateTimeField(null=True, blank=True)
 
 	def __str__(self):
-		return self.name
+		return f"Task: {self.name} Ord.#{self.order}"
 
 	class Meta:
 		verbose_name = "Task"
