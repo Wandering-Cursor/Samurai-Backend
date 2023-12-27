@@ -32,7 +32,12 @@ MEDIA_ROOT = config("MEDIA_ROOT", default=f"{BASE_DIR}/media")
 BASE_URL = config("BASE_URL", default="http://localhost:8000")
 
 
+# As required by https://django-autocomplete-light.readthedocs.io/en/master/install.html#configuration
+# dal and dal_select2 is placed before django.contrib.admin
+
 django_apps = [
+	"dal",
+	"dal_select2",
 	"django.contrib.admin",
 	"django.contrib.auth",
 	"django.contrib.contenttypes",

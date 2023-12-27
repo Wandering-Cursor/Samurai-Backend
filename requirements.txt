@@ -12,3 +12,4 @@ gunicorn==21.2.0
 djangorestframework-simplejwt[crypto]==5.3.1
 django-cors-headers==4.3.1
 pydantic==2.5.2
+django-autocomplete-light==3.9.7
