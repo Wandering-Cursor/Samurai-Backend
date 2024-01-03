@@ -68,6 +68,19 @@ class TeacherInfoSerializer(BaseUserInfoSerializer):
 		read_only_fields = fields
 
 
+class ShortTeacherInfoSerializer(TeacherInfoSerializer):
+	class Meta:
+		model = Teacher
+		fields = [
+			"id",
+			"first_name",
+			"last_name",
+			"middle_name",
+			"profile_picture",
+		]
+		read_only_fields = fields
+
+
 class OverseerInfoSerializer(BaseUserInfoSerializer):
 	account_type = serializers.CharField(default=AccountTypeEnum.OVERSEER.value, read_only=True)
 
