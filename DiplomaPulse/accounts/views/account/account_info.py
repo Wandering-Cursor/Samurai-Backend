@@ -10,11 +10,13 @@ from DiplomaPulse.views import AuthenticatedApiView
 
 class AccountInfoView(AuthenticatedApiView):
 	@swagger_auto_schema(
-		operation_summary="Get information about the current user",
+		operation_summary="Get information about the user",
 		operation_description=(
-			"This endpoint will return information about the current user. "
-			"Call it with a valid JWT token in the header."
+			"This endpoint will return information about the user. "
+			"Call it with a valid JWT token in the header. "
+			"If you pass the account_id parameter - it will try to fetch data for that user"
 		),
+		query_serializer=AccountInfoSerializer,
 		responses={
 			status.HTTP_200_OK: openapi.Response(
 				description=(
@@ -43,5 +45,9 @@ class AccountInfoView(AuthenticatedApiView):
 		tags=["account"],
 	)
 	def get(self, request: Request) -> Response:
-		serializer = AccountInfoSerializer(request.user)
+		serializer = AccountInfoSerializer(
+			instance=request.user,
+			data=request.query_params,
+		)
+		serializer.is_valid(raise_exception=True)
 		return Response(serializer.data, status=status.HTTP_200_OK)

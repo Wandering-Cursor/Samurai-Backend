@@ -168,6 +168,11 @@ LOGGING = {
 		},
 	},
 	"handlers": {
+		"console": {
+			"level": "DEBUG",
+			"class": "logging.StreamHandler",
+			"formatter": "app",
+		},
 		"default": {
 			"level": "INFO",
 			"class": "logging.handlers.RotatingFileHandler",

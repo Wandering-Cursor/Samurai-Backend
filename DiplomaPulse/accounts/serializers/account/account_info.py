@@ -100,6 +100,24 @@ class AllUsersInfoSerializer(serializers.Serializer):
 
 
 class AccountInfoSerializer(serializers.Serializer):
+	account_id = serializers.UUIDField(required=False)
+
+	def validate(self, attrs):
+		attrs = super().validate(attrs)
+
+		if account_id := attrs.get("account_id"):
+			user_entity = BaseUser.objects.filter(id=account_id).first()
+			if not user_entity:
+				raise serializers.ValidationError(
+					{
+						"account_id": "User not found",
+					},
+					code=404,
+				)
+			self.instance = user_entity
+
+		return attrs
+
 	def to_representation(self, instance: BaseUser):
 		concrete_instance = instance.concrete
 		concrete_type = type(concrete_instance)

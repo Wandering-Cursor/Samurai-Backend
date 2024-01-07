@@ -5,6 +5,7 @@ from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
+from rest_framework_simplejwt import authentication
 
 from .views import MainPageView
 
@@ -18,6 +19,7 @@ schema_view = get_schema_view(
 		license=openapi.License(name="MIT License"),
 	),
 	public=True,
+	authentication_classes=(authentication.JWTAuthentication,),
 	permission_classes=(permissions.AllowAny,),
 	url=settings.BASE_URL,
 )
