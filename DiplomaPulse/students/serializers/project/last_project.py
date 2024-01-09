@@ -1,11 +1,11 @@
 from typing import TypedDict
 from uuid import UUID
 
-from rest_framework import serializers
-
 from accounts.models import Student
 from accounts.serializers.account.account_info import ShortTeacherInfoSerializer
+from core.serializers.models import ModelWithUUID
 from students.models import UserProject
+from students.serializers.base import AccountSerializerMixIn
 
 
 class ValidatedData(TypedDict):
@@ -13,12 +13,13 @@ class ValidatedData(TypedDict):
 	student: Student
 
 
-class UserProjectSerializer(serializers.ModelSerializer):
+class UserProjectSerializer(ModelWithUUID):
 	supervisor = ShortTeacherInfoSerializer()
 
 	class Meta:
 		model = UserProject
 		fields = [
+			"id",
 			"theme",
 			"description",
 			"supervisor",
@@ -26,23 +27,11 @@ class UserProjectSerializer(serializers.ModelSerializer):
 		read_only_fields = fields
 
 
-class LastProjectSerializer(serializers.Serializer):
-	account_uuid = serializers.UUIDField(required=True)
-	student_entity: Student = None
-
-	def validate_account_uuid(self, value):
-		student = Student.objects.filter(id=value).first()
-		if not student:
-			raise serializers.ValidationError("Student not found")
-
-		self.student_entity = student
-
-		return value
-
+class LastProjectSerializer(AccountSerializerMixIn):
 	def validate(self, attrs):
 		attrs = super().validate(attrs)
 
-		self.validate_account_uuid(attrs["account_uuid"])
+		# self.validate_account_uuid(attrs["account_uuid"])
 
 		attrs["student"] = self.student_entity
 

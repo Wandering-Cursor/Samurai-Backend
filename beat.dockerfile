@@ -18,4 +18,6 @@ RUN --mount=type=cache,target=/root/.cache \
 
 COPY . /app/
 
+RUN chmod +x /app/*.sh /app/entrypoints/*sh
+
 ENTRYPOINT [ "bash", "/app/entrypoints/beat.sh" ]

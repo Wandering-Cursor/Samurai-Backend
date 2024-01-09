@@ -8,5 +8,9 @@ class BaseModel(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 
+	@property
+	def get_id(self):
+		return self.id
+
 	class Meta:
 		abstract = True

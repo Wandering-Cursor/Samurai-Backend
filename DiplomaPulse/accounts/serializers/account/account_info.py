@@ -1,10 +1,12 @@
 from rest_framework import serializers
 
+from core.serializers.models import ModelWithUUID
+
 from ...enums import AccountTypeEnum
 from ...models import BaseUser, Faculty, Group, Overseer, Student, Teacher
 
 
-class BaseUserInfoSerializer(serializers.ModelSerializer):
+class BaseUserInfoSerializer(ModelWithUUID):
 	account_type = serializers.CharField(default=AccountTypeEnum.BASE.value, read_only=True)
 
 	class Meta:
