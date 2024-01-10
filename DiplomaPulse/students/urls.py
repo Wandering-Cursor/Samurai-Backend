@@ -15,7 +15,17 @@ tasks_patterns = [
 		"tasks/overview",
 		views.tasks.tasks_overview.GetTasksOverview.as_view(),
 		name="get_tasks_overview",
-	)
+	),
+	path(
+		"tasks/list",
+		views.tasks.tasks_list.GetTasksList.as_view(),
+		name="get_tasks_list",
+	),
+	path(
+		"tasks/task",
+		views.tasks.task_details.GetTaskDetails.as_view(),
+		name="get_task_details",
+	),
 ]
 
 urlpatterns = project_patterns + tasks_patterns

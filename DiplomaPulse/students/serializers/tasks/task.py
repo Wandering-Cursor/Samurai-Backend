@@ -4,7 +4,7 @@ from students.models import UserTask
 
 
 class TaskSerializer(ModelWithUUID):
-	reviewer = ShortTeacherInfoSerializer()
+	reviewer = ShortTeacherInfoSerializer(allow_null=True)
 
 	class Meta:
 		model = UserTask
