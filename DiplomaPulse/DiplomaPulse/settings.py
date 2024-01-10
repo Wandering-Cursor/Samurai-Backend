@@ -192,7 +192,7 @@ LOGGING = {
 	},
 	"loggers": {
 		"django": {"handlers": ["default"], "level": "INFO", "propagate": True},
-		"django.request": {"handlers": ["request_handler"], "level": "DEBUG", "propagate": True},
+		"django.request": {"handlers": ["request_handler"], "level": "INFO", "propagate": True},
 	},
 	"root": {"level": "INFO", "handlers": ["default"]},
 }

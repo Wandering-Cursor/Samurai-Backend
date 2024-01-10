@@ -1,7 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.db import models
 
 from ..choices import TaskState
 from ._base import BaseModel
+
+if TYPE_CHECKING:
+	from .project import UserProject
 
 
 class UserTask(BaseModel):
@@ -33,6 +40,8 @@ class UserTask(BaseModel):
 		related_name="comments",
 		blank=True,
 	)
+
+	user_projects: models.ManyToManyField[UserProject]
 
 	class Meta:
 		ordering = ["order"]

@@ -18,6 +18,8 @@ RUN --mount=type=cache,target=/root/.cache \
 
 COPY . /app/
 
+RUN chmod +x /app/*.sh /app/entrypoints/*sh
+
 EXPOSE 8000
 
 ENTRYPOINT [ "bash", "/app/entrypoints/backend.sh" ]

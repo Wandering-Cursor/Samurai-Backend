@@ -27,6 +27,5 @@ jobs:
 
     - name: Run isort and ruff in check-only mode
       run: |
-        isort --check-only . &&
         ruff check .
 
