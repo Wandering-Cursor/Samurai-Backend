@@ -31,8 +31,6 @@ class LastProjectSerializer(AccountSerializerMixIn):
 	def validate(self, attrs):
 		attrs = super().validate(attrs)
 
-		# self.validate_account_uuid(attrs["account_uuid"])
-
 		attrs["student"] = self.student_entity
 
 		return attrs
