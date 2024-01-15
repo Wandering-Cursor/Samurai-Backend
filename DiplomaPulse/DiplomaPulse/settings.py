@@ -72,6 +72,7 @@ MIDDLEWARE = [
 	"django.middleware.clickjacking.XFrameOptionsMiddleware",
 	"corsheaders.middleware.CorsMiddleware",
 	"django.middleware.common.CommonMiddleware",
+	"django.middleware.locale.LocaleMiddleware",
 ]
 
 if DEBUG:
@@ -139,6 +140,8 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+
+LOCALE_PATHS = [f"{BASE_DIR}/locale"]
 
 
 # Django REST Framework

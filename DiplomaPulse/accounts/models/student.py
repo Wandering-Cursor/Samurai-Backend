@@ -16,6 +16,7 @@ class Student(BaseUser):
 		"Group",
 		on_delete=models.CASCADE,
 		related_name="students",
+		verbose_name=_("related group"),
 	)
 
 	class Meta:

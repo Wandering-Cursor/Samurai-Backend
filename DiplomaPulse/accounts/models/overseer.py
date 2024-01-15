@@ -16,6 +16,7 @@ class Overseer(BaseUser):
 		"Faculty",
 		on_delete=models.CASCADE,
 		related_name="overseers",
+		verbose_name=_("related faculty"),
 	)
 
 	class Meta:

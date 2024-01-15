@@ -11,6 +11,7 @@ echo "Starting backend server..."
 python manage.py makemigrations
 python manage.py migrate
 python manage.py collectstatic --noinput
+python manage.py add_admin_user
 
 USE_GUNICORN=$(grep -oP '(?<=USE_GUNICORN=).*' ../.env | tr -d '\r')
 

@@ -15,8 +15,13 @@ class Teacher(BaseUser):
 	faculties: models.QuerySet[Faculty] = models.ManyToManyField(
 		"Faculty",
 		related_name="teachers",
+		verbose_name=_("related faculties"),
 	)
-	contact_information = models.TextField(blank=True, null=True)
+	contact_information = models.TextField(
+		blank=True,
+		null=True,
+		verbose_name=_("contact information"),
+	)
 
 	class Meta:
 		verbose_name = _("Teacher")
