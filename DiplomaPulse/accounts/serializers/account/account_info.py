@@ -71,6 +71,9 @@ class TeacherInfoSerializer(BaseUserInfoSerializer):
 
 
 class ShortTeacherInfoSerializer(TeacherInfoSerializer):
+	first_name = serializers.CharField()
+	last_name = serializers.CharField()
+
 	class Meta:
 		model = Teacher
 		fields = [
