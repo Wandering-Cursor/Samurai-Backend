@@ -14,7 +14,7 @@ class TaskListInputSerializer(serializers.Serializer):
 
 
 class TasksListOutputSerializer(serializers.Serializer):
-	pages = serializers.IntegerField(min_value=0)
+	pages = serializers.IntegerField(min_value=1)
 	data = TaskSerializer(many=True)
 
 
