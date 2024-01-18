@@ -11,6 +11,16 @@ jobs:
     runs-on: self-hosted
 
     steps:
+
+    - name: Fetch new images (nginx)
+      run: docker pull ghcr.io/wandering-cursor/samurai-nginx:latest
+    - name: Fetch new images (worker)
+      run: docker pull ghcr.io/wandering-cursor/samurai-worker:latest
+    - name: Fetch new images (backend)
+      run: docker pull ghcr.io/wandering-cursor/samurai-backend:latest
+    - name: Fetch new images (beat)
+      run: docker pull ghcr.io/wandering-cursor/samurai-beat:latest
+
     - name: Stop containers
       run: docker compose -f "docker-compose.yml" down
 
@@ -23,9 +33,6 @@ jobs:
       run: |
         echo "${{ secrets.ENV_FILE }}" > .env
         echo "${{ secrets.NGINX_FILE }}" > nginx.conf
-    
-    - name: List files
-      run: ls -la
 
     - name: Start containers
       run: docker compose -f "docker-compose.yml" up -d --build
