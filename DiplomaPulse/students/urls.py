@@ -26,6 +26,11 @@ tasks_patterns = [
 		views.tasks.task_details.GetTaskDetails.as_view(),
 		name="get_task_details",
 	),
+	path(
+		"tasks/move_task",
+		views.tasks.task_update.UpdateTask.as_view(),
+		name="update_task_state",
+	),
 ]
 
 urlpatterns = project_patterns + tasks_patterns
