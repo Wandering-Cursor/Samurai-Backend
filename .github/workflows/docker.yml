@@ -12,6 +12,8 @@ jobs:
 
     steps:
 
+    - name: Log In
+      run: echo "${{ secrets.PACKAGES_PAT }}" | docker login ghcr.io -u Wandering-Cursor --password-stdin
     - name: Fetch new images (nginx)
       run: docker pull ghcr.io/wandering-cursor/samurai-nginx:latest
     - name: Fetch new images (worker)
