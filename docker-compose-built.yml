@@ -1,0 +1,82 @@
+version: '3.7'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: backend.dockerfile
+    volumes:
+      - type: bind
+        source: ./
+        target: /app
+      - type: bind
+        source: /logs
+        target: /logs
+    ports:
+      - "8000:8000" # HTTP requests
+      - "8001:8001" # Websocket requests
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgresData:/var/lib/postgresql/data
+
+  redis:
+    image: "redis:latest"
+    volumes:
+      - redisData:/data
+
+  worker:
+    build:
+      context: .
+      dockerfile: worker.dockerfile
+    volumes:
+      - type: bind
+        source: ./
+        target: /app
+      - type: bind
+        source: /logs
+        target: /logs
+    depends_on:
+      - db
+      - redis
+  
+  beat:
+    build:
+      context: .
+      dockerfile: beat.dockerfile
+    volumes:
+      - type: bind
+        source: ./
+        target: /app
+      - type: bind
+        source: /logs
+        target: /logs
+    depends_on:
+      - db
+      - redis
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx.dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /logs:/logs
+
+volumes:
+  postgresData:
+
+  redisData:
