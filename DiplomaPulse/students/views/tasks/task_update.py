@@ -16,7 +16,7 @@ class UpdateTask(StudentView):
 	serializer_class = UpdateTaskSerializer
 
 	@swagger_auto_schema(
-		operation_summary="Returns details about the task",
+		operation_summary="Allows to change status of a task (as a Student)",
 		request_body=UpdateTaskInputSerializer,
 		responses={
 			status.HTTP_200_OK: TaskSerializer,
