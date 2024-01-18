@@ -24,7 +24,7 @@ jobs:
       run: docker pull ghcr.io/wandering-cursor/samurai-beat:latest
 
     - name: Stop containers
-      run: docker compose -f "docker-compose.yml" down
+      run: docker compose -f "docker-compose-built.yml" down
 
     - name: Checkout
       uses: actions/checkout@v4
