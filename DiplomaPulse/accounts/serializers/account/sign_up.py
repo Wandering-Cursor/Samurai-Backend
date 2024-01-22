@@ -1,10 +1,10 @@
-import logging
 from typing import TypedDict
 
 from django.db import transaction
 from rest_framework import serializers
 
 from accounts.models.base_user import BaseUser
+from DiplomaPulse.logger import main_logger
 
 from ..errors.account.sign_up import RegistrationCodeNotFound
 from .base_user import BaseUserShortInfoSerializer
@@ -51,7 +51,7 @@ class SignUpSerializer(serializers.Serializer):
 			# Safety precaution
 			# We do not want to let anyone know that this email is already in use
 			# So we just return the same response as if the user was created
-			logging.warn("User with this email already exists")
+			main_logger.warn("User with this email already exists")
 			user_entity = user_with_email
 		else:
 			# We generate default email, but we need to set it to an actual one
@@ -61,7 +61,7 @@ class SignUpSerializer(serializers.Serializer):
 			user_entity.registration_code = None
 
 			user_entity.save()
-			logging.info(f"User was created successfully - {user_entity}")
+			main_logger.info(f"User was created successfully - {user_entity}")
 
 		result = user_entity
 		if return_representation:

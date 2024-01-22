@@ -1,5 +1,3 @@
-import logging
-
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers, status
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -23,5 +21,4 @@ class DecoratedTokenRefreshView(TokenRefreshView):
 		tags=["token"],
 	)
 	def post(self, request, *args, **kwargs):
-		logging.warning("Refreshing token")
 		return super().post(request, *args, **kwargs)

@@ -6,8 +6,18 @@ from ._base import BaseModel
 
 
 class Comment(BaseModel):
-	file = models.FileField(upload_to="comments", blank=True, null=True, verbose_name=_("file"))
-	text = models.TextField(default="", blank=True, verbose_name=_("text content"))
+	file = models.FileField(
+		upload_to="comments",
+		blank=True,
+		null=True,
+		verbose_name=_("file"),
+	)
+	text = models.TextField(
+		default="",
+		blank=True,
+		null=True,
+		verbose_name=_("text content"),
+	)
 
 	author = models.ForeignKey(
 		"accounts.BaseUser",
@@ -21,6 +31,8 @@ class Comment(BaseModel):
 
 		if not self.text and not self.file:
 			raise ValidationError("Comment should have either text or file")
+		if self.text and self.file:
+			raise ValidationError("Comments cannot have text AND file fields")
 
 	class Meta:
 		verbose_name = _("Comment")

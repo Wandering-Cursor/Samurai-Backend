@@ -33,4 +33,12 @@ tasks_patterns = [
 	),
 ]
 
-urlpatterns = project_patterns + tasks_patterns
+comments_patterns = [
+	path(
+		"comments/add",
+		views.comments.new_comment.AddCommentView.as_view(),
+		name="add_comment",
+	)
+]
+
+urlpatterns = project_patterns + tasks_patterns + comments_patterns
