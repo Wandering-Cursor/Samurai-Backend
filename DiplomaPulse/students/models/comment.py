@@ -40,4 +40,4 @@ class Comment(BaseModel):
 		ordering = ["-created_at"]
 
 	def __str__(self):
-		return f"Comment by {self.author}: '{self.text[:20]}...' at {self.created_at} "
+		return f"Comment by {self.author}: '{str(self.text)[:20]}...' at {self.created_at} "

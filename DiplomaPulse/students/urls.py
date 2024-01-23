@@ -38,7 +38,12 @@ comments_patterns = [
 		"comments/add",
 		views.comments.new_comment.AddCommentView.as_view(),
 		name="add_comment",
-	)
+	),
+	path(
+		"comments/list",
+		views.comments.list_comments.ListCommentsView.as_view(),
+		name="list_comments",
+	),
 ]
 
 urlpatterns = project_patterns + tasks_patterns + comments_patterns

@@ -1,3 +1,4 @@
+from django.core.files.base import ContentFile
 from django.db.models import TextChoices
 from django.db.transaction import atomic
 from django.utils.crypto import get_random_string
@@ -78,15 +79,23 @@ class AddCommentSerializer(AccountSerializerMixIn, NewCommentInputSerializer, Ta
 
 	def create(self, validated_data) -> Comment:
 		with atomic():
-			from django.core.files.base import ContentFile
+			file = None
+			if file_content := validated_data.get("file_content", None):
+				file_name = validated_data.get("file_name")
+				file_name = f"{get_random_string(length=12)}_{file_name}"
+
+				file = ContentFile(
+					content=file_content,
+					name=file_name,
+				)
 
 			comment = Comment.objects.create(
-				file=ContentFile(
-					content=validated_data.get("file_content", None),
-					name=f"{get_random_string(length=12)}_{validated_data.get('file_name', None)}",
-				),
+				file=file,
 				text=validated_data.get("text", None),
 				author=self.student_entity,
 			)
+
+			self.task.comments.add(comment)
+			self.task.save()
 
 			return comment

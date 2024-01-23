@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import os
+from typing import TYPE_CHECKING
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import default_storage
@@ -7,6 +10,9 @@ from rest_framework import serializers
 
 from accounts.serializers.account.account_info import ShortTeacherInfoSerializer
 from students.models.comment import Comment
+
+if TYPE_CHECKING:
+	from django.db.models.fields.files import FieldFile
 
 
 class FileDetailsSerializer(serializers.Serializer):
@@ -50,9 +56,15 @@ class FileDetailsSerializer(serializers.Serializer):
 		return None
 
 
-class FileRepresentationField(serializers.FileField):
-	def to_representation(self, value) -> FileDetailsSerializer:
-		return FileDetailsSerializer(value).data
+class FileRepresentationField(serializers.DictField):
+	def to_representation(self, value: FieldFile | dict) -> FileDetailsSerializer | None:
+		# When calling the second time (for some reason) - we get a dict
+		if isinstance(value, dict):
+			return value
+
+		elif value.name:
+			return FileDetailsSerializer(value).data
+		return None
 
 	class Meta:
 		swagger_schema_fields = {
@@ -76,7 +88,7 @@ class FileRepresentationField(serializers.FileField):
 
 class CommentSerializer(serializers.ModelSerializer):
 	author = ShortTeacherInfoSerializer()
-	file = FileRepresentationField()
+	file = FileRepresentationField(allow_null=True)
 
 	class Meta:
 		model = Comment
