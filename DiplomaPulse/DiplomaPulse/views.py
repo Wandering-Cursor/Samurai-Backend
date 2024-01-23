@@ -1,8 +1,8 @@
-import logging
-
+from django.http import HttpResponseRedirect
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from DiplomaPulse.logger import main_logger
 
 
 class BaseApiView(APIView):
@@ -22,5 +22,5 @@ class PublicApiView(BaseApiView):
 
 class MainPageView(PublicApiView):
 	def get(self, request):
-		logging.info("Main Page was called")
-		return Response({"text": "Hello, world!"})
+		main_logger.info("Attempt of accessing the main page")
+		return HttpResponseRedirect("/swagger/")
