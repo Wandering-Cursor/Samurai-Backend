@@ -44,6 +44,11 @@ comments_patterns = [
 		views.comments.list_comments.ListCommentsView.as_view(),
 		name="list_comments",
 	),
+	path(
+		"comments/delete",
+		views.comments.delete_comment.DeleteCommentView.as_view(),
+		name="delete_comment",
+	),
 ]
 
 urlpatterns = project_patterns + tasks_patterns + comments_patterns

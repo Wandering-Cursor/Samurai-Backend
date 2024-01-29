@@ -6,9 +6,10 @@ from typing import TYPE_CHECKING
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import default_storage
 from drf_yasg import openapi
-from rest_framework import serializers
+from rest_framework import serializers, status
 
 from accounts.serializers.account.account_info import ShortTeacherInfoSerializer
+from core.serializers.models import ModelWithUUID
 from students.models.comment import Comment
 
 if TYPE_CHECKING:
@@ -86,10 +87,41 @@ class FileRepresentationField(serializers.DictField):
 		}
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentSerializer(ModelWithUUID):
 	author = ShortTeacherInfoSerializer()
 	file = FileRepresentationField(allow_null=True)
 
 	class Meta:
 		model = Comment
 		fields = "__all__"
+
+
+class CommentNotFound(serializers.Serializer):
+	error = serializers.CharField(default="COMMENT_NOT_FOUND")
+	details = serializers.CharField(default="Comment with specified comment_id is not found")
+	code = serializers.IntegerField(default=status.HTTP_404_NOT_FOUND)
+
+
+class CommentFinderMixin:
+	"""All serializers using this Mixin must have a property `student_entity`"""
+
+	comment: Comment = None
+
+	def validate_comment_id(self, comment_id):
+		comment_not_found = Exception(
+			CommentNotFound(
+				data={
+					"details": f"Comment not found with {comment_id=}",
+				}
+			)
+		)
+
+		qs = Comment.objects.all()
+		qs = Comment.objects.filter(id=comment_id, author=self.student_entity)
+		comment = qs.first()
+		if not comment:
+			raise comment_not_found
+
+		self.comment = comment
+
+		return comment.id

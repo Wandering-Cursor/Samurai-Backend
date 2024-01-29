@@ -166,6 +166,11 @@ SWAGGER_SETTINGS = {
 	},
 }
 
+if DEBUG:
+	BASE_LOGS_DIR = config("BASE_LOGS_DIR", default=f"{BASE_DIR}/logs")
+else:
+	BASE_LOGS_DIR = "/logs"
+
 LOGGING = {
 	"version": 1,
 	"disable_existing_loggers": False,
@@ -184,7 +189,7 @@ LOGGING = {
 		"default": {
 			"level": "INFO",
 			"class": "logging.handlers.RotatingFileHandler",
-			"filename": "/logs/django.log",
+			"filename": f"{BASE_LOGS_DIR}/django.log",
 			"formatter": "app",
 			"maxBytes": 1024 * 1024 * 10,
 			"backupCount": 10,
@@ -192,7 +197,7 @@ LOGGING = {
 		"request_handler": {
 			"level": "INFO",
 			"class": "logging.handlers.RotatingFileHandler",
-			"filename": "/logs/django_request.log",
+			"filename": f"{BASE_LOGS_DIR}/django_request.log",
 			"formatter": "app",
 			"maxBytes": 1024 * 1024 * 10,
 			"backupCount": 10,
