@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 
+from students.serializers.comments.comment import BadCommentRequest
 from students.serializers.comments.new_comment import (
 	AddCommentSerializer,
-	BadCommentRequest,
 	NewCommentInputSerializer,
 	NewCommentOutputSerializer,
 )

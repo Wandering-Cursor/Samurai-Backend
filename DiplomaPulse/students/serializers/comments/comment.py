@@ -5,11 +5,13 @@ from typing import TYPE_CHECKING
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import default_storage
+from django.db.models import TextChoices
 from drf_yasg import openapi
 from rest_framework import serializers, status
 
 from accounts.serializers.account.account_info import ShortTeacherInfoSerializer
 from core.serializers.models import ModelWithUUID
+from DiplomaPulse.logger import main_logger
 from students.models.comment import Comment
 
 if TYPE_CHECKING:
@@ -125,3 +127,43 @@ class CommentFinderMixin:
 		self.comment = comment
 
 		return comment.id
+
+
+class BadCommentErrorCodes(TextChoices):
+	INVALID_FILE = "INVALID_FILE", "INVALID_FILE"
+	INVALID_ARGUMENTS = "INVALID_ARGUMENTS", "INVALID_ARGUMENTS"
+
+
+class BadCommentRequest(serializers.Serializer):
+	error = serializers.ChoiceField(BadCommentErrorCodes.choices)
+	code = serializers.IntegerField(default=400)
+
+
+def validate_comment_content(args: dict):
+	comment_text = args.get("text", None)
+	file_name, file_content = args.get("file_name"), args.get("file_content")
+
+	if comment_text and any([file_name, file_content]):
+		main_logger.error("Got comment_text and file parameters")
+		raise Exception(
+			BadCommentRequest(
+				data={
+					"error": BadCommentErrorCodes.INVALID_ARGUMENTS,
+				}
+			)
+		)
+
+	if any([file_name, file_content]) and not all([file_name, file_content]):
+		main_logger.error(
+			f"Got one of file_arguments, but not both: {str(file_name)[:100]=}"
+			f"{str(file_content)[:100]=}"
+		)
+		raise Exception(
+			BadCommentRequest(
+				data={
+					"error_code": BadCommentErrorCodes.INVALID_ARGUMENTS,
+				}
+			)
+		)
+
+	return args
