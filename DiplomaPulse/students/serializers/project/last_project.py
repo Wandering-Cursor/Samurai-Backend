@@ -18,13 +18,7 @@ class UserProjectSerializer(ModelWithUUID):
 
 	class Meta:
 		model = UserProject
-		fields = [
-			"id",
-			"theme",
-			"description",
-			"supervisor",
-		]
-		read_only_fields = fields
+		fields = "__all__"
 
 
 class LastProjectSerializer(AccountSerializerMixIn):

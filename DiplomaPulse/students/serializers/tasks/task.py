@@ -10,17 +10,7 @@ class TaskSerializer(ModelWithUUID):
 
 	class Meta:
 		model = UserTask
-		fields = [
-			"id",
-			"order",
-			"name",
-			"description",
-			"state",
-			"reviewer",
-			"due_date",
-			"comments",  # Probably won't work, something has to be done for this
-			"updated_at",
-		]
+		fields = "__all__"
 
 
 class TaskNotFound(serializers.Serializer):

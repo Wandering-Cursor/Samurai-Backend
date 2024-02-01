@@ -5,10 +5,13 @@ from typing import TYPE_CHECKING
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import default_storage
+from django.db.models import TextChoices
 from drf_yasg import openapi
-from rest_framework import serializers
+from rest_framework import serializers, status
 
 from accounts.serializers.account.account_info import ShortTeacherInfoSerializer
+from core.serializers.models import ModelWithUUID
+from DiplomaPulse.logger import main_logger
 from students.models.comment import Comment
 
 if TYPE_CHECKING:
@@ -86,10 +89,81 @@ class FileRepresentationField(serializers.DictField):
 		}
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentSerializer(ModelWithUUID):
 	author = ShortTeacherInfoSerializer()
 	file = FileRepresentationField(allow_null=True)
 
 	class Meta:
 		model = Comment
 		fields = "__all__"
+
+
+class CommentNotFound(serializers.Serializer):
+	error = serializers.CharField(default="COMMENT_NOT_FOUND")
+	details = serializers.CharField(default="Comment with specified comment_id is not found")
+	code = serializers.IntegerField(default=status.HTTP_404_NOT_FOUND)
+
+
+class CommentFinderMixin:
+	"""All serializers using this Mixin must have a property `student_entity`"""
+
+	comment: Comment = None
+
+	def validate_comment_id(self, comment_id):
+		comment_not_found = Exception(
+			CommentNotFound(
+				data={
+					"details": f"Comment not found with {comment_id=}",
+				}
+			)
+		)
+
+		qs = Comment.objects.all()
+		qs = Comment.objects.filter(id=comment_id, author=self.student_entity)
+		comment = qs.first()
+		if not comment:
+			raise comment_not_found
+
+		self.comment = comment
+
+		return comment.id
+
+
+class BadCommentErrorCodes(TextChoices):
+	INVALID_FILE = "INVALID_FILE", "INVALID_FILE"
+	INVALID_ARGUMENTS = "INVALID_ARGUMENTS", "INVALID_ARGUMENTS"
+
+
+class BadCommentRequest(serializers.Serializer):
+	error = serializers.ChoiceField(BadCommentErrorCodes.choices)
+	code = serializers.IntegerField(default=400)
+
+
+def validate_comment_content(args: dict):
+	comment_text = args.get("text", None)
+	file_name, file_content = args.get("file_name"), args.get("file_content")
+
+	if comment_text and any([file_name, file_content]):
+		main_logger.error("Got comment_text and file parameters")
+		raise Exception(
+			BadCommentRequest(
+				data={
+					"error": BadCommentErrorCodes.INVALID_ARGUMENTS,
+				}
+			)
+		)
+
+	if any([file_name, file_content]) and not all([file_name, file_content]):
+		main_logger.error(
+			f"Got one of file_arguments, but not both: {str(file_name)[:100]=}"
+			f"{str(file_content)[:100]=}"
+		)
+		raise Exception(
+			BadCommentRequest(
+				data={
+					"error_code": BadCommentErrorCodes.INVALID_ARGUMENTS,
+				}
+			)
+		)
+
+	return args

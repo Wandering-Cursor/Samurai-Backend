@@ -6,14 +6,13 @@ from rest_framework import serializers
 from core.serializers.fields import Base64Field
 from students.models.comment import Comment
 from students.serializers.base import AccountSerializerMixIn
-from students.serializers.comments.comment import validate_comment_content
-from students.serializers.tasks.task import TaskFinderMixin
+from students.serializers.comments.comment import CommentFinderMixin, validate_comment_content
 
 from .comment import CommentSerializer
 
 
-class NewCommentInputSerializer(serializers.Serializer):
-	task_id = serializers.UUIDField()
+class UpdateCommentInputSerializer(serializers.Serializer):
+	comment_id = serializers.UUIDField()
 	file_name = serializers.CharField(
 		required=False,
 		allow_null=True,
@@ -30,19 +29,21 @@ class NewCommentInputSerializer(serializers.Serializer):
 	)
 
 
-class NewCommentOutputSerializer(CommentSerializer):
+class UpdateCommentOutputSerializer(CommentSerializer):
 	pass
 
 
-class AddCommentSerializer(AccountSerializerMixIn, NewCommentInputSerializer, TaskFinderMixin):
-	def validate(self, args: dict):
-		args: dict = super().validate(args)
+class UpdateCommentSerializer(
+	AccountSerializerMixIn, UpdateCommentInputSerializer, CommentFinderMixin
+):
+	def validate(self, attrs):
+		attrs = super().validate(attrs)
 
-		args = validate_comment_content(args)
+		attrs = validate_comment_content(attrs)
 
-		return args
+		return attrs
 
-	def create(self, validated_data: dict) -> Comment:
+	def update(self, instance: Comment, validated_data: dict) -> Comment:
 		with atomic():
 			file = None
 			if file_content := validated_data.get("file_content", None):
@@ -54,13 +55,8 @@ class AddCommentSerializer(AccountSerializerMixIn, NewCommentInputSerializer, Ta
 					name=file_name,
 				)
 
-			comment = Comment.objects.create(
-				file=file,
-				text=validated_data.get("text", None),
-				author=self.student_entity,
-			)
+			instance.file = file
+			instance.text = validated_data.get("text", None)
+			instance.save()
 
-			self.task.comments.add(comment)
-			self.task.save()
-
-			return comment
+			return instance
