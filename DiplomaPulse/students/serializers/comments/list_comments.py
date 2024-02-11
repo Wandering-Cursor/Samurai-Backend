@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator
 from rest_framework import serializers
 
-from students.serializers.base import AccountSerializerMixIn
+from accounts.serializers.account.mixin import StudentSerializerMixIn
 from students.serializers.tasks.task import TaskFinderMixin
 
 from .comment import CommentSerializer
@@ -15,10 +15,10 @@ class ListCommentsInputSerializer(serializers.Serializer):
 
 class ListCommentsOutputSerializer(serializers.Serializer):
 	pages = serializers.IntegerField(min_value=1, default=1)
-	data = CommentSerializer(many=True)
+	content = CommentSerializer(many=True)
 
 
-class ListCommentsSerializer(TaskFinderMixin, AccountSerializerMixIn, ListCommentsInputSerializer):
+class ListCommentsSerializer(TaskFinderMixin, StudentSerializerMixIn, ListCommentsInputSerializer):
 	output_serializer: ListCommentsOutputSerializer = None
 
 	def validate(self, attrs):
@@ -40,7 +40,7 @@ class ListCommentsSerializer(TaskFinderMixin, AccountSerializerMixIn, ListCommen
 		self.output_serializer = ListCommentsOutputSerializer(
 			data={
 				"pages": total_pages,
-				"data": comments.data,
+				"content": comments.data,
 			}
 		)
 

@@ -164,6 +164,10 @@ SWAGGER_SETTINGS = {
 			"description": "Don't forget to add Bearer before you paste a token",
 		},
 	},
+	"DOC_EXPANSION": "none",
+	"DEEP_LINKING": True,
+	"SHOW_EXTENSIONS": True,
+	"PERSIST_AUTH": True,
 }
 
 if DEBUG:

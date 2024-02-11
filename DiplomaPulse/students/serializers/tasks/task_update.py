@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
+from accounts.serializers.account.mixin import StudentSerializerMixIn
 from students.choices import TaskState
 from students.models.task import UserTask
-from students.serializers.base import AccountSerializerMixIn
 from students.serializers.tasks.task import TaskFinderMixin
 
 ALLOWED_OPERATIONS = {
@@ -25,7 +25,7 @@ class UpdateTaskForbiddenSerializer(serializers.Serializer):
 	code = serializers.IntegerField(default=403)
 
 
-class UpdateTaskSerializer(AccountSerializerMixIn, UpdateTaskInputSerializer, TaskFinderMixin):
+class UpdateTaskSerializer(StudentSerializerMixIn, UpdateTaskInputSerializer, TaskFinderMixin):
 	def create(self, validated_data) -> UserTask:
 		task = self.task
 

@@ -1,8 +1,8 @@
 from rest_framework import serializers, status
 
+from accounts.serializers.account.mixin import StudentSerializerMixIn
 from students.choices import TaskState
 from students.models.project import UserProject
-from students.serializers.base import AccountSerializerMixIn
 from students.serializers.tasks.task import TaskSerializer
 
 
@@ -32,7 +32,7 @@ class TasksOverviewOutputSerializer(serializers.Serializer):
 	recent = TaskSerializer(many=True)
 
 
-class GetTasksOverviewSerializer(AccountSerializerMixIn, TasksOverviewInputSerializer):
+class GetTasksOverviewSerializer(StudentSerializerMixIn, TasksOverviewInputSerializer):
 	project_entity: UserProject = None
 
 	def validate(self, attrs):

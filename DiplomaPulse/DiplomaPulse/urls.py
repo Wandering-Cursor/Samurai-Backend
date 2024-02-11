@@ -58,6 +58,7 @@ custom_patterns = [
 	path("", MainPageView.as_view()),
 	path("api/accounts/", include("accounts.urls")),
 	path("api/students/", include("students.urls")),
+	path("api/communication/", include("communication.urls")),
 ]
 
 urlpatterns = django_patterns + swagger_patterns + custom_patterns

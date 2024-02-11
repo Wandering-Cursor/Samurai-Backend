@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from students.serializers.base import AccountSerializerMixIn
+from accounts.serializers.account.mixin import StudentSerializerMixIn
 from students.serializers.tasks.task import TaskFinderMixin, TaskSerializer
 
 
@@ -12,6 +12,6 @@ class TaskDetailsOutputSerializer(TaskSerializer):
 	pass
 
 
-class GetTaskDetailsSerializer(AccountSerializerMixIn, TaskDetailsInputSerializer, TaskFinderMixin):
+class GetTaskDetailsSerializer(StudentSerializerMixIn, TaskDetailsInputSerializer, TaskFinderMixin):
 	def create(self):
 		return TaskDetailsOutputSerializer(self.task)

@@ -1,9 +1,9 @@
 from django.core.paginator import Paginator
 from rest_framework import serializers, status
 
+from accounts.serializers.account.mixin import StudentSerializerMixIn
 from students.models.project import UserProject
 from students.models.task import UserTask
-from students.serializers.base import AccountSerializerMixIn
 from students.serializers.tasks.task import TaskSerializer
 
 
@@ -15,10 +15,10 @@ class TaskListInputSerializer(serializers.Serializer):
 
 class TasksListOutputSerializer(serializers.Serializer):
 	pages = serializers.IntegerField(min_value=1)
-	data = TaskSerializer(many=True)
+	content = TaskSerializer(many=True)
 
 
-class GetTasksListSerializer(AccountSerializerMixIn, TaskListInputSerializer):
+class GetTasksListSerializer(StudentSerializerMixIn, TaskListInputSerializer):
 	project_entity: UserProject = None
 	tasks_list: list[UserTask] = None
 	total_pages: int = None
@@ -59,6 +59,6 @@ class GetTasksListSerializer(AccountSerializerMixIn, TaskListInputSerializer):
 		return TasksListOutputSerializer(
 			data={
 				"pages": self.total_pages,
-				"data": tasks_serializer.data,
+				"content": tasks_serializer.data,
 			}
 		)

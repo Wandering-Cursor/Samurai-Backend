@@ -3,9 +3,9 @@ from django.db.transaction import atomic
 from django.utils.crypto import get_random_string
 from rest_framework import serializers
 
+from accounts.serializers.account.mixin import StudentSerializerMixIn
 from core.serializers.fields import Base64Field
 from students.models.comment import Comment
-from students.serializers.base import AccountSerializerMixIn
 from students.serializers.comments.comment import validate_comment_content
 from students.serializers.tasks.task import TaskFinderMixin
 
@@ -34,7 +34,7 @@ class NewCommentOutputSerializer(CommentSerializer):
 	pass
 
 
-class AddCommentSerializer(AccountSerializerMixIn, NewCommentInputSerializer, TaskFinderMixin):
+class AddCommentSerializer(StudentSerializerMixIn, NewCommentInputSerializer, TaskFinderMixin):
 	def validate(self, args: dict):
 		args: dict = super().validate(args)
 

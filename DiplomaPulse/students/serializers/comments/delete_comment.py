@@ -1,7 +1,7 @@
 from django.db.transaction import atomic
 from rest_framework import serializers
 
-from students.serializers.base import AccountSerializerMixIn
+from accounts.serializers.account.mixin import StudentSerializerMixIn
 
 from .comment import CommentFinderMixin
 
@@ -15,7 +15,7 @@ class DeleteCommentOutputSerializer(serializers.Serializer):
 
 
 class DeleteCommentSerializer(
-	AccountSerializerMixIn,
+	StudentSerializerMixIn,
 	CommentFinderMixin,
 	DeleteCommentInputSerializer,
 ):

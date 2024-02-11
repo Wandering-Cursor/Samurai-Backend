@@ -3,9 +3,9 @@ from uuid import UUID
 
 from accounts.models import Student
 from accounts.serializers.account.account_info import ShortTeacherInfoSerializer
+from accounts.serializers.account.mixin import StudentSerializerMixIn
 from core.serializers.models import ModelWithUUID
 from students.models import UserProject
-from students.serializers.base import AccountSerializerMixIn
 
 
 class ValidatedData(TypedDict):
@@ -21,7 +21,7 @@ class UserProjectSerializer(ModelWithUUID):
 		fields = "__all__"
 
 
-class LastProjectSerializer(AccountSerializerMixIn):
+class LastProjectSerializer(StudentSerializerMixIn):
 	def validate(self, attrs):
 		attrs = super().validate(attrs)
 
