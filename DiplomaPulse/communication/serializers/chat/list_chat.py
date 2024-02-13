@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from accounts.serializers.account.mixin import AccountSerializerMixIn
 from communication.models.chat import Chat
-from communication.serializers.chat.chat import ChatSerializer
+from communication.serializers.chat.chat import ChatSerializerTrimmed
 
 
 class ListChatInputSerializer(serializers.Serializer):
@@ -25,7 +25,7 @@ class ListChatInputSerializer(serializers.Serializer):
 
 class ListChatOutputSerializer(serializers.Serializer):
 	pages = serializers.IntegerField(min_value=1, default=1)
-	content = ChatSerializer(many=True)
+	content = ChatSerializerTrimmed(many=True)
 
 
 class ListChatSerializer(AccountSerializerMixIn, ListChatInputSerializer):
@@ -50,12 +50,13 @@ class ListChatSerializer(AccountSerializerMixIn, ListChatInputSerializer):
 		)
 
 		chats_list: list[Chat] = list(paginator.get_page(page))
+		chats_list_serializer = ChatSerializerTrimmed(instance=chats_list, many=True)
 		total_pages = paginator.num_pages
 
 		self.output_serializer = ListChatOutputSerializer(
 			data={
 				"pages": total_pages,
-				"content": chats_list,
+				"content": chats_list_serializer.data,
 			}
 		)
 

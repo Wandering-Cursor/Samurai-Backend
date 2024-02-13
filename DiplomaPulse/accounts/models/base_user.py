@@ -9,6 +9,8 @@ from django.db import models
 from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
 
+from accounts.enums import AccountTypeEnum
+
 from ..managers import UserManager
 from ._base import BaseModel
 
@@ -83,6 +85,17 @@ class BaseUser(AbstractUser, BaseModel):
 		if self.content_type:
 			return self.content_type.get_object_for_this_type(pk=self.pk)
 		return self
+
+	@property
+	def account_type(self) -> AccountTypeEnum:
+		concrete = self.concrete
+		if not isinstance(concrete, BaseUser):
+			return concrete.account_type
+		return AccountTypeEnum.BASE
+
+	@property
+	def account_type_value(self) -> str:
+		return self.account_type.value
 
 	class Meta:
 		verbose_name = _("Base User")

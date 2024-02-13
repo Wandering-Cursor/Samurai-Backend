@@ -14,8 +14,7 @@ chat_patterns = [
 	),
 	path(
 		"chat/create",
-		# TMP
-		chat_views.list_chat.CommunicationView.as_view(),
+		chat_views.create_chat.CreateChatView.as_view(),
 	),
 	path(
 		"chat/leave",

@@ -21,3 +21,8 @@ class Message(BaseModel):
 	read_by: models.ManyToManyField[BaseUser] = models.ManyToManyField(
 		"accounts.BaseUser", related_name="read_messages"
 	)
+
+	class Meta:
+		verbose_name = "Message"
+		verbose_name_plural = "Messages"
+		ordering = ["-created_at"]

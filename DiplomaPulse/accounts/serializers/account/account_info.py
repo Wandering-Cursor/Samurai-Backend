@@ -6,6 +6,26 @@ from ...enums import AccountTypeEnum
 from ...models import BaseUser, Faculty, Group, Overseer, Student, Teacher
 
 
+class UserUUID(serializers.ModelSerializer):
+	id = serializers.UUIDField()
+
+	def validate_id(self, value):
+		if not BaseUser.objects.filter(id=value).exists():
+			raise serializers.ValidationError(
+				detail=f"User with {value=} was not found",
+				code=404,
+			)
+
+		return value
+
+	class Meta:
+		model = BaseUser
+		fields = [
+			"id",
+		]
+		read_only_fields = fields
+
+
 class BaseUserInfoSerializer(ModelWithUUID):
 	account_type = serializers.CharField(default=AccountTypeEnum.BASE.value, read_only=True)
 
@@ -15,6 +35,27 @@ class BaseUserInfoSerializer(ModelWithUUID):
 			"id",
 			"account_type",
 			"email",
+			"first_name",
+			"last_name",
+			"middle_name",
+			"profile_picture",
+		]
+		read_only_fields = fields
+
+
+class ShortBaseUserInfoSerializer(BaseUserInfoSerializer):
+	first_name = serializers.CharField()
+	last_name = serializers.CharField()
+	account_type = serializers.ChoiceField(
+		choices=AccountTypeEnum.choices(),
+		source="account_type_value",
+	)
+
+	class Meta:
+		model = BaseUser
+		fields = [
+			"id",
+			"account_type",
 			"first_name",
 			"last_name",
 			"middle_name",

@@ -23,9 +23,22 @@ class Chat(BaseModel):
 		"accounts.BaseUser", related_name="chats"
 	)
 	messages: models.ManyToManyField[Message] = models.ManyToManyField(
-		"communication.Message", related_name="chats"
+		"communication.Message", related_name="chats", blank=True
 	)
+
+	@property
+	def trimmed_users(self):
+		return self.users.all()[:3]
+
+	@property
+	def users_count(self) -> int:
+		return self.users.count()
 
 	@property
 	def last_message(self):
 		return self.messages.last()
+
+	class Meta:
+		verbose_name = "Chat"
+		verbose_name_plural = "Chats"
+		ordering = ["-updated_at"]

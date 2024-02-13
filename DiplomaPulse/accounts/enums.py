@@ -6,3 +6,7 @@ class AccountTypeEnum(Enum):
 	STUDENT = "Student"
 	TEACHER = "Teacher"
 	OVERSEER = "Overseer"
+
+	@classmethod
+	def choices(cls):
+		return tuple((i.value, i.value) for i in cls)

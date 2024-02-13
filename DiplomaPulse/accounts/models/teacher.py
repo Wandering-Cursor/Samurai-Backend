@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from accounts.enums import AccountTypeEnum
+
 from .base_user import BaseUser
 
 if TYPE_CHECKING:
@@ -22,6 +24,10 @@ class Teacher(BaseUser):
 		null=True,
 		verbose_name=_("contact information"),
 	)
+
+	@property
+	def account_type(self) -> AccountTypeEnum:
+		return AccountTypeEnum.TEACHER
 
 	class Meta:
 		verbose_name = _("Teacher")
