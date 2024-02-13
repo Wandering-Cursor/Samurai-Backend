@@ -38,6 +38,10 @@ class Chat(BaseModel):
 	def last_message(self):
 		return self.messages.last()
 
+	@property
+	def last_messages(self):
+		return self.messages.all()[:3]
+
 	class Meta:
 		verbose_name = "Chat"
 		verbose_name_plural = "Chats"

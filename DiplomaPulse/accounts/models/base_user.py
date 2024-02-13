@@ -89,7 +89,8 @@ class BaseUser(AbstractUser, BaseModel):
 	@property
 	def account_type(self) -> AccountTypeEnum:
 		concrete = self.concrete
-		if not isinstance(concrete, BaseUser):
+		print(f"concrete: {concrete=} {self=}")
+		if type(self) != type(concrete):
 			return concrete.account_type
 		return AccountTypeEnum.BASE
 
