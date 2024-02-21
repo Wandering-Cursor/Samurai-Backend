@@ -1,4 +1,4 @@
-Django==5.0.1
+Django==5.0.2
 # Any of those can be higer* unless there's a breaking change
 Pillow==10.2.0
 drf-yasg==1.21.7
