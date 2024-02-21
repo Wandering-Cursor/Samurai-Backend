@@ -1,5 +1,5 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.12-slim
+FROM python:3.12
 
 EXPOSE 8000
 
@@ -9,16 +9,8 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
 
-# Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    postgresql-client \
-    && rm -rf /var/lib/apt/lists/*
-
 # Install pip requirements
 COPY requirements.txt .
-
-RUN pip install --upgrade pip
 RUN python -m pip install -r requirements.txt
 
 WORKDIR /app

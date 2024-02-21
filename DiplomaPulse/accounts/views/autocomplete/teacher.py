@@ -6,9 +6,9 @@ from .base_user import BaseUserAutocomplete
 
 
 class TeacherAutocomplete(BaseUserAutocomplete):
-	model = Teacher
+    model = Teacher
 
-	def get_q_filters(self):
-		super_filters = super().get_q_filters()
-		super_filters |= Q(faculties__name=self.q)
-		return super_filters
+    def get_q_filters(self) -> Q:
+        super_filters = super().get_q_filters()
+        super_filters |= Q(faculties__name=self.q)
+        return super_filters

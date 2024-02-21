@@ -3,167 +3,167 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
+from accounts.serializers.account.account_info import ShortTeacherInfoSerializer
+from core.serializers.models import ModelWithUUID
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import default_storage
 from django.db.models import TextChoices
 from drf_yasg import openapi
 from rest_framework import serializers, status
 
-from accounts.serializers.account.account_info import ShortTeacherInfoSerializer
-from core.serializers.models import ModelWithUUID
 from DiplomaPulse.logger import main_logger
 from students.models.comment import Comment
 
 if TYPE_CHECKING:
-	from django.db.models.fields.files import FieldFile
+    from django.db.models.fields.files import FieldFile
 
 
 class FileDetailsSerializer(serializers.Serializer):
-	path_to_file = serializers.SerializerMethodField()
-	file_size = serializers.SerializerMethodField()
-	file_format = serializers.SerializerMethodField()
+    path_to_file = serializers.SerializerMethodField()
+    file_size = serializers.SerializerMethodField()
+    file_format = serializers.SerializerMethodField()
 
-	def get_path_to_file(self, obj):
-		if obj:
-			return default_storage.url(obj.name)
-		return None
+    def get_path_to_file(self, obj: FieldFile) -> str:
+        if obj:
+            return default_storage.url(obj.name)
+        return None
 
-	def get_file_size(self, obj) -> str:
-		if obj:
-			try:
-				# Kilo, Mega, Giga
-				K = 1_000
-				M = K * K
-				G = M * K
-				bytes_size = default_storage.size(obj.name)
-				prefix = "B"
-				divider = 1
-				if bytes_size >= G:
-					divider = G
-					prefix = "Impressive"
-				elif bytes_size >= M:
-					divider = M
-					prefix = "MB"
-				elif bytes_size >= K:
-					divider = K
-					prefix = "KB"
-				return f"{round(bytes_size/divider, 2)}{prefix}"
-			except (OSError, ObjectDoesNotExist):
-				pass
-		return "Unknown"
+    def get_file_size(self, obj: FieldFile) -> str:
+        if obj:
+            try:
+                # Kilo, Mega, Giga
+                k = 1_000
+                m = k * k
+                g = m * k
+                bytes_size = default_storage.size(obj.name)
+                prefix = "B"
+                divider = 1
+                if bytes_size >= g:
+                    divider = g
+                    prefix = "Impressive"
+                elif bytes_size >= m:
+                    divider = m
+                    prefix = "MB"
+                elif bytes_size >= k:
+                    divider = k
+                    prefix = "KB"
+                return f"{round(bytes_size/divider, 2)}{prefix}"
+            except (OSError, ObjectDoesNotExist):
+                pass
+        return "Unknown"
 
-	def get_file_format(self, obj):
-		if obj:
-			_, file_extension = os.path.splitext(obj.name)
-			return file_extension.lstrip(".").lower()
-		return None
+    def get_file_format(self, obj: FieldFile) -> str | None:
+        if obj:
+            _, file_extension = os.path.splitext(obj.name)
+            return file_extension.lstrip(".").lower()
+        return None
 
 
 class FileRepresentationField(serializers.DictField):
-	def to_representation(self, value: FieldFile | dict) -> FileDetailsSerializer | None:
-		# When calling the second time (for some reason) - we get a dict
-		if isinstance(value, dict):
-			return value
+    def to_representation(self, value: FieldFile | dict) -> FileDetailsSerializer | None:
+        # When calling the second time (for some reason) - we get a dict
+        if isinstance(value, dict):
+            return value
 
-		elif value.name:
-			return FileDetailsSerializer(value).data
-		return None
+        if value.name:
+            return FileDetailsSerializer(value).data
+        return None
 
-	class Meta:
-		swagger_schema_fields = {
-			"type": openapi.TYPE_OBJECT,
-			"title": "File representation",
-			"properties": {
-				"path_to_file": openapi.Schema(
-					title="(Relative) path to file",
-					type=openapi.TYPE_STRING,
-				),
-				"file_size": openapi.Schema(
-					title="Size of the file (with units)",
-					type=openapi.TYPE_STRING,
-				),
-				"file_format": openapi.Schema(
-					type=openapi.TYPE_STRING,
-				),
-			},
-		}
+    class Meta:
+        swagger_schema_fields = {
+            "type": openapi.TYPE_OBJECT,
+            "title": "File representation",
+            "properties": {
+                "path_to_file": openapi.Schema(
+                    title="(Relative) path to file",
+                    type=openapi.TYPE_STRING,
+                ),
+                "file_size": openapi.Schema(
+                    title="Size of the file (with units)",
+                    type=openapi.TYPE_STRING,
+                ),
+                "file_format": openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                ),
+            },
+        }
 
 
 class CommentSerializer(ModelWithUUID):
-	author = ShortTeacherInfoSerializer()
-	file = FileRepresentationField(allow_null=True)
+    author = ShortTeacherInfoSerializer()
+    file = FileRepresentationField(allow_null=True)
 
-	class Meta:
-		model = Comment
-		fields = "__all__"
+    class Meta:
+        model = Comment
+        fields = "__all__"
 
 
 class CommentNotFound(serializers.Serializer):
-	error = serializers.CharField(default="COMMENT_NOT_FOUND")
-	details = serializers.CharField(default="Comment with specified comment_id is not found")
-	code = serializers.IntegerField(default=status.HTTP_404_NOT_FOUND)
+    error = serializers.CharField(default="COMMENT_NOT_FOUND")
+    details = serializers.CharField(default="Comment with specified comment_id is not found")
+    code = serializers.IntegerField(default=status.HTTP_404_NOT_FOUND)
 
 
 class CommentFinderMixin:
-	"""All serializers using this Mixin must have a property `student_entity`"""
+    """All serializers using this Mixin must have a property `student_entity`"""
 
-	comment: Comment = None
+    comment: Comment = None
 
-	def validate_comment_id(self, comment_id):
-		comment_not_found = Exception(
-			CommentNotFound(
-				data={
-					"details": f"Comment not found with {comment_id=}",
-				}
-			)
-		)
+    def validate_comment_id(self, comment_id: str) -> str:
+        comment_not_found = Exception(
+            CommentNotFound(
+                data={
+                    "details": f"Comment not found with {comment_id=}",
+                }
+            )
+        )
 
-		qs = Comment.objects.all()
-		qs = Comment.objects.filter(id=comment_id, author=self.student_entity)
-		comment = qs.first()
-		if not comment:
-			raise comment_not_found
+        qs = Comment.objects.all()
+        qs = Comment.objects.filter(id=comment_id, author=self.student_entity)
+        comment = qs.first()
+        if not comment:
+            raise comment_not_found
 
-		self.comment = comment
+        self.comment = comment
 
-		return comment.id
+        return comment.id
 
 
 class BadCommentErrorCodes(TextChoices):
-	INVALID_FILE = "INVALID_FILE", "INVALID_FILE"
-	INVALID_ARGUMENTS = "INVALID_ARGUMENTS", "INVALID_ARGUMENTS"
+    INVALID_FILE = "INVALID_FILE", "INVALID_FILE"
+    INVALID_ARGUMENTS = "INVALID_ARGUMENTS", "INVALID_ARGUMENTS"
 
 
 class BadCommentRequest(serializers.Serializer):
-	error = serializers.ChoiceField(BadCommentErrorCodes.choices)
-	code = serializers.IntegerField(default=400)
+    error = serializers.ChoiceField(BadCommentErrorCodes.choices)
+    code = serializers.IntegerField(default=400)
 
 
-def validate_comment_content(args: dict):
-	comment_text = args.get("text", None)
-	file_name, file_content = args.get("file_name"), args.get("file_content")
+def validate_comment_content(args: dict) -> dict:
+    comment_text = args.get("text")
+    file_name, file_content = args.get("file_name"), args.get("file_content")
 
-	if comment_text and any([file_name, file_content]):
-		main_logger.error("Got comment_text and file parameters")
-		raise Exception(
-			BadCommentRequest(
-				data={
-					"error": BadCommentErrorCodes.INVALID_ARGUMENTS,
-				}
-			)
-		)
+    if comment_text and any([file_name, file_content]):
+        main_logger.error("Got comment_text and file parameters")
+        raise Exception(
+            BadCommentRequest(
+                data={
+                    "error": BadCommentErrorCodes.INVALID_ARGUMENTS,
+                }
+            )
+        )
 
-	if any([file_name, file_content]) and not all([file_name, file_content]):
-		main_logger.error(
-			f"Got one of file_arguments, but not both: {str(file_name)[:100]=}"
-			f"{str(file_content)[:100]=}"
-		)
-		raise Exception(
-			BadCommentRequest(
-				data={
-					"error_code": BadCommentErrorCodes.INVALID_ARGUMENTS,
-				}
-			)
-		)
+    if any([file_name, file_content]) and not all([file_name, file_content]):
+        main_logger.error(
+            f"Got one of file_arguments, but not both: {str(file_name)[:100]=}"
+            f"{str(file_content)[:100]=}"
+        )
+        raise Exception(
+            BadCommentRequest(
+                data={
+                    "error_code": BadCommentErrorCodes.INVALID_ARGUMENTS,
+                }
+            )
+        )
 
-	return args
+    return args

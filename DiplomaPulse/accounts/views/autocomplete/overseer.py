@@ -6,9 +6,9 @@ from .base_user import BaseUserAutocomplete
 
 
 class OverseerAutocomplete(BaseUserAutocomplete):
-	model = Overseer
+    model = Overseer
 
-	def get_q_filters(self):
-		super_filters = super().get_q_filters()
-		super_filters |= Q(faculty__name=self.q)
-		return super_filters
+    def get_q_filters(self) -> Q:
+        super_filters = super().get_q_filters()
+        super_filters |= Q(faculty__name=self.q)
+        return super_filters
