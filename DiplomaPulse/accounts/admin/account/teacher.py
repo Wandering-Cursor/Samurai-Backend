@@ -7,5 +7,5 @@ from .base_user import BaseUserAdmin
 
 @admin.register(Teacher)
 class TeacherAdmin(BaseUserAdmin):
-	class Meta:
-		model = Teacher
+    class Meta:
+        model = Teacher

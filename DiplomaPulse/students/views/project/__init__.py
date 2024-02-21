@@ -1,5 +1,5 @@
 from . import last_project
 
 __all__ = [
-	last_project.__name__,
+    "last_project",
 ]

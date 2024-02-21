@@ -7,5 +7,5 @@ from .base_user import BaseUserAdmin
 
 @admin.register(Overseer)
 class OverseerAdmin(BaseUserAdmin):
-	class Meta:
-		model = Overseer
+    class Meta:
+        model = Overseer
