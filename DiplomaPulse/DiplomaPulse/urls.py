@@ -34,9 +34,7 @@ media_patterns = static(
 )
 
 django_patterns = [
-    [
-        path("admin/", admin.site.urls),
-    ],
+    path("admin/", admin.site.urls),
     *static_patterns,
     *media_patterns,
 ]

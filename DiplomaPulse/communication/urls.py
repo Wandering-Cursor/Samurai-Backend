@@ -5,8 +5,7 @@ from communication.views import chat as chat_views
 chat_patterns = [
     path(
         "chat/",
-        # TMP
-        chat_views.list_chat.CommunicationView.as_view(),
+        chat_views.chat_details.ChatDetailsView.as_view(),
     ),
     path(
         "chat/list",

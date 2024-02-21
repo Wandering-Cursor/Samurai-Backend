@@ -6,14 +6,15 @@ from rest_framework.response import Response
 from communication.serializers.chat.chat import (
     ChatSerializer,
 )
+from communication.serializers.chat.details import ChatDetailsInputSerializer, ChatDetailsSerializer
 from communication.views.base import CommunicationView
 
 
 class ChatDetailsView(CommunicationView):
-    serializer_class = ChatSerializer
+    serializer_class = ChatDetailsSerializer
 
     @swagger_auto_schema(
-        query_serializer=None,
+        query_serializer=ChatDetailsInputSerializer,
         responses={200: openapi.Response("Chat details", ChatSerializer)},
         tags=["communication", "chat"],
         operation_description="Lists all chats for the user. Available for all authenticated users",
