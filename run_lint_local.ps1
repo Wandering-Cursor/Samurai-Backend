@@ -1,1 +1,1 @@
-ruff check . --fix
+ruff check .

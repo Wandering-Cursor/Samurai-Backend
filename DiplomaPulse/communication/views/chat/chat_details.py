@@ -3,9 +3,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from communication.serializers.chat.chat import (
-    ChatSerializer,
-)
+from communication.serializers.chat.chat import ChatSerializer
 from communication.serializers.chat.details import ChatDetailsInputSerializer, ChatDetailsSerializer
 from communication.views.base import CommunicationView
 
