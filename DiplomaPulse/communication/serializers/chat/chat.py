@@ -38,7 +38,7 @@ class ChatSerializerTrimmed(ChatSerializer):
 class ChatFinderMixin:
     """All serializers using this Mixin must have a property `user`"""
 
-    chat = None
+    chat: Chat | None = None
 
     def validate_chat_id(self, chat_id: str) -> str:
         """Validates chat ID"""
