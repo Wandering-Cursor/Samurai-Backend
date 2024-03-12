@@ -13,12 +13,12 @@ class CreateChatInputSerializer(serializers.Serializer):
 
 
 class CreateChatOutputSerializer(serializers.ModelSerializer):
-    id = serializers.UUIDField()
+    chat_id = serializers.UUIDField()
     name = serializers.CharField(max_length=255)
 
     class Meta:
         model = Chat
-        fields = ["id", "name"]
+        fields = ["chat_id", "name"]
         read_only_fields = fields
 
 

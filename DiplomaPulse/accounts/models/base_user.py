@@ -1,6 +1,7 @@
 """
 Base user model.
 """
+
 from uuid import uuid4
 
 from django.contrib.auth.models import AbstractUser

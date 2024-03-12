@@ -7,10 +7,12 @@ if TYPE_CHECKING:
 
 from django.db import models
 
-from ._base import BaseModel
+from ._base import BaseModel, get_id_field
 
 
 class Message(BaseModel):
+    message_id = get_id_field()
+
     from_user: BaseUser = models.ForeignKey(
         "accounts.BaseUser", related_name="sent_messages", on_delete=models.CASCADE
     )

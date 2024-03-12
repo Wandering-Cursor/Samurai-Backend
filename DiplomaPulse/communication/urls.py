@@ -1,6 +1,8 @@
 from django.urls import path
 
 from communication.views import chat as chat_views
+from communication.views import message as message_views
+from communication.views.base import CommunicationView
 
 chat_patterns = [
     path(
@@ -21,5 +23,24 @@ chat_patterns = [
     ),
 ]
 
+message_patterns = [
+    path(
+        "message/send",
+        message_views.send_message.SendMessageView.as_view(),
+    ),
+    path(
+        "message/",
+        CommunicationView.as_view(),
+    ),
+    path(
+        "message/list",
+        CommunicationView.as_view(),
+    ),
+    path(
+        "message/search",
+        CommunicationView.as_view(),
+    ),
+]
 
-urlpatterns = chat_patterns
+
+urlpatterns = chat_patterns + message_patterns

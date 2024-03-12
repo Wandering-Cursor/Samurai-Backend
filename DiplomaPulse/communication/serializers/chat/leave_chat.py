@@ -1,7 +1,6 @@
-from accounts.serializers.account.mixin import AccountSerializerMixIn
 from rest_framework import serializers
 
-from communication.serializers.chat.chat import ChatFinderMixin
+from communication.serializers.chat.chat import UserChatFinderMixin
 
 
 class LeaveChatInputSerializer(serializers.Serializer):
@@ -17,7 +16,7 @@ class LeaveChatOutputSerializer(serializers.Serializer):
     )
 
 
-class LeaveChatSerializer(AccountSerializerMixIn, ChatFinderMixin, LeaveChatInputSerializer):
+class LeaveChatSerializer(UserChatFinderMixin, LeaveChatInputSerializer):
     def create(self, _: dict) -> LeaveChatOutputSerializer:
         if not self.chat:
             raise ValueError("Chat not found")

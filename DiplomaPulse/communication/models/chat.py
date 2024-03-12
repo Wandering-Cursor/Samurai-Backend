@@ -11,13 +11,15 @@ from django.db import models
 
 from communication.utils.randomizer import get_random_pass_name
 
-from ._base import BaseModel
+from ._base import BaseModel, get_id_field
 
 
 class Chat(BaseModel):
     """
     Model for chat, used to send messages between userss
     """
+
+    chat_id = get_id_field()
 
     name = models.CharField(max_length=255, default=get_random_pass_name)
     users: models.ManyToManyField[BaseUser] = models.ManyToManyField(

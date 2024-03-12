@@ -22,12 +22,8 @@ class ListChatView(CommunicationView):
     )
     def get(self, request: Request) -> Response:
         serializer = self.serializer_class(
-            data={
-                "page": request.query_params.get("page", 1),
-                "page_size": request.query_params.get("page_size", 25),
-                "chat_name": request.query_params.get("chat_name", None),
-                "account_uuid": request.user.id,
-            },
+            data=request.query_params,
+            context={"request": request},
         )
         serializer.is_valid(raise_exception=True)
         output_serializer = serializer.create(serializer.validated_data)

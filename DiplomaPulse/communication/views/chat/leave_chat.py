@@ -26,11 +26,9 @@ class LeaveChatView(CommunicationView):
         tags=["communication", "chat"],
     )
     def delete(self, request: Request) -> Response:
-        data = request.data.copy()
-        data["account_uuid"] = request.user.id
-
         serializer = self.serializer_class(
-            data=data,
+            data=request.data,
+            context={"request": request},
         )
         serializer.is_valid(raise_exception=True)
         output_serializer = serializer.create(request.data)

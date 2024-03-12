@@ -23,13 +23,10 @@ class CreateChatView(CommunicationView):
         operation_description="Creates a new chat. Available for all authenticated users",
     )
     def post(self, request: Request) -> Response:
-        if not isinstance(request.data, dict):
-            raise ValueError("Supplied data is invalid")
-
-        data = request.data.copy()
-        data.update({"account_uuid": request.user.id})
-
-        serializer = self.serializer_class(data=data)
+        serializer = self.serializer_class(
+            data=request.data,
+            context={"request": request},
+        )
         serializer.is_valid(raise_exception=True)
         output_serializer = serializer.create(serializer.validated_data)
 

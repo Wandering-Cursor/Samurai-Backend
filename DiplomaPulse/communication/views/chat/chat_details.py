@@ -19,10 +19,8 @@ class ChatDetailsView(CommunicationView):
     )
     def get(self, request: Request) -> Response:
         serializer = self.serializer_class(
-            data={
-                "chat_id": request.query_params.get("chat_id", None),
-                "account_uuid": request.user.id,
-            },
+            data=request.query_params,
+            context={"request": request},
         )
         serializer.is_valid(raise_exception=True)
         output_serializer = serializer.create(serializer.validated_data)

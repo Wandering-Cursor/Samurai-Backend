@@ -1,4 +1,5 @@
 from accounts.serializers.account.account_info import ShortBaseUserInfoSerializer
+from accounts.serializers.account.mixin import AccountSerializerMixIn
 from core.serializers.models import ModelWithUUID
 from rest_framework import serializers
 
@@ -7,6 +8,10 @@ from communication.serializers.message.message import MessageSerializer
 
 
 class ChatSerializer(ModelWithUUID):
+    chat_id = serializers.UUIDField(
+        help_text="Chat ID",
+    )
+
     users = ShortBaseUserInfoSerializer(many=True)
     users_count = serializers.IntegerField()
     last_message = MessageSerializer(required=False, allow_null=True)
@@ -14,7 +19,7 @@ class ChatSerializer(ModelWithUUID):
     class Meta:
         model = Chat
         fields = [
-            "id",
+            "chat_id",
             "name",
             "users",
             "users_count",
@@ -22,7 +27,7 @@ class ChatSerializer(ModelWithUUID):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ("id", "created_at", "updated_at")
+        read_only_fields = ("chat_id", "created_at", "updated_at")
 
 
 class ChatSerializerTrimmed(ChatSerializer):
@@ -35,16 +40,21 @@ class ChatSerializerTrimmed(ChatSerializer):
     )
 
 
-class ChatFinderMixin:
+class UserChatFinderMixin(AccountSerializerMixIn):
     """All serializers using this Mixin must have a property `user`"""
 
     chat: Chat | None = None
 
-    def validate_chat_id(self, chat_id: str) -> str:
-        """Validates chat ID"""
+    def validate(self, attrs: dict) -> dict:
+        values = super().validate(attrs)
+        if "chat_id" not in values:
+            raise serializers.ValidationError("Chat ID is required")
+
+        chat_id = values["chat_id"]
+
         try:
-            self.chat = Chat.objects.filter(users__id=self.user.id).get(id=chat_id)
+            self.chat = Chat.objects.filter(users__id=self.user.id).get(chat_id=chat_id)
         except Chat.DoesNotExist as e:
             raise serializers.ValidationError("Chat not found") from e
 
-        return chat_id
+        return values
