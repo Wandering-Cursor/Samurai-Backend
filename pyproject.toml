@@ -1,3 +1,114 @@
-[tool.isort]
-line_length=100
-known_first_party = ["accounts", "administration", "communication", "core", "DiplomaPulse", "students"]
+[project]
+name = "Samurai-Backend"
+version = "0.7.0"
+description = "Backend part of the Samurai project"
+authors = [
+    {name = "Pavlo Pohorieltsev", email = "hdydpavel@gmail.com"},
+]
+dependencies = [
+    "Django>=5.0.3",
+    "Pillow>=10.2.0",
+    "drf-yasg>=1.21.7",
+    "celery[redis]>=5.3.6",
+    "djangorestframework>=3.14.0",
+    "redis>=5.0.3",
+    "psycopg[binary,pool]>=3.1.18",
+    "python-decouple>=3.8",
+    "gunicorn>=21.2.0",
+    "djangorestframework-simplejwt[crypto]>=5.3.1",
+    "django-cors-headers>=4.3.1",
+    "pydantic>=2.6.4",
+    "django-autocomplete-light>=3.11.0",
+    "django-oauth-toolkit>=2.3.0",
+    "dj-database-url>=2.1.0",
+    "setuptools>=69.1.1",
+    "django-model-utils>=4.4.0",
+]
+requires-python = ">=3.12"
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.3.2",
+]
+windows = [
+    "setuptools>=69.1.1",
+]
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.scripts]
+_.env_file=".env"
+ruff_format = {cmd="ruff format", help ="Run ruff format"}
+ruff_lint = {cmd="ruff check --fix", help ="Run ruff lint"}
+create_new_app = {shell="python samurai/manage.py startapp", help ="Start the Django server"}
+run_server = {shell="gunicorn --chdir samurai --bind 0.0.0.0:8000 samurai_backend.wsgi:application", help ="Run the Django server"}
+run_celery_worker = {shell="celery --workdir samurai -A samurai_backend worker -l info", help ="Run the Celery worker"}
+
+build_image={shell="docker build -t samurai-backend .", help ="Build the Docker image"}
+dev_compose={shell="docker-compose -f compose/dev-docker-compose.yml up -d", help ="Run the Docker compose for development"}
+
+[tool.ruff]
+target-version = "py312"
+exclude = [
+    "migrations"
+]
+line-length = 100
+
+[tool.ruff.lint]
+extend-select = [
+  "UP",
+  "E",
+  "W",
+  "I",
+  "C90",
+  "N",
+  "ANN",
+  "ASYNC",
+  "BLE",
+  "FBT",
+  "B",
+  "A",
+  "C4",
+  "DTZ",
+  "T10",
+  "FA",
+  "ISC",
+  "ICN",
+  "INP",
+  "PIE",
+  "T20",
+  "PYI",
+  "Q",
+  "RET",
+  "SLF",
+  "SIM",
+  "TID",
+  "TCH",
+  "ARG",
+  "TD",
+  "FIX",
+  "ERA",
+  "PL",
+  "RUF",
+]
+ignore = [
+  "ISC001",
+  "N999",
+  "ERA001",
+  "RUF012",
+  "ANN101",
+  "ANN102",
+  "FBT001",
+  "FBT002",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+docstring-code-format = true

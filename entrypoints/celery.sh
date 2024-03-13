@@ -1,4 +1,7 @@
-mkdir -p /logs
+#!/bin/bash
+set -e -x
+echo "Starting celery worker"
 
-cd DiplomaPulse
-celery -A DiplomaPulse worker --loglevel=info
+pdm run_celery_worker
+
+echo "Exited!!!"
