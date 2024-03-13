@@ -6,12 +6,19 @@ authors = [
     {name = "Pavlo Pohorieltsev", email = "hdydpavel@gmail.com"},
 ]
 dependencies = [
-    "emmett>=2.5.9",
+    "fastapi[all]>=0.110.0",
+    "pydantic-settings>=2.2.1",
+    "sqlalchemy>=2.0.28",
+    "psycopg2-binary>=2.9.9",
 ]
 requires-python = ">=3.12"
 readme = "README.md"
 license = {text = "MIT"}
 
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.3.2",
+]
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
@@ -21,4 +28,64 @@ build-backend = "pdm.backend"
 distribution = true
 
 [tool.pdm.scripts]
-develop = {cmd = "emmett develop", help="Run the development server"}
+echo_done={shell = "echo Done!"}
+_perform_lint="ruff check . --fix"
+lint={composite = ["_perform_lint", "echo_done"], help="Executes ruff check, and echoes 'Done!'."}
+format="ruff format ."
+run_ruff={composite = ["format", "lint"], help="Runs formatter and linter on the code"}
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+extend-select = [
+  "UP",
+  "E",
+  "W",
+  "I",
+  "C90",
+  "N",
+  "ANN",
+  "ASYNC",
+  "BLE",
+  "FBT",
+  "B",
+  "A",
+  "C4",
+  "DTZ",
+  "T10",
+  "FA",
+  "ISC",
+  "ICN",
+  "INP",
+  "PIE",
+  "T20",
+  "PYI",
+  "Q",
+  "RET",
+  "SLF",
+  "SIM",
+  "TID",
+  "TCH",
+  "ARG",
+  "TD",
+  "FIX",
+  "ERA",
+  "PL",
+  "RUF",
+]
+ignore = [
+  "ISC001",
+  "N999",
+  "ERA001",
+  "RUF012",
+  "ANN101",
+  "ANN102",
+  "FBT001",
+  "FBT002",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+docstring-code-format = true

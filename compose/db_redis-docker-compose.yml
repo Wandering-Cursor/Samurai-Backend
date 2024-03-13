@@ -19,22 +19,6 @@ services:
     volumes:
       - redis-data:/data
 
-  celery:
-    image: samurai-backend
-    entrypoint: ["/app/celery.sh"]
-    depends_on:
-      - database
-      - redis
-
-  web:
-    image: samurai-backend
-    entrypoint: ["/app/web.sh"]
-    ports:
-      - "8000:8000"
-    depends_on:
-      - database
-      - redis
-
 volumes:
   postgres-data:
   redis-data:
