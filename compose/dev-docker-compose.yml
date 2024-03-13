@@ -21,14 +21,14 @@ services:
 
   celery:
     image: samurai-backend
-    entrypoint: ["/app/entrypoints/celery.sh"]
+    entrypoint: ["/app/celery.sh"]
     depends_on:
       - database
       - redis
 
   web:
     image: samurai-backend
-    entrypoint: ["/app/entrypoints/web.sh"]
+    entrypoint: ["/app/web.sh"]
     ports:
       - "8000:8000"
     depends_on:
