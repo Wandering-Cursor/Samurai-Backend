@@ -10,6 +10,11 @@ dependencies = [
     "pydantic-settings>=2.2.1",
     "sqlalchemy>=2.0.28",
     "psycopg2-binary>=2.9.9",
+    "python-multipart>=0.0.9",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "pytz>=2024.1",
+    "sqlmodel>=0.0.16",
 ]
 requires-python = ">=3.12"
 readme = "README.md"
@@ -28,9 +33,9 @@ build-backend = "pdm.backend"
 distribution = true
 
 [tool.pdm.scripts]
-echo_done={shell = "echo Done!"}
+_echo_done={shell = "echo Done!"}
 _perform_lint="ruff check . --fix"
-lint={composite = ["_perform_lint", "echo_done"], help="Executes ruff check, and echoes 'Done!'."}
+lint={composite = ["_perform_lint", "_echo_done"], help="Executes ruff check, and echoes 'Done!'."}
 format="ruff format ."
 run_ruff={composite = ["format", "lint"], help="Runs formatter and linter on the code"}
 
