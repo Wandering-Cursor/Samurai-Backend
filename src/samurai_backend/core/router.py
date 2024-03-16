@@ -128,3 +128,7 @@ async def refresh_token(
         content=token.model_dump(mode="json"),
         status_code=200,
     )
+
+
+# TODO: Implement logout endpoint (delete refresh token and session)
+# TODO: Store sessions (perhaps we don't really need this :shruh:)
