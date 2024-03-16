@@ -16,6 +16,7 @@ jobs:
 
   start-containers:
     if: always()
+    needs: stop-containers
     runs-on: self-hosted
 
     steps:
