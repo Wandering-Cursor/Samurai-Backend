@@ -23,7 +23,7 @@ services:
       - redis-data:/data
 
   web:
-    image: samurai-backend:latest
+    image: ghcr.io/wandering-cursor/samurai-backend:latest
     ports:
       - "8000:8000"
     depends_on:
