@@ -1,6 +1,6 @@
 [project]
 name = "Samurai-Backend"
-version = "0.7.0"
+version = "0.7.0c"
 description = "Backend part of the Samurai project"
 authors = [
     {name = "Pavlo Pohorieltsev", email = "hdydpavel@gmail.com"},
@@ -25,7 +25,7 @@ license = {text = "MIT"}
 
 [project.optional-dependencies]
 dev = [
-    "ruff>=0.3.2",
+    "ruff>=0.3.3",
 ]
 [build-system]
 requires = ["pdm-backend"]
