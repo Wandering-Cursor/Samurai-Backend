@@ -10,6 +10,10 @@ class BaseSchema(pydantic.BaseModel):
         from_attributes = True
 
 
+class ErrorSchema(pydantic.BaseModel):
+    detail: str
+
+
 class GetToken(pydantic.BaseModel):
     username: str
     password: str
@@ -21,20 +25,19 @@ class GetToken(pydantic.BaseModel):
     )
 
 
+class RefreshTokenInput(pydantic.BaseModel):
+    refresh_token: str | None = None
+
+
 class Token(pydantic.BaseModel):
     access_token: str
     token_type: str
 
 
 class TokenData(pydantic.BaseModel):
-    account_id: pydantic.UUID4
+    sub: pydantic.UUID4 = pydantic.Field(alias="sub")
     scopes: list[str] = []
-
-    def as_dict(self) -> dict:
-        return {
-            "sub": str(self.account_id),
-            "scopes": self.scopes,
-        }
+    type: str = "access"
 
 
 class PaginationSearchSchema(pydantic.BaseModel):

@@ -1,19 +1,21 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, Form
+from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 
-from samurai_backend.core.schemas import GetToken, Token
+from samurai_backend.core.schemas import ErrorSchema, GetToken, RefreshTokenInput, Token
 from samurai_backend.dependencies import database_session, database_session_type
 from samurai_backend.settings import security_settings
 
-from .dependencies import authenticate
+from .dependencies import authenticate, authenticate_by_refresh_token
 
 auth_router = APIRouter(
     prefix="/auth",
     responses={
         401: {
             "description": "Unauthorized, or invalid credentials.",
+            "model": ErrorSchema,
         }
     },
     tags=["auth"],
@@ -43,6 +45,7 @@ def perform_login(db: database_session_type, auth_data: GetToken) -> JSONRespons
         value=refresh,
         httponly=True,
         max_age=security_settings.refresh_token_lifetime_minutes * 60,
+        secure=True,
     )
 
     return response
@@ -82,4 +85,46 @@ async def login_form(
             password=password,
             access_token_ttl_min=access_token_ttl_min,
         ),
+    )
+
+
+@auth_router.post(
+    "/refresh",
+    description="Refresh the Access token using the Refresh token stored in a cookie.",
+    responses={
+        200: {
+            "description": "Access token refreshed.",
+            "model": Token,
+        },
+    },
+)
+async def refresh_token(
+    request: Request,
+    db: Annotated[database_session_type, Depends(database_session)],
+    refresh_body: Annotated[RefreshTokenInput | None, Body()],
+) -> JSONResponse:
+    refresh_token = refresh_body.refresh_token
+    if cookie_token := request.cookies.get("refresh_token"):
+        refresh_token = cookie_token
+
+    if not refresh_token:
+        return JSONResponse(
+            content={"detail": "No refresh token provided."},
+            status_code=401,
+        )
+
+    try:
+        token = authenticate_by_refresh_token(
+            db=db,
+            refresh_token=refresh_token,
+        )
+    except ValueError as e:
+        return JSONResponse(
+            content={"detail": str(e)},
+            status_code=401,
+        )
+
+    return JSONResponse(
+        content=token.model_dump(mode="json"),
+        status_code=200,
     )

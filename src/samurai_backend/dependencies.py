@@ -34,7 +34,7 @@ def create_access_token(data: TokenData, expires_delta: timedelta | None = None)
     """
     Creates an access token.
     """
-    to_encode = data.as_dict()
+    to_encode = data.model_dump(mode="json")
 
     if expires_delta:
         expire = datetime.now(tz=settings.timezone) + expires_delta
@@ -59,7 +59,7 @@ def create_refresh_token(data: TokenData) -> str:
     """
     Creates a refresh token.
     """
-    to_encode = data.as_dict()
+    to_encode = data.model_dump(mode="json")
 
     expire = datetime.now(tz=settings.timezone) + timedelta(
         minutes=security_settings.refresh_token_lifetime_minutes
@@ -76,6 +76,25 @@ def create_refresh_token(data: TokenData) -> str:
         security_settings.secret_key,
         algorithm=security_settings.algorithm,
     )
+
+
+def decode_refresh_token(token: str) -> TokenData:
+    """
+    Decodes a refresh token.
+    """
+    token_data = TokenData(
+        **jwt.decode(
+            token,
+            security_settings.secret_key,
+            algorithms=[security_settings.algorithm],
+        )
+    )
+    if token_data.type != "refresh":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token type",
+        )
+    return token_data
 
 
 def get_current_account(
@@ -112,7 +131,7 @@ def get_current_account(
 
         token_scopes = payload.get("scopes", [])
         token_data = TokenData(
-            account_id=account_id,
+            sub=account_id,
             scopes=token_scopes,
         )
     except JWTError as e:
@@ -121,7 +140,7 @@ def get_current_account(
     account = get_account(
         db=db,
         search=AccountSearchSchema(
-            account_id=token_data.account_id,
+            account_id=token_data.sub,
         ),
     )
     if account is None:
