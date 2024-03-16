@@ -23,9 +23,9 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install -r lint-requirements.txt
-
-    - name: Run isort and ruff in check-only mode
+        pip install pdm
+        pdm install
+    
+    - name: Run lint checks
       run: |
-        ruff check .
-
+        pdm run_ruff

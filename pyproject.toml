@@ -1,3 +1,100 @@
-[tool.isort]
-line_length=100
-known_first_party = ["accounts", "administration", "communication", "core", "DiplomaPulse", "students"]
+[project]
+name = "Samurai-Backend"
+version = "0.7.0"
+description = "Backend part of the Samurai project"
+authors = [
+    {name = "Pavlo Pohorieltsev", email = "hdydpavel@gmail.com"},
+]
+dependencies = [
+    "fastapi[all]>=0.110.0",
+    "pydantic-settings>=2.2.1",
+    "sqlalchemy>=2.0.28",
+    "psycopg2-binary>=2.9.9",
+    "python-multipart>=0.0.9",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "pytz>=2024.1",
+    "sqlmodel>=0.0.16",
+    "alembic[tz]>=1.13.1",
+    "asyncpg>=0.29.0",
+]
+requires-python = ">=3.12"
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.3.2",
+]
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.scripts]
+_echo_done={shell = "echo Done!"}
+_perform_lint="ruff check . --fix"
+lint={composite = ["_perform_lint", "_echo_done"], help="Executes ruff check, and echoes 'Done!'."}
+format="ruff format ."
+run_ruff={composite = ["format", "lint"], help="Runs formatter and linter on the code"}
+run_server="uvicorn samurai_backend.app:app --reload"
+create_admin="python src/samurai_backend/scripts/create_admin.py"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+extend-select = [
+  "UP",
+  "E",
+  "W",
+  "I",
+  "C90",
+  "N",
+  "ANN",
+  "ASYNC",
+  "BLE",
+  "FBT",
+  "B",
+  "A",
+  "C4",
+  "DTZ",
+  "T10",
+  "FA",
+  "ISC",
+  "ICN",
+  "INP",
+  "PIE",
+  "T20",
+  "PYI",
+  "Q",
+  "RET",
+  "SLF",
+  "SIM",
+  "TID",
+  "TCH",
+  "ARG",
+  "TD",
+  "FIX",
+  "ERA",
+  "PL",
+  "RUF",
+]
+ignore = [
+  "ISC001",
+  "N999",
+  "ERA001",
+  "RUF012",
+  "ANN101",
+  "ANN102",
+  "FBT001",
+  "FBT002",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+docstring-code-format = true

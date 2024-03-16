@@ -1,0 +1,73 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from sqlalchemy import or_
+from sqlmodel import select
+
+from samurai_backend.account.schemas.account import AccountSearchResult
+from samurai_backend.core.schemas import PaginationMetaInformation
+from samurai_backend.models.account.account import AccountModel
+
+if TYPE_CHECKING:
+    from sqlmodel import Session
+
+    from samurai_backend.account.schemas.account import (
+        AccountSearchPaginationSchema,
+        AccountSearchSchema,
+    )
+
+
+def get_account(db: Session, search: AccountSearchSchema) -> AccountModel | None:
+    """
+    Returns a user from the database.
+    """
+    query = select(AccountModel).filter(
+        or_(
+            AccountModel.account_id == search.account_id,
+            AccountModel.email == search.email,
+            AccountModel.username == search.username,
+            AccountModel.registration_code == search.registration_code,
+        ),
+    )
+    user = db.exec(query).first()
+
+    if not user:
+        return None
+
+    return user
+
+
+def get_accounts(db: Session, search: AccountSearchPaginationSchema) -> AccountSearchResult:
+    """
+    Returns a list of users from the database.
+    """
+    query = db.query(AccountModel)
+
+    if search.account_id:
+        query = query.filter(AccountModel.account_id == search.account_id)
+
+    if search.email:
+        query = query.filter(AccountModel.email == search.email)
+
+    if search.username:
+        query = query.filter(AccountModel.username == search.username)
+
+    if search.account_type:
+        query = query.filter(AccountModel.account_type == search.account_type)
+
+    if search.registration_code:
+        query = query.filter(AccountModel.registration_code == search.registration_code)
+
+    total = query.count()
+
+    query = query.offset(search.search_page * search.page_size).limit(search.page_size)
+
+    return AccountSearchResult(
+        meta=PaginationMetaInformation(
+            total=total,
+            page=search.page,
+            page_size=search.page_size,
+        ),
+        content=query.all(),
+    )
