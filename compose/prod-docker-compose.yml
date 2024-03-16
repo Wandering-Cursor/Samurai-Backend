@@ -1,0 +1,57 @@
+version: "3.8"
+
+name: samurai-backend
+
+services:
+  database:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: /run/secrets/POSTGRES_DB
+      POSTGRES_USER: /run/secrets/POSTGRES_USER
+      POSTGRES_PASSWORD: /run/secrets/POSTGRES_PASSWORD
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    secrets:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+
+
+  redis:
+    image: redis:latest
+    volumes:
+      - redis-data:/data
+
+  web:
+    image: samurai-backend-web:latest
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+      - redis
+    environment:
+      database_url: /run/secrets/database_url
+      REDIS_URL: /run/secrets/REDIS_URL
+      jwt_secret: /run/secrets/jwt_secret
+    volumes:
+      - .:/app/compose/
+    secrets:
+      - security_env
+      - settings_env
+    entrypoint: /app/compose/backend.sh
+
+volumes:
+  postgres-data:
+  redis-data:
+
+secrets:
+  POSTGRES_DB:
+    file: .secrets/POSTGRES_DB
+  POSTGRES_USER:
+    file: .secrets/POSTGRES_USER
+  POSTGRES_PASSWORD:
+    file: .secrets/POSTGRES_PASSWORD
+  security_env:
+    file: .secrets/security_env
+  settings_env:
+    file: .secrets/settings_env

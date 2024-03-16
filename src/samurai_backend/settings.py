@@ -31,5 +31,11 @@ class SecuritySettings(BaseSettings):
         env_prefix = "security_"
 
 
-settings = Settings(_env_file="settings.env", _env_file_encoding="UTF-8")
-security_settings = SecuritySettings(_env_file="security.env", _env_file_encoding="UTF-8")
+settings = Settings(
+    _env_file="/run/secrets/settings_env",
+    _env_file_encoding="UTF-8",
+)
+security_settings = SecuritySettings(
+    _env_file="/run/secrets/security_env",
+    _env_file_encoding="UTF-8",
+)

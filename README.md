@@ -60,14 +60,15 @@ docker compose -f compose/dev-docker-compose.yml up -d
 
 This will start the database and the redis server.
 
-### 4. Create `*.env` files
+### 4. Create `*env` secrets
 
 This project needs two `.env` files:
-- `security.env` - Handles the security settings (JWT, CORS, etc.)
-- `settings.env` - Handles general settings (Debug mode, DB connection, etc.)
+- `security_env` - Handles the security settings (JWT, CORS, etc.)
+- `settings_env` - Handles general settings (Debug mode, DB connection, etc.)
 
 Examples are provided in [security.env.md](./security.env.md) and [settings.env.md](./settings.env.md)
 You can also refer to [settings models](./src/samurai_backend/settings.py) for more details
+They should be placed in `/run/secrets/` folder. (Unless you are running Docker. Then you should use `./compose/.secrets/` folder.)
 
 ### 5. Run the migrations
 
