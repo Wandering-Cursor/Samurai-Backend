@@ -2,7 +2,10 @@
 
 ## About
 
-TODO
+# TODO:
+- [ ] Add a proper description
+- [ ] Recreate CI/CD workflow
+- [ ] Add docker file for backend
 
 ## Installation
 
