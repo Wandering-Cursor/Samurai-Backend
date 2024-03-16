@@ -30,9 +30,9 @@ def perform_login(db: database_session_type, auth_data: GetToken) -> JSONRespons
             password=auth_data.password,
             access_token_ttl_min=auth_data.access_token_ttl_min,
         )
-    except ValueError as e:
+    except ValueError:
         return JSONResponse(
-            content={"detail": str(e)},
+            content={"detail": "Could not validate credentials"},
             status_code=401,
         )
 
@@ -118,9 +118,9 @@ async def refresh_token(
             db=db,
             refresh_token=refresh_token,
         )
-    except ValueError as e:
+    except ValueError:
         return JSONResponse(
-            content={"detail": str(e)},
+            content={"detail": "Could not validate credentials"},
             status_code=401,
         )
 
