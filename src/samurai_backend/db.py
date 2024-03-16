@@ -1,6 +1,6 @@
 from collections.abc import AsyncGenerator
 
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, create_engine
 
 from samurai_backend import models
 from samurai_backend.settings import settings
@@ -11,7 +11,12 @@ __all__ = [
 
 SQLALCHEMY_DATABASE_URL = settings.database_url
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
+def make_engine() -> None:
+    return create_engine(SQLALCHEMY_DATABASE_URL)
+
+
+engine = make_engine()
 
 
 async def get_db_session() -> AsyncGenerator[Session, None, None]:
@@ -23,7 +28,3 @@ async def get_db_session() -> AsyncGenerator[Session, None, None]:
         yield db
     finally:
         db.close()
-
-
-def create_all_tables() -> None:
-    SQLModel.metadata.create_all(engine)

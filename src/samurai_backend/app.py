@@ -1,7 +1,7 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 
 from samurai_backend.core.router import auth_router
-from samurai_backend.db import create_all_tables
 from samurai_backend.middleware import add_cors_middleware
 from samurai_backend.settings import settings
 
@@ -14,7 +14,12 @@ app = FastAPI(
 
 add_cors_middleware(app)
 
-create_all_tables()
-
-
 app.include_router(auth_router)
+
+
+@app.get(
+    "/",
+    include_in_schema=False,
+)
+async def docs_redirect() -> RedirectResponse:
+    return RedirectResponse("/docs")

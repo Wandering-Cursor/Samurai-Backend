@@ -15,6 +15,8 @@ dependencies = [
     "passlib[bcrypt]>=1.7.4",
     "pytz>=2024.1",
     "sqlmodel>=0.0.16",
+    "alembic[tz]>=1.13.1",
+    "asyncpg>=0.29.0",
 ]
 requires-python = ">=3.12"
 readme = "README.md"
@@ -38,6 +40,7 @@ _perform_lint="ruff check . --fix"
 lint={composite = ["_perform_lint", "_echo_done"], help="Executes ruff check, and echoes 'Done!'."}
 format="ruff format ."
 run_ruff={composite = ["format", "lint"], help="Runs formatter and linter on the code"}
+run_server="uvicorn samurai_backend.app:app --reload"
 
 [tool.ruff]
 target-version = "py312"
