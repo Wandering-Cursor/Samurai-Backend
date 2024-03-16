@@ -6,9 +6,9 @@ services:
   database:
     image: postgres:latest
     environment:
-      POSTGRES_DB: /run/secrets/POSTGRES_DB
-      POSTGRES_USER: /run/secrets/POSTGRES_USER
-      POSTGRES_PASSWORD: /run/secrets/POSTGRES_PASSWORD
+      POSTGRES_DB_FILE: /run/secrets/POSTGRES_DB
+      POSTGRES_USER_FILE: /run/secrets/POSTGRES_USER
+      POSTGRES_PASSWORD_FILE: /run/secrets/POSTGRES_PASSWORD
     volumes:
       - postgres-data:/var/lib/postgresql/data
     secrets:
@@ -29,10 +29,6 @@ services:
     depends_on:
       - database
       - redis
-    environment:
-      database_url: /run/secrets/database_url
-      REDIS_URL: /run/secrets/REDIS_URL
-      jwt_secret: /run/secrets/jwt_secret
     volumes:
       - .:/app/compose/
     secrets:
