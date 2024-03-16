@@ -1,29 +1,25 @@
-from __future__ import annotations
-
 import secrets
 from collections.abc import AsyncGenerator
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from jose import JWTError, jwt
+from sqlmodel import Session
 
 from samurai_backend.account.get.account import get_account
 from samurai_backend.account.schemas.account import AccountSchema, AccountSearchSchema
 from samurai_backend.core.schemas import TokenData
-from samurai_backend.db import get_db_session
+from samurai_backend.db import get_db_session_async
 from samurai_backend.settings import security_settings, settings
 
-if TYPE_CHECKING:
-    from sqlmodel import Session
-
-database_session_type = AsyncGenerator["Session", None, None]
-database_session = get_db_session
+database_session_type = AsyncGenerator[Session, None, None]
+database_session = get_db_session_async
 
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/auth/token",
+    tokenUrl="/auth/token/form",
     scopes={
         "admin": "Administrator level scope",
         "overseer": "Overseer level scope",
@@ -34,11 +30,11 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+def create_access_token(data: TokenData, expires_delta: timedelta | None = None) -> str:
     """
     Creates an access token.
     """
-    to_encode = data.copy()
+    to_encode = data.as_dict()
 
     if expires_delta:
         expire = datetime.now(tz=settings.timezone) + expires_delta
@@ -59,11 +55,11 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     )
 
 
-def create_refresh_token(data: dict) -> str:
+def create_refresh_token(data: TokenData) -> str:
     """
     Creates a refresh token.
     """
-    to_encode = data.copy()
+    to_encode = data.as_dict()
 
     expire = datetime.now(tz=settings.timezone) + timedelta(
         minutes=security_settings.refresh_token_lifetime_minutes
@@ -138,15 +134,30 @@ def get_current_account(
                 headers={"WWW-Authenticate": authenticate_value},
             )
 
-    return account
+    return AccountSchema.model_validate(account)
 
 
 def get_current_active_account(
-    current_account: Annotated[AccountSchema, Depends(get_current_account)],
+    current_account: Annotated[
+        AccountSchema,
+        Security(
+            get_current_account,
+            scopes=[],
+        ),
+    ],
 ) -> dict:
     """
     Returns the current active account.
     """
-    if current_account["is_active"] is False:
-        raise HTTPException(status_code=400, detail="Inactive account")
+    if current_account.is_active is False:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not verify credentials",
+        )
+    if current_account.is_email_verified is False:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not verify credentials",
+        )
+
     return current_account

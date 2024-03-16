@@ -1,6 +1,8 @@
 import pydantic
 
-from samurai_backend.core.schemas import BaseSchema
+from samurai_backend.core.schemas import BasePaginatedResponse, BaseSchema, PaginationSearchSchema
+from samurai_backend.enums import AccountType
+from samurai_backend.models.account.account import AccountModel
 
 
 class BaseAccount(BaseSchema):
@@ -19,6 +21,8 @@ class AccountRepresentation(BaseAccount):
 class VerboseAccountRepresentation(AccountRepresentation):
     is_active: bool
 
+    account_type: AccountType
+
 
 class AdminAccountRepresentation(VerboseAccountRepresentation):
     is_email_verified: bool
@@ -35,3 +39,19 @@ class AccountSearchSchema(pydantic.BaseModel):
     account_id: pydantic.UUID4 | None = None
     email: pydantic.EmailStr | None = None
     username: str | None = None
+
+    account_type: AccountType | None = None
+
+    registration_code: str | None = None
+
+
+class AccountSearchPaginationSchema(AccountSearchSchema, PaginationSearchSchema):
+    pass
+
+
+class AccountSearchResult(BasePaginatedResponse):
+    content: list[AccountModel]
+
+
+class AccountSearchResultVerbose(AccountSearchResult):
+    content: list[VerboseAccountRepresentation]

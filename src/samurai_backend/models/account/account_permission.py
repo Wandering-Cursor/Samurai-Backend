@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from .account import AccountModel
 
 
-class AccountPermission(SQLModel, table=True):
+class PermissionBase(SQLModel):
     """
     Describes a permission that can be assigned to an account.
     """
@@ -24,6 +24,8 @@ class AccountPermission(SQLModel, table=True):
     name: str = Field(unique=True, index=True)
     description: str = Field(default="No description")
 
+
+class AccountPermission(PermissionBase, table=True):
     accounts: list["AccountModel"] = Relationship(
         back_populates="permissions",
         link_model=AccountPermissionAccountLink,

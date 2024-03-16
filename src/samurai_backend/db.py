@@ -1,4 +1,4 @@
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Generator
 
 from sqlmodel import Session, create_engine
 
@@ -19,7 +19,18 @@ def make_engine() -> None:
 engine = make_engine()
 
 
-async def get_db_session() -> AsyncGenerator[Session, None, None]:
+def get_db_session() -> Generator[Session, None, None]:
+    """
+    Returns a database session.
+    """
+    db = Session(engine)
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+async def get_db_session_async() -> AsyncGenerator[Session, None, None]:
     """
     Returns a generator that yields a database session.
     """

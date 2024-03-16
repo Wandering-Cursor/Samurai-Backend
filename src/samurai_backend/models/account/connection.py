@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from .account import AccountModel
 
 
-class ConnectionModel(SQLModel, table=True):
+class ConnectionBase(SQLModel):
     connection_id: uuid.UUID = Field(
         default_factory=uuid.uuid4,
         primary_key=True,
@@ -32,6 +32,8 @@ class ConnectionModel(SQLModel, table=True):
         nullable=True,
     )
 
+
+class ConnectionModel(ConnectionBase, table=True):
     account: "AccountModel" = Relationship(
         back_populates="connections",
         link_model=ConnectionLinkModel,

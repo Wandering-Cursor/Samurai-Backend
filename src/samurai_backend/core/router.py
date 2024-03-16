@@ -1,10 +1,8 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, Form
 from fastapi.responses import JSONResponse
 
-from samurai_backend.account import operations
-from samurai_backend.account.schemas.account import VerboseAccountRepresentation
 from samurai_backend.core.schemas import GetToken, Token
 from samurai_backend.dependencies import database_session, database_session_type
 from samurai_backend.settings import security_settings
@@ -18,24 +16,11 @@ auth_router = APIRouter(
             "description": "Unauthorized, or invalid credentials.",
         }
     },
-)
-
-
-@auth_router.post(
-    "/token",
     tags=["auth"],
-    description="Create a pair of Access and Refresh tokens. Latter is stored in a cookie.",
-    responses={
-        200: {
-            "description": "Access token created.",
-            "model": Token,
-        },
-    },
 )
-async def login(
-    db: Annotated[database_session_type, Depends(database_session)],
-    auth_data: Annotated[GetToken, Body()],
-) -> JSONResponse:
+
+
+def perform_login(db: database_session_type, auth_data: GetToken) -> JSONResponse:
     try:
         token, refresh = authenticate(
             db=db,
@@ -63,14 +48,38 @@ async def login(
     return response
 
 
-@auth_router.post("/create")
-async def create_account(
+@auth_router.post(
+    "/token",
+    description="Create a pair of Access and Refresh tokens. Latter is stored in a cookie.",
+    responses={
+        200: {
+            "description": "Access token created.",
+            "model": Token,
+        },
+    },
+)
+async def login(
     db: Annotated[database_session_type, Depends(database_session)],
-    username: str,
-    password: str,
-) -> VerboseAccountRepresentation:
-    return operations.create_account(
-        db=db,
-        username=username,
-        password=password,
+    auth_data: Annotated[GetToken, Body()],
+) -> JSONResponse:
+    return perform_login(db, auth_data)
+
+
+@auth_router.post(
+    "/token/form",
+    include_in_schema=False,
+)
+async def login_form(
+    db: Annotated[database_session_type, Depends(database_session)],
+    username: str = Form(),
+    password: str = Form(),
+    access_token_ttl_min: int = Form(None),
+) -> JSONResponse:
+    return perform_login(
+        db,
+        GetToken(
+            username=username,
+            password=password,
+            access_token_ttl_min=access_token_ttl_min,
+        ),
     )

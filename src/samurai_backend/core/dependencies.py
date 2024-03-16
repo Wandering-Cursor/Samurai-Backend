@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import logging
+from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from samurai_backend.account.get.account import get_account
 from samurai_backend.account.schemas.account import AccountSearchSchema
-from samurai_backend.core.schemas import Token
+from samurai_backend.core.schemas import Token, TokenData
 from samurai_backend.dependencies import create_access_token, create_refresh_token
 from samurai_backend.settings import security_settings
 from samurai_backend.utils import verify_password
@@ -29,6 +30,7 @@ def authenticate(
         db,
         search=AccountSearchSchema(
             username=username,
+            email=username,
         ),
     )
     if not account:
@@ -43,14 +45,16 @@ def authenticate(
     if not is_password_valid:
         raise auth_error
 
-    token_data = {
-        "sub": username,
-        "scopes": [],
-    }
+    access_token_ttl = timedelta(minutes=access_token_ttl_min) if access_token_ttl_min else None
+
+    token_data = TokenData(
+        account_id=account.account_id,
+        scopes=[permission.name for permission in account.permissions],
+    )
     return Token(
         access_token=create_access_token(
             data=token_data,
-            expires_delta=access_token_ttl_min,
+            expires_delta=access_token_ttl,
         ),
         token_type="bearer",
     ), create_refresh_token(
