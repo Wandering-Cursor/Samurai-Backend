@@ -23,7 +23,7 @@ services:
       - redis-data:/data
 
   web:
-    image: samurai-backend:latest
+    image: samurai-backend-web:latest
     ports:
       - "8000:8000"
     depends_on:
