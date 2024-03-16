@@ -7,20 +7,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  docker:
+  stop-containers:
+    runs-on: self-hosted
+
+    steps:
+      - name: Stop containers
+        run: docker compose -f "compose/prod-docker-compose.yml" down
+
+  start-containers:
+    if: always()
     runs-on: self-hosted
 
     steps:
       - name: Log In
         run: echo "${{ secrets.PACKAGES_PAT }}" | docker login ghcr.io -u Wandering-Cursor --password-stdin
+
       - name: Fetch new images (backend)
         run: docker pull ghcr.io/wandering-cursor/samurai-backend:latest
 
-      - name: Stop containers
-        run: docker compose -f "compose/prod-docker-compose.yml" down
-
       - name: Checkout
-        if: always()
         uses: actions/checkout@v4
         with:
           clean: false
