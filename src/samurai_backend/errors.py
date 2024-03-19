@@ -20,3 +20,9 @@ class SamuraiIntegrityError(SamuraiAPIError):
     error_name: str = "IntegrityError"
     status_code: int = 409
     detail: str = "Database Integrity Error"
+
+
+class SamuraiNotFoundError(SamuraiAPIError):
+    error_name: str = "NotFoundError"
+    status_code: int = 404
+    detail: str = "Resource Not Found"

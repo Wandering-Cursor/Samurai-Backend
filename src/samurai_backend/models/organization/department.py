@@ -1,14 +1,26 @@
 import uuid
-from typing import TYPE_CHECKING
 
 import pydantic
 from sqlmodel import Field, Relationship, SQLModel
 
-if TYPE_CHECKING:
-    from .faculty import FacultyModel
+from .faculty import FacultyModel
 
 
-class DepartmentModel(SQLModel, table=True):
+class BaseDepartment(SQLModel):
+    name: str = Field(unique=True, index=True)
+    description: str | None = Field(default=None, nullable=True)
+
+
+class CreateDepartment(BaseDepartment):
+    pass
+
+
+class DepartmentRepresentation(BaseDepartment):
+    department_id: pydantic.UUID4
+    faculties: list[FacultyModel]
+
+
+class DepartmentModel(BaseDepartment, table=True):
     """
     Describes a department in an educational institution.
     Highest level of organization in an educational institution.
@@ -22,7 +34,4 @@ class DepartmentModel(SQLModel, table=True):
         index=True,
     )
 
-    name: str = Field(unique=True, index=True)
-    description: str | None = Field(default=None, nullable=True)
-
-    faculties: list["FacultyModel"] = Relationship(back_populates="department")
+    faculties: list[FacultyModel] = Relationship(back_populates="department")
