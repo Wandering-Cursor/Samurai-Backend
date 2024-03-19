@@ -130,5 +130,20 @@ async def refresh_token(
     )
 
 
-# TODO: Implement logout endpoint (delete refresh token and session)
-# TODO: Store sessions (perhaps we don't really need this :shruh:)
+@auth_router.post(
+    "/logout",
+    description="Delete the Refresh token and the session.",
+    responses={
+        200: {
+            "description": "Logged out.",
+            "content": {"detail": "Logged out."},
+        },
+    },
+)
+async def logout() -> JSONResponse:
+    response = JSONResponse(
+        content="OK",
+        status_code=200,
+    )
+    response.delete_cookie("refresh_token")
+    return response
