@@ -62,6 +62,7 @@ async def custom_swagger_ui_html() -> str:
         swagger_js_url="/static/swagger-ui-bundle.js",
         swagger_css_url="/static/swagger-ui.css",
         swagger_ui_parameters=app.swagger_ui_parameters,
+        swagger_favicon_url="/static/favicon.png",
     )
 
 
@@ -79,4 +80,5 @@ async def custom_redoc_html() -> str:
         openapi_url=app.openapi_url,
         title=app.title + " - ReDoc",
         redoc_js_url="/static/redoc.standalone.js",
+        redoc_favicon_url="/static/favicon.png",
     )
