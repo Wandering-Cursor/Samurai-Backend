@@ -23,6 +23,7 @@ class SecuritySettings(BaseSettings):
     max_access_token_ttl: int = 60 * 24 * 31
 
     cors_allow_origins: list[str] = ["*"]
+    cors_allow_origin_regex: str = r"(((http|https):\/\/)?localhost.*)"
     cors_allow_credentials: bool = True
     cors_allow_methods: list[str] = ["*"]
     cors_allow_headers: list[str] = ["*"]

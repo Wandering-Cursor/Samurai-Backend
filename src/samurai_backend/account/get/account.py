@@ -8,6 +8,7 @@ from sqlmodel import select
 from samurai_backend.account.schemas.account import AccountSearchResult
 from samurai_backend.core.schemas import PaginationMetaInformation
 from samurai_backend.models.account.account import AccountModel
+from samurai_backend.utils import get_count
 
 if TYPE_CHECKING:
     from sqlmodel import Session
@@ -42,7 +43,7 @@ def get_accounts(db: Session, search: AccountSearchPaginationSchema) -> AccountS
     """
     Returns a list of users from the database.
     """
-    query = db.query(AccountModel)
+    query = select(AccountModel)
 
     if search.account_id:
         query = query.filter(AccountModel.account_id == search.account_id)
@@ -59,9 +60,10 @@ def get_accounts(db: Session, search: AccountSearchPaginationSchema) -> AccountS
     if search.registration_code:
         query = query.filter(AccountModel.registration_code == search.registration_code)
 
-    total = query.count()
-
+    total = get_count(db, query)
     query = query.offset(search.search_page * search.page_size).limit(search.page_size)
+
+    query = db.exec(query)
 
     return AccountSearchResult(
         meta=PaginationMetaInformation(

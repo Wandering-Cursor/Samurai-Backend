@@ -1,7 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends, Form
-from fastapi.requests import Request
+from fastapi import APIRouter, Body, Cookie, Depends, Form
 from fastapi.responses import JSONResponse
 
 from samurai_backend.core.schemas import ErrorSchema, GetToken, RefreshTokenInput, Token
@@ -46,6 +45,9 @@ def perform_login(db: database_session_type, auth_data: GetToken) -> JSONRespons
         httponly=True,
         max_age=security_settings.refresh_token_lifetime_minutes * 60,
         secure=True,
+        # Using samesite = "none" because frontend and backend are on different domains.
+        # MSDN seems to suggest that this is the correct way to do it.
+        samesite="none",
     )
 
     return response
@@ -88,6 +90,11 @@ async def login_form(
     )
 
 
+refresh_body = Body(
+    default=None,
+)
+
+
 @auth_router.post(
     "/refresh",
     description="Refresh the Access token using the Refresh token stored in a cookie.",
@@ -99,13 +106,13 @@ async def login_form(
     },
 )
 async def refresh_token(
-    request: Request,
     db: Annotated[database_session_type, Depends(database_session)],
-    refresh_body: Annotated[RefreshTokenInput | None, Body()],
+    refresh_cooke: str | None = Cookie(default=None),
+    refresh_body: RefreshTokenInput | None = refresh_body,
 ) -> JSONResponse:
-    refresh_token = refresh_body.refresh_token
-    if cookie_token := request.cookies.get("refresh_token"):
-        refresh_token = cookie_token
+    refresh_token = refresh_cooke
+    if refresh_body:
+        refresh_token = refresh_body.refresh_token
 
     if not refresh_token:
         return JSONResponse(
@@ -130,5 +137,20 @@ async def refresh_token(
     )
 
 
-# TODO: Implement logout endpoint (delete refresh token and session)
-# TODO: Store sessions (perhaps we don't really need this :shruh:)
+@auth_router.post(
+    "/logout",
+    description="Delete the Refresh token and the session.",
+    responses={
+        200: {
+            "description": "Logged out.",
+            "content": {"detail": "Logged out."},
+        },
+    },
+)
+async def logout() -> JSONResponse:
+    response = JSONResponse(
+        content="OK",
+        status_code=200,
+    )
+    response.delete_cookie("refresh_token")
+    return response
