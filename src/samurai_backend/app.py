@@ -3,7 +3,6 @@ import json
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.openapi.docs import (
-    get_redoc_html,
     get_swagger_ui_oauth2_redirect_html,
     swagger_ui_default_parameters,
 )
@@ -133,7 +132,6 @@ async def custom_redoc_html() -> str:
     title = app.title + " - ReDoc"
     redoc_js_url = "/static/redoc.standalone.js"
     redoc_favicon_url = "/static/favicon.png"
-    with_google_fonts = False
 
     html = f"""
     <!DOCTYPE html>
@@ -143,12 +141,6 @@ async def custom_redoc_html() -> str:
     <!-- needed for adaptive design -->
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    """
-    if with_google_fonts:
-        html += """
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
-    """
-    html += f"""
     <link rel="shortcut icon" href="{redoc_favicon_url}">
     <!--
     ReDoc doesn't change outer page styles
