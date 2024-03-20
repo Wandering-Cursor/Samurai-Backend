@@ -157,7 +157,7 @@ async def custom_redoc_html() -> str:
         ReDoc requires Javascript to function. Please enable it to browse the documentation.
     </noscript>
     <redoc spec-url="{openapi_url}"></redoc>
-    <script src="{redoc_js_url}" nonce={settings.script_nonce}> </script>
+    <script src="{redoc_js_url}" nonce="{settings.script_nonce}"> </script>
     </body>
     </html>
     """
