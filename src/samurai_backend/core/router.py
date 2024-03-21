@@ -45,9 +45,7 @@ def perform_login(db: database_session_type, auth_data: GetToken) -> JSONRespons
         httponly=True,
         max_age=security_settings.refresh_token_lifetime_minutes * 60,
         secure=True,
-        # Using samesite = "none" because frontend and backend are on different domains.
-        # MSDN seems to suggest that this is the correct way to do it.
-        samesite="none",
+        domain=security_settings.cookie_domain,
     )
 
     return response
@@ -107,10 +105,10 @@ refresh_body = Body(
 )
 async def refresh_token(
     db: Annotated[database_session_type, Depends(database_session)],
-    refresh_cooke: str | None = Cookie(default=None),
+    refresh_cookie: str | None = Cookie(default=None),
     refresh_body: RefreshTokenInput | None = refresh_body,
 ) -> JSONResponse:
-    refresh_token = refresh_cooke
+    refresh_token = refresh_cookie
     if refresh_body:
         refresh_token = refresh_body.refresh_token
 

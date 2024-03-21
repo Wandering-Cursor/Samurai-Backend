@@ -145,7 +145,7 @@ async def custom_redoc_html() -> str:
     <!--
     ReDoc doesn't change outer page styles
     -->
-    <style>
+    <style nonce="{settings.script_nonce}">
       body {{
         margin: 0;
         padding: 0;
@@ -156,8 +156,8 @@ async def custom_redoc_html() -> str:
     <noscript>
         ReDoc requires Javascript to function. Please enable it to browse the documentation.
     </noscript>
-    <redoc spec-url="{openapi_url}"></redoc>
-    <script src="{redoc_js_url}" nonce="{settings.script_nonce}"> </script>
+    <redoc spec-url="{openapi_url}" nonce="{settings.script_nonce}"></redoc>
+    <script src="{redoc_js_url}" nonce="{settings.script_nonce}"></script>
     </body>
     </html>
     """
