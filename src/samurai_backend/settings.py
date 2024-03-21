@@ -22,7 +22,7 @@ class SecuritySettings(BaseSettings):
     access_token_lifetime_minutes: int = 15
     refresh_token_lifetime_minutes: int = 60 * 24 * 7
     max_access_token_ttl: int = 60 * 24 * 31
-    cookie_domain: str = "obscurial.art"
+    cookie_domain: str = ".obscurial.art"
 
     cors_allow_origins: list[str] = ["*"]
     cors_allow_origin_regex: str = r"(((http|https):\/\/)?localhost.*)"

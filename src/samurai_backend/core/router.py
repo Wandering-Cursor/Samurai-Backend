@@ -46,6 +46,7 @@ def perform_login(db: database_session_type, auth_data: GetToken) -> JSONRespons
         max_age=security_settings.refresh_token_lifetime_minutes * 60,
         secure=True,
         domain=security_settings.cookie_domain,
+        samesite="none",
     )
 
     return response
