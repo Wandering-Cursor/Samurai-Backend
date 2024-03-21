@@ -111,14 +111,14 @@ refresh_body = Body(
 )
 async def refresh_token(
     db: Annotated[database_session_type, Depends(database_session)],
-    refresh_cookie: str | None = Cookie(default=None),
+    refresh_token: str | None = Cookie(default=None),
     refresh_body: RefreshTokenInput | None = refresh_body,
 ) -> JSONResponse:
-    refresh_token = refresh_cookie
+    refresh_token_value = refresh_token
     if refresh_body:
-        refresh_token = refresh_body.refresh_token
+        refresh_token_value = refresh_body.refresh_token
 
-    if not refresh_token:
+    if not refresh_token_value:
         return JSONResponse(
             content={"detail": "No refresh token provided."},
             status_code=401,
@@ -127,7 +127,7 @@ async def refresh_token(
     try:
         token = authenticate_by_refresh_token(
             db=db,
-            refresh_token=refresh_token,
+            refresh_token=refresh_token_value,
         )
     except ValueError:
         return JSONResponse(
