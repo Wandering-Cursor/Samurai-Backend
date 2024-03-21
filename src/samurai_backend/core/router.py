@@ -1,11 +1,12 @@
 from typing import Annotated
+import datetime
 
 from fastapi import APIRouter, Body, Cookie, Depends, Form
 from fastapi.responses import JSONResponse
 
 from samurai_backend.core.schemas import ErrorSchema, GetToken, RefreshTokenInput, Token
 from samurai_backend.dependencies import database_session, database_session_type
-from samurai_backend.settings import security_settings
+from samurai_backend.settings import settings, security_settings
 
 from .dependencies import authenticate, authenticate_by_refresh_token
 
@@ -47,6 +48,10 @@ def perform_login(db: database_session_type, auth_data: GetToken) -> JSONRespons
         secure=True,
         domain=security_settings.cookie_domain,
         samesite="none",
+        expires=(
+            datetime.datetime.now(tz=settings.timezone).timestamp()
+            + (security_settings.refresh_token_lifetime_minutes * 60)
+        ),
     )
 
     return response
