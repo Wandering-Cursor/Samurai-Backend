@@ -48,8 +48,8 @@ def perform_login(db: database_session_type, auth_data: GetToken) -> JSONRespons
         secure=True,
         domain=security_settings.cookie_domain,
         samesite="none",
-        expires=(
-            datetime.datetime.now(tz=settings.timezone).timestamp()
+        expires=int(
+            datetime.datetime.now(tz=datetime.UTC).timestamp()
             + (security_settings.refresh_token_lifetime_minutes * 60)
         ),
     )
