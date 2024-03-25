@@ -3,7 +3,7 @@ import uuid
 import pydantic
 from sqlmodel import Field, Relationship, SQLModel
 
-from .faculty import FacultyModel
+from .faculty import Faculty, FacultyModel
 
 
 class BaseDepartment(SQLModel):
@@ -17,7 +17,7 @@ class CreateDepartment(BaseDepartment):
 
 class DepartmentRepresentation(BaseDepartment):
     department_id: pydantic.UUID4
-    faculties: list[FacultyModel]
+    faculties: list[Faculty]
 
 
 class DepartmentModel(BaseDepartment, table=True):
