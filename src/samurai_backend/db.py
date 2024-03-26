@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator, Generator
 
+from sqlalchemy.engine import Engine
 from sqlmodel import Session, create_engine
 
 from samurai_backend import models
@@ -12,7 +13,7 @@ __all__ = [
 SQLALCHEMY_DATABASE_URL = settings.database_url
 
 
-def make_engine() -> None:
+def make_engine() -> Engine:
     return create_engine(SQLALCHEMY_DATABASE_URL)
 
 
@@ -30,7 +31,7 @@ def get_db_session() -> Generator[Session, None, None]:
         db.close()
 
 
-async def get_db_session_async() -> AsyncGenerator[Session, None, None]:
+async def get_db_session_async() -> AsyncGenerator[Session, None]:
     """
     Returns a generator that yields a database session.
     """

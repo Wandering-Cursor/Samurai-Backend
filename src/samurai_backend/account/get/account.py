@@ -5,7 +5,10 @@ from typing import TYPE_CHECKING
 from sqlalchemy import or_
 from sqlmodel import select
 
-from samurai_backend.account.schemas.account import AccountSearchResult
+from samurai_backend.account.schemas.account import (
+    AccountSearchResultVerbose,
+    VerboseAccountRepresentation,
+)
 from samurai_backend.core.schemas import PaginationMetaInformation
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.utils import get_count
@@ -39,7 +42,7 @@ def get_account(db: Session, search: AccountSearchSchema) -> AccountModel | None
     return user
 
 
-def get_accounts(db: Session, search: AccountSearchPaginationSchema) -> AccountSearchResult:
+def get_accounts(db: Session, search: AccountSearchPaginationSchema) -> AccountSearchResultVerbose:
     """
     Returns a list of users from the database.
     """
@@ -65,11 +68,14 @@ def get_accounts(db: Session, search: AccountSearchPaginationSchema) -> AccountS
 
     query = db.exec(query)
 
-    return AccountSearchResult(
+    return AccountSearchResultVerbose(
         meta=PaginationMetaInformation(
             total=total,
             page=search.page,
             page_size=search.page_size,
         ),
-        content=query.all(),
+        content=[
+            VerboseAccountRepresentation.model_validate(row, from_attributes=True)
+            for row in query.all()
+        ],
     )

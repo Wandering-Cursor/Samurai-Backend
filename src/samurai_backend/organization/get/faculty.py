@@ -5,11 +5,8 @@ from typing import TYPE_CHECKING
 from sqlmodel import select
 
 from samurai_backend.core.schemas import PaginationMetaInformation
-from samurai_backend.models.organization.department import DepartmentModel, DepartmentRepresentation
-from samurai_backend.organization.schemas.department import (
-    DepartmentSearchInput,
-    DepartmentSearchOutput,
-)
+from samurai_backend.models.organization.faculty import FacultyModel, FacultyRepresentation
+from samurai_backend.organization.schemas.faculty import FacultySearchInput, FacultySearchOutput
 from samurai_backend.utils import get_count
 
 if TYPE_CHECKING:
@@ -17,36 +14,35 @@ if TYPE_CHECKING:
     from sqlmodel import Session
 
 
-def get_department_by_id(
+def get_faculty_by_id(
     session: Session,
-    department_id: pydantic.UUID4,
-) -> DepartmentModel | None:
-    """
-    Get a department by its ID
-    """
+    faculty_id: pydantic.UUID4,
+) -> FacultyModel | None:
     return session.exec(
         select(
-            DepartmentModel,
+            FacultyModel,
         ).where(
-            DepartmentModel.department_id == department_id,
+            FacultyModel.faculty_id == faculty_id,
         )
     ).first()
 
 
-def get_departments_search(
+def get_faculty_search(
     session: Session,
-    search: DepartmentSearchInput,
-) -> DepartmentSearchOutput:
-    """
-    Search for departments
-    """
+    search: FacultySearchInput,
+) -> FacultySearchOutput:
     query = select(
-        DepartmentModel,
+        FacultyModel,
     )
+
+    if search.department_id:
+        query = query.filter(
+            FacultyModel.department_id == search.department_id,
+        )
 
     if search.name:
         query = query.filter(
-            DepartmentModel.name.icontains(search.name),
+            FacultyModel.name.icontains(search.name),
         )
 
     total = get_count(session, query)
@@ -54,9 +50,9 @@ def get_departments_search(
 
     rows = session.exec(query)
 
-    return DepartmentSearchOutput(
+    return FacultySearchOutput(
         content=[
-            DepartmentRepresentation.model_validate(row, from_attributes=True) for row in rows.all()
+            FacultyRepresentation.model_validate(row, from_attributes=True) for row in rows.all()
         ],
         meta=PaginationMetaInformation(
             total=total,

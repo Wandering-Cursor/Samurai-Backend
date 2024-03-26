@@ -114,7 +114,7 @@ class AccountModel(BaseAccountModel, table=True):
         self.hashed_password = get_password_hash(self.salt, password)
 
     @classmethod
-    def from_create_model(cls: "AccountModel", account: CreateAccountModel) -> "AccountModel":
+    def from_create_model(cls: type["AccountModel"], account: CreateAccountModel) -> "AccountModel":
         obj = cls(
             account_id=account.account_id,
             email=account.email,

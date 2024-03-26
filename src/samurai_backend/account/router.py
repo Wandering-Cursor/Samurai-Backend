@@ -27,10 +27,13 @@ account_router = APIRouter(
 async def register_account(
     db: Annotated[database_session_type, Depends(database_session)],
     body: Annotated[RegisterAccount, Body()],
-) -> None:
+) -> RegisterAccountResponse:
     account = account_get.get_account(
         db=db, search=AccountSearchSchema(registration_code=body.registration_code)
     )
+
+    if not account:
+        raise ValueError("Invalid registration code.")
 
     account_operations.register_account(
         db=db,
@@ -48,7 +51,7 @@ async def register_account(
 async def confirm_email(
     db: Annotated[database_session_type, Depends(database_session)],
     body: Annotated[ConfirmEmail, Body()],
-) -> None:
+) -> ConfirmEmailResponse:
     account_operations.confirm_email(
         db=db,
         email_code=body.email_code,

@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from samurai_backend.core.operations import store_entity
+from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.account.registration_code import RegistrationEmailCode
 
 from .get.registration_code import get_registration_code
@@ -10,16 +11,7 @@ from .get.registration_code import get_registration_code
 if TYPE_CHECKING:
     from sqlmodel import Session
 
-    from samurai_backend.models.account.account import AccountModel
-
     from .schemas.register import RegisterAccount
-
-
-def store_account(
-    db: Session,
-    account: AccountModel,
-) -> AccountModel:
-    return store_entity(db, account)
 
 
 def register_account(
@@ -35,7 +27,10 @@ def register_account(
         account.username = registration_info.username
     account.set_password(registration_info.password)
 
-    account = store_account(db, account)
+    account = AccountModel.model_validate(
+        store_entity(db, account),
+        from_attributes=True,
+    )
 
     registration_code = RegistrationEmailCode(
         account_id=account.account_id,
@@ -64,7 +59,7 @@ def confirm_email(
 
     account = registration_code.account
     account.is_email_verified = True
-    store_account(db, account)
+    store_entity(db, account)
     registration_code.is_used = True
     store_entity(db, registration_code)
 

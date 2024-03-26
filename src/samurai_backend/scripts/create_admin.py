@@ -1,4 +1,4 @@
-from samurai_backend.account.operations import store_account
+from samurai_backend.core.operations import store_entity
 from samurai_backend.db import get_db_session
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.account.account_permission import AccountPermission
@@ -24,7 +24,7 @@ def create_admin() -> None:
     )
     admin.set_password(password)
 
-    store_account(db, admin)
+    store_entity(db, admin)
     print(f"Admin account created with email: {email}")  # noqa: T201
 
 

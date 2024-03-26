@@ -1,6 +1,6 @@
 [project]
 name = "Samurai-Backend"
-version = "0.7.0c"
+version = "0.7.4"
 description = "Backend part of the Samurai project"
 authors = [
     {name = "Pavlo Pohorieltsev", email = "hdydpavel@gmail.com"},
@@ -26,6 +26,8 @@ license = {text = "MIT"}
 [project.optional-dependencies]
 dev = [
     "ruff>=0.3.3",
+    "pre-commit>=3.7.0",
+    "pyright>=1.1.355",
 ]
 [build-system]
 requires = ["pdm-backend"]
@@ -99,3 +101,12 @@ ignore = [
 [tool.ruff.format]
 quote-style = "double"
 docstring-code-format = true
+
+
+[tool.pyright]
+include = [
+  "src/samurai_backend",
+]
+exclude = [
+  "src/samurai_backend/migrations",
+]

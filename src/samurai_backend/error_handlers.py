@@ -6,7 +6,7 @@ from jose.exceptions import JOSEError
 from pydantic import ValidationError
 
 
-def validation_exception_handler(_: Request, exc: ValidationError) -> None:
+def validation_exception_handler(_: Request, exc: ValidationError) -> JSONResponse:
     raise HTTPException(
         status_code=422,
         detail=exc.errors(),
@@ -40,7 +40,7 @@ def http_exception_handler(_: Request, exc: HTTPException) -> JSONResponse:
         status_code=exc.status_code,
         headers={
             "X-Error": "HTTP Error",
-            **exc.headers,
+            **(exc.headers or {}),
         },
     )
 
