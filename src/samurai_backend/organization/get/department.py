@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from sqlmodel import select
 
 from samurai_backend.core.schemas import PaginationMetaInformation
-from samurai_backend.models.organization.department import DepartmentModel
+from samurai_backend.models.organization.department import DepartmentModel, DepartmentRepresentation
 from samurai_backend.organization.schemas.department import (
     DepartmentSearchInput,
     DepartmentSearchOutput,
@@ -13,12 +13,13 @@ from samurai_backend.organization.schemas.department import (
 from samurai_backend.utils import get_count
 
 if TYPE_CHECKING:
+    import pydantic
     from sqlmodel import Session
 
 
 def get_department_by_id(
     session: Session,
-    department_id: str,
+    department_id: pydantic.UUID4,
 ) -> DepartmentModel | None:
     """
     Get a department by its ID
@@ -54,7 +55,9 @@ def get_departments_search(
     rows = session.exec(query)
 
     return DepartmentSearchOutput(
-        content=rows.all(),
+        content=[
+            DepartmentRepresentation.model_validate(row, from_attributes=True) for row in rows.all()
+        ],
         meta=PaginationMetaInformation(
             total=total,
             page=search.page,

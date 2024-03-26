@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from sqlmodel import select
 
 from samurai_backend.core.schemas import PaginationMetaInformation
-from samurai_backend.models.organization.faculty import FacultyModel
+from samurai_backend.models.organization.faculty import FacultyModel, FacultyRepresentation
 from samurai_backend.organization.schemas.faculty import FacultySearchInput, FacultySearchOutput
 from samurai_backend.utils import get_count
 
@@ -51,7 +51,9 @@ def get_faculty_search(
     rows = session.exec(query)
 
     return FacultySearchOutput(
-        content=rows.all(),
+        content=[
+            FacultyRepresentation.model_validate(row, from_attributes=True) for row in rows.all()
+        ],
         meta=PaginationMetaInformation(
             total=total,
             page=search.page,

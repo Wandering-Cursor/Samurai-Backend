@@ -10,7 +10,12 @@ if TYPE_CHECKING:
     from .account import AccountModel
 
 
-class PermissionBase(SQLModel):
+class CreatePermission(SQLModel):
+    name: str = Field(unique=True, index=True)
+    description: str = Field(default="No description")
+
+
+class PermissionBase(CreatePermission):
     """
     Describes a permission that can be assigned to an account.
     """
@@ -20,9 +25,6 @@ class PermissionBase(SQLModel):
         primary_key=True,
         index=True,
     )
-
-    name: str = Field(unique=True, index=True)
-    description: str = Field(default="No description")
 
 
 class AccountPermission(PermissionBase, table=True):

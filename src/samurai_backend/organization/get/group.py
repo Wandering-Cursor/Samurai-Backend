@@ -51,7 +51,7 @@ def get_group_search(
     rows = session.exec(query)
 
     return GroupSearchOutput(
-        content=rows.all(),
+        content=list(rows.all()),
         meta=PaginationMetaInformation(
             total=total,
             page=search.page,

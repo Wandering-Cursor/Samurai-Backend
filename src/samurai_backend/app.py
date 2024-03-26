@@ -56,7 +56,7 @@ async def docs_redirect() -> RedirectResponse:
     "/docs",
     include_in_schema=False,
 )
-async def custom_swagger_ui_html() -> str:
+async def custom_swagger_ui_html() -> HTMLResponse:
     openapi_url = app.openapi_url
     title = app.title + " - Swagger UI"
     oauth2_redirect_url = app.swagger_ui_oauth2_redirect_url
@@ -108,16 +108,18 @@ async def custom_swagger_ui_html() -> str:
     return HTMLResponse(html)
 
 
-@app.get(app.swagger_ui_oauth2_redirect_url, include_in_schema=False)
-async def swagger_ui_redirect() -> HTMLResponse:
-    return get_swagger_ui_oauth2_redirect_html()
+if app.swagger_ui_oauth2_redirect_url:
+
+    @app.get(app.swagger_ui_oauth2_redirect_url, include_in_schema=False)
+    async def swagger_ui_redirect() -> HTMLResponse:
+        return get_swagger_ui_oauth2_redirect_html()
 
 
 @app.get(
     "/redoc",
     include_in_schema=False,
 )
-async def custom_redoc_html() -> str:
+async def custom_redoc_html() -> HTMLResponse:
     """
     Generate and return the HTML response that loads ReDoc for the alternative
     API docs (normally served at `/redoc`).

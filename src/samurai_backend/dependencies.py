@@ -1,5 +1,4 @@
 import secrets
-from collections.abc import AsyncGenerator
 from datetime import datetime, timedelta
 from typing import Annotated
 
@@ -14,7 +13,7 @@ from samurai_backend.core.schemas import TokenData
 from samurai_backend.db import get_db_session_async
 from samurai_backend.settings import security_settings, settings
 
-database_session_type = AsyncGenerator[Session, None, None]
+database_session_type = Session
 database_session = get_db_session_async
 
 
@@ -121,15 +120,18 @@ def get_current_account(
             security_settings.secret_key,
             algorithms=[security_settings.algorithm],
         )
-        account_id: str = payload.get("sub")
-        if account_id is None:
+        account_id = payload.get("sub")
+        if not isinstance(account_id, str):
             raise JWTError
 
-        token_type: str = payload.get("type")
-        if token_type != "access":
+        token_type = payload.get("type")
+        if not isinstance(token_type, str) or token_type != "access":
             raise JWTError
 
         token_scopes = payload.get("scopes", [])
+        if not isinstance(token_scopes, list):
+            raise JWTError
+
         token_data = TokenData(
             sub=account_id,
             scopes=token_scopes,
@@ -164,7 +166,7 @@ def get_current_active_account(
             scopes=[],
         ),
     ],
-) -> dict:
+) -> AccountSchema:
     """
     Returns the current active account.
     """

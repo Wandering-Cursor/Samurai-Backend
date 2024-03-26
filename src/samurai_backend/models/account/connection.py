@@ -9,13 +9,7 @@ if TYPE_CHECKING:
     from .account import AccountModel
 
 
-class ConnectionBase(SQLModel):
-    connection_id: uuid.UUID = Field(
-        default_factory=uuid.uuid4,
-        primary_key=True,
-        index=True,
-    )
-
+class ConnectionCreate(SQLModel):
     group_id: uuid.UUID | None = Field(
         default=None,
         foreign_key="groupmodel.group_id",
@@ -30,6 +24,14 @@ class ConnectionBase(SQLModel):
         default=None,
         foreign_key="departmentmodel.department_id",
         nullable=True,
+    )
+
+
+class ConnectionBase(ConnectionCreate):
+    connection_id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        primary_key=True,
+        index=True,
     )
 
 

@@ -28,9 +28,12 @@ async def create_department(
     department: Annotated[CreateDepartment, Body()],
 ) -> DepartmentRepresentation:
     department_obj = DepartmentModel.model_validate(department)
-    return store_entity(
-        db=db,
-        entity=department_obj,
+    return DepartmentRepresentation.model_validate(
+        store_entity(
+            db=db,
+            entity=department_obj,
+        ),
+        from_attributes=True,
     )
 
 
@@ -46,10 +49,13 @@ async def update_department(
 ) -> DepartmentRepresentation:
     department_obj = DepartmentModel.model_validate(department)
     department_obj.department_id = department_id
-    return update_entity(
-        db=db,
-        entity=department_obj,
-        primary_key="department_id",
+    return DepartmentRepresentation.model_validate(
+        update_entity(
+            db=db,
+            entity=department_obj,
+            primary_key="department_id",
+        ),
+        from_attributes=True,
     )
 
 
@@ -74,7 +80,10 @@ async def delete_department(
 async def get_department_by_id(
     department: Annotated[DepartmentModel, Depends(department_exists)],
 ) -> DepartmentRepresentation:
-    return department
+    return DepartmentRepresentation.model_validate(
+        department,
+        from_attributes=True,
+    )
 
 
 @admin_router.get(
