@@ -1,5 +1,3 @@
-from collections.abc import Sequence
-
 import pydantic
 
 from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
@@ -12,4 +10,4 @@ class GroupSearchInput(PaginationSearchSchema):
 
 
 class GroupSearchOutput(BasePaginatedResponse):
-    content: Sequence[Group]
+    content: list[Group]

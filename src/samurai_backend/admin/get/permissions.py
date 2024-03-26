@@ -7,15 +7,13 @@ from sqlmodel import select
 from samurai_backend.models.account.account_permission import AccountPermission
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-
     import pydantic
     from sqlmodel import Session
 
 
 def get_permissions(
     db: Session,
-) -> Sequence[AccountPermission]:
+) -> list[AccountPermission]:
     query = select(AccountPermission)
     return db.exec(query).all()
 

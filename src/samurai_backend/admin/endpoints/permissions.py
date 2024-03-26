@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from typing import Annotated
 
 from fastapi import Depends
@@ -20,7 +19,7 @@ from samurai_backend.models.account.account_permission import (
 )
 async def get_permissions(
     db: Annotated[database_session_type, Depends(database_session)],
-) -> Sequence[AccountPermission]:
+) -> list[AccountPermission]:
     return permissions_get.get_permissions(db=db)
 
 

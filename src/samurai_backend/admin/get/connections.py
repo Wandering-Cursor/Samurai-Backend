@@ -7,15 +7,13 @@ from sqlmodel import select
 from samurai_backend.models.account.connection import ConnectionModel
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-
     import pydantic
     from sqlmodel import Session
 
 
 def get_connections(
     db: Session,
-) -> Sequence[ConnectionModel]:
+) -> list[ConnectionModel]:
     query = select(ConnectionModel)
     return db.exec(query).all()
 

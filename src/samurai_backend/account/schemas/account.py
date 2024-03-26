@@ -1,5 +1,3 @@
-from collections.abc import Sequence
-
 import pydantic
 
 from samurai_backend.core.schemas import BasePaginatedResponse, BaseSchema, PaginationSearchSchema
@@ -52,8 +50,8 @@ class AccountSearchPaginationSchema(AccountSearchSchema, PaginationSearchSchema)
 
 
 class AccountSearchResult(BasePaginatedResponse):
-    content: Sequence[AccountModel]
+    content: list[AccountModel]
 
 
 class AccountSearchResultVerbose(BasePaginatedResponse):
-    content: Sequence[VerboseAccountRepresentation]
+    content: list[VerboseAccountRepresentation]

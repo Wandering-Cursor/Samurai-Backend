@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from math import ceil
 
 import pydantic
@@ -70,4 +69,4 @@ class PaginationMetaInformation(pydantic.BaseModel):
 
 class BasePaginatedResponse(pydantic.BaseModel):
     meta: PaginationMetaInformation
-    content: Sequence
+    content: list

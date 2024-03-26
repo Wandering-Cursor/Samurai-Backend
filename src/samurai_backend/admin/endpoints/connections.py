@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from typing import Annotated
 
 from fastapi import Depends
@@ -20,7 +19,7 @@ from samurai_backend.models.account.connection import (
 )
 async def get_connections(
     db: Annotated[database_session_type, Depends(database_session)],
-) -> Sequence[ConnectionBase]:
+) -> list[ConnectionBase]:
     return connections_get.get_connections(db=db)
 
 
