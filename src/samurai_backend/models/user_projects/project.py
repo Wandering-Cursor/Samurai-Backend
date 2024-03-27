@@ -1,0 +1,22 @@
+import uuid
+from typing import TYPE_CHECKING
+
+import pydantic
+from sqlmodel import Field, Relationship
+
+from samurai_backend.models.projects.project import BaseProject
+
+if TYPE_CHECKING:
+    from .task import UserTaskModel
+    from .user_project_link import UserProjectLinkModel
+
+
+class UserProjectModel(BaseProject, table=True):
+    project_id: pydantic.UUID4 = Field(
+        default_factory=uuid.uuid4,
+        primary_key=True,
+        index=True,
+    )
+
+    account_links: list["UserProjectLinkModel"] = Relationship(back_populates="user_project")
+    tasks: list["UserTaskModel"] = Relationship(back_populates="project")

@@ -12,6 +12,8 @@ from .account_permission_link import AccountPermissionAccountLink
 from .connection_link import ConnectionLinkModel
 
 if TYPE_CHECKING:
+    from samurai_backend.models.user_projects.user_project_link import UserProjectLinkModel
+
     from .account_permission import AccountPermission
     from .connection import ConnectionModel
     from .registration_code import RegistrationEmailCode
@@ -104,6 +106,9 @@ class AccountModel(BaseAccountModel, table=True):
         link_model=ConnectionLinkModel,
     )
     registration_email_code: "RegistrationEmailCode" = Relationship(
+        back_populates="account",
+    )
+    user_project_links: list["UserProjectLinkModel"] = Relationship(
         back_populates="account",
     )
 
