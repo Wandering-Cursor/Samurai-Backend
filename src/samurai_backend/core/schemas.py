@@ -54,6 +54,10 @@ class PaginationSearchSchema(pydantic.BaseModel):
     def search_page(self: "PaginationSearchSchema") -> int:
         return self.page - 1
 
+    @property
+    def offset(self: "PaginationSearchSchema") -> int:
+        return self.search_page * self.page_size
+
 
 class PaginationMetaInformation(pydantic.BaseModel):
     total: int

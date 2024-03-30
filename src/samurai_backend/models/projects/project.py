@@ -1,13 +1,10 @@
 import uuid
-from typing import TYPE_CHECKING
 
 import pydantic
 from sqlmodel import Field, Relationship
 
 from .base import BaseNamed
-
-if TYPE_CHECKING:
-    from .task import TaskModel
+from .task import TaskModel
 
 
 class BaseProject(BaseNamed):
@@ -22,7 +19,7 @@ class CreateProject(BaseProject):
 
 class ProjectRepresentation(BaseProject):
     project_id: pydantic.UUID4
-    tasks: list["TaskModel"]
+    tasks: list[TaskModel]
 
 
 class ProjectModel(BaseProject, table=True):
@@ -32,4 +29,4 @@ class ProjectModel(BaseProject, table=True):
         index=True,
     )
 
-    tasks: list["TaskModel"] = Relationship(back_populates="project")
+    tasks: list[TaskModel] = Relationship(back_populates="project")
