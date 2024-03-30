@@ -43,15 +43,14 @@ def perform_login(db: database_session_type, auth_data: GetToken) -> JSONRespons
     response.set_cookie(
         key="refresh_token",
         value=refresh,
+        expires=(
+            datetime.datetime.now(tz=datetime.UTC)
+            + datetime.timedelta(minutes=security_settings.refresh_token_lifetime_minutes)
+        ),
         httponly=True,
-        max_age=security_settings.refresh_token_lifetime_minutes * 60,
         secure=True,
         domain=security_settings.cookie_domain,
-        samesite="none",
-        expires=int(
-            datetime.datetime.now(tz=datetime.UTC).timestamp()
-            + (security_settings.refresh_token_lifetime_minutes * 60)
-        ),
+        samesite="lax",
     )
 
     return response
