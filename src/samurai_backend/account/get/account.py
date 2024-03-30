@@ -11,9 +11,11 @@ from samurai_backend.account.schemas.account import (
 )
 from samurai_backend.core.schemas import PaginationMetaInformation
 from samurai_backend.models.account.account import AccountModel
+from samurai_backend.models.account.connection import ConnectionModel
 from samurai_backend.utils import get_count
 
 if TYPE_CHECKING:
+    import pydantic
     from sqlmodel import Session
 
     from samurai_backend.account.schemas.account import (
@@ -79,3 +81,16 @@ def get_accounts(db: Session, search: AccountSearchPaginationSchema) -> AccountS
             for row in query.all()
         ],
     )
+
+
+def get_all_accounts_by_group(db: Session, group_id: pydantic.UUID4) -> list[AccountModel]:
+    query = select(ConnectionModel).filter(ConnectionModel.group_id == group_id)
+    query = db.exec(query)
+
+    query = select(AccountModel).filter(
+        AccountModel.account_id.in_(row.account.account_id for row in query.all())
+    )
+
+    query = db.exec(query)
+
+    return query.all()

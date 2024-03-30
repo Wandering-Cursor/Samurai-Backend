@@ -55,3 +55,7 @@ class AccountSearchResult(BasePaginatedResponse):
 
 class AccountSearchResultVerbose(BasePaginatedResponse):
     content: list[VerboseAccountRepresentation]
+
+
+class AccountSetPermissionsInput(pydantic.BaseModel):
+    permissions: list[pydantic.UUID4]

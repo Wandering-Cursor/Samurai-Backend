@@ -1,6 +1,6 @@
 [project]
 name = "Samurai-Backend"
-version = "0.7.5"
+version = "0.8.0"
 description = "Backend part of the Samurai project"
 authors = [
     {name = "Pavlo Pohorieltsev", email = "hdydpavel@gmail.com"},
@@ -45,6 +45,7 @@ format="ruff format ."
 run_ruff={composite = ["format", "lint"], help="Runs formatter and linter on the code"}
 run_server="uvicorn samurai_backend.app:app --reload"
 create_admin="python src/samurai_backend/scripts/create_admin.py"
+change_password="python src/samurai_backend/scripts/change_password.py"
 
 [tool.ruff]
 target-version = "py312"

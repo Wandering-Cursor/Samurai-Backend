@@ -155,5 +155,12 @@ async def logout() -> JSONResponse:
         content="OK",
         status_code=200,
     )
-    response.delete_cookie("refresh_token")
+    response.delete_cookie(
+        "refresh_token",
+        path="/",
+        domain=security_settings.cookie_domain,
+        secure=True,
+        httponly=True,
+        samesite="lax",
+    )
     return response
