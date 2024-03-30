@@ -13,6 +13,8 @@ from samurai_backend.models.projects.project import (
     ProjectRepresentation,
 )
 from samurai_backend.organization.get import project as project_get
+from samurai_backend.organization.operations import project as project_operations
+from samurai_backend.organization.schemas import project as project_schemas
 
 
 @admin_router.post(
@@ -54,8 +56,8 @@ async def get_project(
 )
 async def search_projects(
     session: Annotated[database_session_type, Depends(database_session)],
-    search: Annotated[project_get.ProjectSearchInput, Depends()],
-) -> project_get.ProjectSearchOutput:
+    search: Annotated[project_schemas.ProjectSearchInput, Depends()],
+) -> project_schemas.ProjectSearchOutput:
     return project_get.search_projects(
         session,
         search,
@@ -101,4 +103,31 @@ async def delete_project(
     delete_entity(
         db=session,
         entity=project,
+    )
+
+
+@admin_router.post(
+    "/project/{project_id}/assign",
+)
+async def assign_project(
+    session: Annotated[database_session_type, Depends(database_session)],
+    project_id: pydantic.UUID4,
+    body: Annotated[project_schemas.ProjectAssignBody, Body()],
+) -> project_schemas.ProjectAssignOutput:
+    project = project_get.get_project_by_id(
+        session,
+        project_id,
+    )
+    if not project:
+        raise SamuraiNotFoundError
+
+    assign_input = project_schemas.ProjectAssignInput(
+        project_id=project_id,
+        **body.model_dump(),
+    )
+
+    return project_operations.assign_project(
+        session=session,
+        assign_input=assign_input,
+        project=project,
     )

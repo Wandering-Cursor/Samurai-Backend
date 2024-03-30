@@ -41,7 +41,7 @@ def search_projects(
         )
     if search_input.name:
         query = query.where(
-            ProjectModel.name == search_input.name,
+            ProjectModel.name.icontains(search_input.name),
         )
 
     total = get_count(session, query)

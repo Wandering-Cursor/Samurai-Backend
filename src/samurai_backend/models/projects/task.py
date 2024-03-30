@@ -20,7 +20,9 @@ class BaseTask(BaseNamed):
     name: str = Field(
         description="Name of the task.",
     )
-    reviewer: pydantic.UUID4 = Field(
+    reviewer: uuid.UUID | None = Field(
+        default=None,
+        nullable=True,
         foreign_key="accountmodel.account_id",
         description="Account ID of the reviewer of the task.",
     )
