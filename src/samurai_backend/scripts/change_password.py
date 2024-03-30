@@ -1,5 +1,5 @@
 from samurai_backend.account.get.account import get_account
-from samurai_backend.account.schemas.account import AccountSearchSchema
+from samurai_backend.account.schemas.account.account import AccountSearchSchema
 from samurai_backend.core.operations import update_entity
 from samurai_backend.db import get_db_session
 

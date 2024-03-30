@@ -4,7 +4,7 @@ import pydantic
 from fastapi import Body, Depends
 
 from samurai_backend.account.get import account as account_get
-from samurai_backend.account.schemas.account import (
+from samurai_backend.account.schemas.account.account import (
     AccountSearchPaginationSchema,
     AccountSearchResultVerbose,
     AccountSearchSchema,

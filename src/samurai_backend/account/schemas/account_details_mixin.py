@@ -1,8 +1,8 @@
 import pydantic
 
-from samurai_backend.account.get.account import get_account
-from samurai_backend.account.schemas.account import AccountRepresentation, AccountSearchSchema
 from samurai_backend.models.account.account import AccountModel
+
+from .account.account import AccountRepresentation, AccountSearchSchema
 
 
 class AccountDetailsMixin(pydantic.BaseModel):
@@ -12,6 +12,7 @@ class AccountDetailsMixin(pydantic.BaseModel):
 
     @property
     def _account(self: "AccountDetailsMixin") -> AccountModel:
+        from samurai_backend.account.get.account import get_account
         from samurai_backend.db import get_db_session
 
         generator = get_db_session()

@@ -1,8 +1,8 @@
 import pydantic
 from sqlmodel import Field, Relationship, SQLModel
 
+from samurai_backend.account.schemas.account_details_mixin import AccountDetailsMixin
 from samurai_backend.models.account.account import AccountModel
-from samurai_backend.models.account.account_details_mixin import AccountDetailsMixin
 
 from .project import UserProjectModel
 

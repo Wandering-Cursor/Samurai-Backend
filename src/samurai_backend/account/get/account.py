@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import or_
 from sqlmodel import select
 
-from samurai_backend.account.schemas.account import (
+from samurai_backend.account.schemas.account.account import (
     AccountSearchResultVerbose,
     VerboseAccountRepresentation,
 )
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     import pydantic
     from sqlmodel import Session
 
-    from samurai_backend.account.schemas.account import (
+    from samurai_backend.account.schemas.account.account import (
         AccountSearchPaginationSchema,
         AccountSearchSchema,
     )

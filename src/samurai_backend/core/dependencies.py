@@ -5,7 +5,7 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from samurai_backend.account.get.account import get_account
-from samurai_backend.account.schemas.account import AccountSearchSchema
+from samurai_backend.account.schemas.account.account import AccountSearchSchema
 from samurai_backend.core.schemas import Token, TokenData
 from samurai_backend.dependencies import (
     create_access_token,

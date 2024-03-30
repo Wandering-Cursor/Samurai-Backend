@@ -2,7 +2,6 @@ import pydantic
 
 from samurai_backend.core.schemas import BasePaginatedResponse, BaseSchema, PaginationSearchSchema
 from samurai_backend.enums import AccountType
-from samurai_backend.models.account.account import AccountModel
 
 
 class BaseAccount(BaseSchema):
@@ -47,10 +46,6 @@ class AccountSearchSchema(pydantic.BaseModel):
 
 class AccountSearchPaginationSchema(AccountSearchSchema, PaginationSearchSchema):
     pass
-
-
-class AccountSearchResult(BasePaginatedResponse):
-    content: list[AccountModel]
 
 
 class AccountSearchResultVerbose(BasePaginatedResponse):

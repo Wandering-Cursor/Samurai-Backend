@@ -8,7 +8,7 @@ from jose import JWTError, jwt
 from sqlmodel import Session
 
 from samurai_backend.account.get.account import get_account
-from samurai_backend.account.schemas.account import AccountSchema, AccountSearchSchema
+from samurai_backend.account.schemas.account.account import AccountSchema, AccountSearchSchema
 from samurai_backend.core.schemas import TokenData
 from samurai_backend.db import get_db_session_async
 from samurai_backend.settings import security_settings, settings
