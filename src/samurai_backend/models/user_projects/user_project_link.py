@@ -2,8 +2,17 @@ import pydantic
 from sqlmodel import Field, Relationship, SQLModel
 
 from samurai_backend.models.account.account import AccountModel
+from samurai_backend.models.account.account_details_mixin import AccountDetailsMixin
 
 from .project import UserProjectModel
+
+
+class UserProjectLinkRepresentation(AccountDetailsMixin):
+    account_id: pydantic.UUID4
+
+    @property
+    def _account_id(self: "UserProjectLinkRepresentation") -> pydantic.UUID4:
+        return self.account_id
 
 
 class UserProjectLinkModel(SQLModel, table=True):

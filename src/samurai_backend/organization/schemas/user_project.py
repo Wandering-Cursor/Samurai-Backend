@@ -1,0 +1,37 @@
+import pydantic
+
+from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
+from samurai_backend.models.projects.project import ProjectRepresentation
+from samurai_backend.models.user_projects.task import UserTaskRepresentation
+from samurai_backend.models.user_projects.user_project_link import UserProjectLinkRepresentation
+
+
+class ProjectSearchInput(PaginationSearchSchema):
+    faculty_id: pydantic.UUID4 | None = None
+    name: str | None = None
+
+
+class UserProjectRepresentation(ProjectRepresentation):
+    account_links: list[UserProjectLinkRepresentation]
+    tasks: list[UserTaskRepresentation]
+
+    @pydantic.field_validator("account_links", mode="before")
+    @classmethod
+    def convert_account_links(
+        cls, value: list[UserProjectLinkRepresentation | object]
+    ) -> list[UserProjectLinkRepresentation]:
+        values = []
+        for item in value:
+            if isinstance(item, UserProjectLinkRepresentation):
+                values.append(item)
+            elif isinstance(item, pydantic.BaseModel):
+                values.append(UserProjectLinkRepresentation(**item.model_dump()))
+            elif isinstance(item, dict):
+                values.append(UserProjectLinkRepresentation(**item))
+            else:
+                raise ValueError("Invalid type")
+        return values
+
+
+class ProjectSearchOutput(BasePaginatedResponse):
+    content: list[UserProjectRepresentation]
