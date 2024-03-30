@@ -16,7 +16,7 @@ def __get_students_from_group(session: Session, group_id: pydantic.UUID4) -> lis
 def __assign_per_student(
     session: Session, student_id: pydantic.UUID4, project: ProjectModel
 ) -> None:
-    user_project = UserProjectModel(**project.model_dump(), account_links=[])
+    user_project = UserProjectModel(**project.model_dump(exclude={"project_id"}), account_links=[])
     link = UserProjectLinkModel(
         account_id=student_id,
         user_project_id=user_project.project_id,
@@ -29,6 +29,7 @@ def __assign_per_student(
     session.commit()
 
     for task in project.tasks:
+        task.task_id = None
         user_project.tasks.append(UserTaskModel.model_validate(task, from_attributes=True))
     session.add(user_project)
     session.commit()

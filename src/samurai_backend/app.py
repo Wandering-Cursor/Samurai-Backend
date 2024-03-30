@@ -21,7 +21,7 @@ app = FastAPI(
     debug=settings.debug,
     title="Samurai Backend",
     summary="Backend for the Samurai project",
-    version="0.8.0",
+    version="0.8.1",
     swagger_ui_parameters={
         "defaultModelRendering": "model",
         "displayRequestDuration": True,
