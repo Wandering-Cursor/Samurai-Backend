@@ -29,8 +29,7 @@ def __assign_per_student(
     session.commit()
 
     for task in project.tasks:
-        task.task_id = None
-        user_project.tasks.append(UserTaskModel.model_validate(task, from_attributes=True))
+        user_project.tasks.append(UserTaskModel(**task.model_dump(exclude={"task_id"})))
     session.add(user_project)
     session.commit()
 
