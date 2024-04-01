@@ -50,8 +50,6 @@ def search_tasks(
         UserTaskModel,
     )
 
-    # Compare account_id from search_input to that of a:
-    # account_links available for the UserProjectModel of the UserTaskModel
     query = query.where(
         UserTaskModel.project.has(
             UserProjectModel.account_links.any(
