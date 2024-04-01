@@ -1,13 +1,10 @@
 import uuid
-from typing import TYPE_CHECKING
 
 import pydantic
 from sqlmodel import Field, Relationship
 
 from samurai_backend.models.projects.task import BaseTask, TaskRepresentation
-
-if TYPE_CHECKING:
-    from samurai_backend.models.user_projects.project import UserProjectModel
+from samurai_backend.models.user_projects.project import UserProjectModel
 
 
 class UserTaskRepresentation(TaskRepresentation):
@@ -22,4 +19,4 @@ class UserTaskModel(BaseTask, table=True):
     )
 
     project_id: pydantic.UUID4 = Field(foreign_key="userprojectmodel.project_id")
-    project: "UserProjectModel" = Relationship(back_populates="tasks")
+    project: UserProjectModel = Relationship(back_populates="tasks")

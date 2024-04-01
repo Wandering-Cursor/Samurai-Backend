@@ -17,6 +17,15 @@ class Permissions(StrEnum):
     PROJECTS_DELETE = "projects:delete"
     PROJECTS_CREATE = "projects:create"
 
+    TASKS = "tasks"
+    TASKS_READ = "tasks:read"
+    TASKS_UPDATE = "tasks:update"
+
+    TASKS_EDITOR = "tasks_editor"
+    TASKS_EDITOR_UPDATE = "tasks_editor:update"
+    TASKS_EDITOR_DELETE = "tasks_editor:delete"
+    TASKS_EDITOR_CREATE = "tasks_editor:create"
+
     COMMENTS = "comments"
     COMMENTS_READ = "comments:read"
     COMMENTS_UPDATE = "comments:update"

@@ -16,6 +16,8 @@ from samurai_backend.settings import security_settings, settings
 database_session_type = Session
 database_session = get_db_session_async
 
+account_type = AccountSchema
+
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/auth/token/form",
