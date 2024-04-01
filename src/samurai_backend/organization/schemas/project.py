@@ -1,7 +1,7 @@
 import pydantic
 
 from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
-from samurai_backend.models.projects.project import ProjectRepresentation
+from samurai_backend.models.projects.project import ShortProjectRepresentation
 
 
 class ProjectSearchInput(PaginationSearchSchema):
@@ -10,7 +10,7 @@ class ProjectSearchInput(PaginationSearchSchema):
 
 
 class ProjectSearchOutput(BasePaginatedResponse):
-    content: list[ProjectRepresentation]
+    content: list[ShortProjectRepresentation]
 
 
 class ProjectAssignBody(pydantic.BaseModel):

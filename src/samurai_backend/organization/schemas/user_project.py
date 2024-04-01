@@ -1,7 +1,10 @@
 import pydantic
 
 from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
-from samurai_backend.models.projects.project import ProjectRepresentation
+from samurai_backend.models.projects.project import (
+    ProjectRepresentation,
+    ShortProjectRepresentation,
+)
 from samurai_backend.models.user_projects.task import UserTaskRepresentation
 from samurai_backend.models.user_projects.user_project_link import UserProjectLinkRepresentation
 
@@ -11,9 +14,16 @@ class ProjectSearchInput(PaginationSearchSchema):
     name: str | None = None
 
 
-class UserProjectRepresentation(ProjectRepresentation):
+class ShortUserProjectRepresentation(ShortProjectRepresentation):
     account_links: list[UserProjectLinkRepresentation]
-    tasks: list[UserTaskRepresentation]
+
+    @pydantic.computed_field
+    @property
+    def _links(self) -> dict[str, dict[str, str]]:
+        return {
+            "self": {"href": f"/projects/project/{self.project_id}"},
+            "tasks": {"href": f"/projects/tasks/{self.project_id}"},
+        }
 
     @pydantic.field_validator("account_links", mode="before")
     @classmethod
@@ -33,5 +43,9 @@ class UserProjectRepresentation(ProjectRepresentation):
         return values
 
 
-class ProjectSearchOutput(BasePaginatedResponse):
-    content: list[UserProjectRepresentation]
+class UserProjectRepresentation(ProjectRepresentation):
+    tasks: list[UserTaskRepresentation]
+
+
+class UserProjectSearchOutput(BasePaginatedResponse):
+    content: list[ShortUserProjectRepresentation]

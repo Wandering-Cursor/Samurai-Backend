@@ -8,7 +8,7 @@ from samurai_backend.core.schemas import PaginationMetaInformation
 from samurai_backend.models.user_projects.project import UserProjectModel
 from samurai_backend.organization.schemas.user_project import (
     ProjectSearchInput,
-    ProjectSearchOutput,
+    UserProjectSearchOutput,
 )
 from samurai_backend.utils import get_count
 
@@ -33,7 +33,7 @@ def get_project_by_id(
 def search_projects(
     session: Session,
     search_input: ProjectSearchInput,
-) -> ProjectSearchOutput:
+) -> UserProjectSearchOutput:
     query = select(
         UserProjectModel,
     )
@@ -52,7 +52,7 @@ def search_projects(
 
     rows = session.exec(query)
 
-    return ProjectSearchOutput(
+    return UserProjectSearchOutput(
         meta=PaginationMetaInformation(
             total=total,
             page=search_input.page,

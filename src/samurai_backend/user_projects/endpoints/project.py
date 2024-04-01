@@ -6,18 +6,21 @@ from samurai_backend.dependencies import database_session, database_session_type
 from samurai_backend.organization.get import user_project as project_get
 from samurai_backend.organization.schemas.user_project import (
     ProjectSearchInput,
-    ProjectSearchOutput,
+    UserProjectSearchOutput,
 )
-from samurai_backend.students.router import student_router
+from samurai_backend.user_projects.router import projects_read, user_projects_router
 
 
-@student_router.get(
+@user_projects_router.get(
     "/projects",
+    dependencies=[
+        projects_read,
+    ],
 )
 async def get_projects(
     session: Annotated[database_session_type, Depends(database_session)],
     search: Annotated[ProjectSearchInput, Depends()],
-) -> ProjectSearchOutput:
+) -> UserProjectSearchOutput:
     """
     Get all available projects for the student.
     """

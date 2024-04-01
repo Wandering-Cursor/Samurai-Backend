@@ -21,10 +21,10 @@ oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/auth/token/form",
     scopes={
         "admin": "Administrator level scope",
-        "overseer": "Overseer level scope",
-        "teacher": "Teacher level scope",
-        "student": "Student level scope",
-        "account": "Any account will have this scope",
+        "projects": "All actions are allowed on projects",
+        "projects:read": "Read-only access to projects",
+        "projects:update": "Update access to projects",
+        "projects:delete": "Delete access to projects",
     },
 )
 
@@ -148,7 +148,17 @@ def get_current_account(
     if account is None:
         raise credentials_exception
     for scope in security_scopes.scopes:
-        if scope not in token_data.scopes:
+        is_scope_specific = ":" in scope
+        general_scope = scope.split(":")[0] if is_scope_specific else scope
+
+        if is_scope_specific and general_scope not in token_data.scopes:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not enough permissions",
+                headers={"WWW-Authenticate": authenticate_value},
+            )
+
+        if not is_scope_specific and scope not in token_data.scopes:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Not enough permissions",

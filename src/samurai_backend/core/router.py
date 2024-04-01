@@ -146,7 +146,6 @@ async def refresh_token(
     responses={
         200: {
             "description": "Logged out.",
-            "content": {"detail": "Logged out."},
         },
     },
 )
