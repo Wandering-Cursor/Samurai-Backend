@@ -4,10 +4,9 @@ from typing import TYPE_CHECKING
 import pydantic
 from sqlmodel import Field, Relationship, SQLModel, UniqueConstraint
 
-from .group import GroupModel
-
 if TYPE_CHECKING:
     from .department import DepartmentModel
+    from .group import GroupModel
 
 
 class CreateFaculty(SQLModel):
@@ -22,7 +21,20 @@ class Faculty(CreateFaculty):
 
 
 class FacultyRepresentation(Faculty):
-    groups: list[GroupModel]
+    groups: list = pydantic.Field(default_factory=list, exclude=True)
+
+    @pydantic.computed_field
+    @property
+    def groups_count(self) -> int:
+        return len(self.groups)
+
+    @pydantic.computed_field
+    @property
+    def _links(self) -> dict[str, dict[str, str]]:
+        return {
+            "self": {"href": f"/admin/faculty/{self.faculty_id}"},
+            "groups": {"href": f"/admin/group?faculty_id={self.faculty_id}"},
+        }
 
 
 class FacultyModel(Faculty, table=True):

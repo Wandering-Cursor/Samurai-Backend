@@ -28,6 +28,16 @@ class Group(GroupCreate):
     )
 
 
+class GroupRepresentation(Group):
+    @pydantic.computed_field
+    @property
+    def _links(self) -> dict[str, dict[str, str]]:
+        return {
+            "self": {"href": f"/admin/group/{self.group_id}"},
+            "faculty": {"href": f"/admin/faculty/{self.faculty_id}"},
+        }
+
+
 class GroupModel(Group, table=True):
     """
     Group is the lowest level of organization in an educational institution.

@@ -19,8 +19,8 @@ def create_admin() -> None:
         is_email_verified=True,
         permissions=[
             AccountPermission(name="admin"),
-            AccountPermission(name="account"),
         ],
+        account_type="admin",
     )
     admin.set_password(password)
 

@@ -3,7 +3,7 @@ import uuid
 import pydantic
 from sqlmodel import Field, Relationship, SQLModel
 
-from .faculty import Faculty, FacultyModel
+from .faculty import FacultyModel
 
 
 class BaseDepartment(SQLModel):
@@ -17,7 +17,20 @@ class CreateDepartment(BaseDepartment):
 
 class DepartmentRepresentation(BaseDepartment):
     department_id: pydantic.UUID4
-    faculties: list[Faculty]
+    faculties: list = pydantic.Field(default_factory=list, exclude=True)
+
+    @pydantic.computed_field
+    @property
+    def faculties_count(self) -> int:
+        return len(self.faculties)
+
+    @pydantic.computed_field
+    @property
+    def _links(self) -> dict[str, dict[str, str]]:
+        return {
+            "self": {"href": f"/admin/department/{self.department_id}"},
+            "faculties": {"href": f"/admin/faculty?department_id={self.department_id}"},
+        }
 
 
 class DepartmentModel(BaseDepartment, table=True):

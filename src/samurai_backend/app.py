@@ -15,7 +15,7 @@ from samurai_backend.core.router import auth_router
 from samurai_backend.error_handlers import add_error_handlers
 from samurai_backend.middleware import add_cors_middleware
 from samurai_backend.settings import settings
-from samurai_backend.students.router import student_router
+from samurai_backend.user_projects.router import user_projects_router
 
 app = FastAPI(
     debug=settings.debug,
@@ -32,6 +32,16 @@ app = FastAPI(
     },
     docs_url=None,
     redoc_url=None,
+    servers=[
+        {
+            "url": "http://localhost:8000",
+            "description": "Local development server",
+        },
+        {
+            "url": "https://api.obscurial.art",
+            "description": "Production server",
+        },
+    ],
 )
 
 
@@ -43,7 +53,7 @@ add_cors_middleware(app)
 app.include_router(auth_router)
 app.include_router(admin_router)
 app.include_router(account_router)
-app.include_router(student_router)
+app.include_router(user_projects_router)
 
 
 @app.get(
