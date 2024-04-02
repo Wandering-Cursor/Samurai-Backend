@@ -31,9 +31,6 @@ class AdminAccountRepresentation(VerboseAccountRepresentation):
     hashed_password: str
 
 
-AccountSchema = AdminAccountRepresentation
-
-
 class AccountSearchSchema(pydantic.BaseModel):
     account_id: pydantic.UUID4 | None = None
     email: pydantic.EmailStr | None = None
