@@ -31,7 +31,8 @@ class RefreshTokenInput(pydantic.BaseModel):
 
 class Token(pydantic.BaseModel):
     access_token: str
-    token_type: str
+
+    token_type: str = "Bearer"
 
 
 class TokenData(pydantic.BaseModel):

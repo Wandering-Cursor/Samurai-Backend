@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 class SecuritySettings(BaseSettings):
     secret_key: str = "secret_jwt_key"
     algorithm: str = "HS256"
-    access_token_lifetime_minutes: int = 15
+    access_token_lifetime_minutes: int = 30
     refresh_token_lifetime_minutes: int = 60 * 24 * 7
     max_access_token_ttl: int = 60 * 24 * 31
     cookie_domain: str = ".obscurial.art"
