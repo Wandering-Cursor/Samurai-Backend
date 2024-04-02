@@ -35,17 +35,16 @@ def create_access_token(data: TokenData, expires_delta: timedelta | None = None)
     """
     to_encode = data.model_dump(mode="json")
 
+    iat = datetime.now(tz=settings.timezone)
     if expires_delta:
-        expire = datetime.now(tz=settings.timezone) + expires_delta
+        expire = iat + expires_delta
     else:
-        expire = datetime.now(tz=settings.timezone) + timedelta(
-            minutes=security_settings.access_token_lifetime_minutes
-        )
-    to_encode.update({"exp": expire})
+        expire = iat + timedelta(minutes=security_settings.access_token_lifetime_minutes)
+    to_encode.update({"exp": int(expire.timestamp())})
+    to_encode.update({"iat": int(iat.timestamp())})
     to_encode.update({"type": "access"})
 
-    # Add entropy to the token to reduce the chance of a collision.
-    to_encode.update({"entropy": secrets.token_urlsafe(32)})
+    to_encode.update({"jti": secrets.token_urlsafe(32)})
 
     return jwt.encode(
         to_encode,
@@ -60,15 +59,15 @@ def create_refresh_token(data: TokenData) -> str:
     """
     to_encode = data.model_dump(mode="json")
 
-    expire = datetime.now(tz=settings.timezone) + timedelta(
-        minutes=security_settings.refresh_token_lifetime_minutes
-    )
+    iat = datetime.now(tz=settings.timezone)
+    expire = iat + timedelta(minutes=security_settings.refresh_token_lifetime_minutes)
 
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": int(expire.timestamp())})
+    to_encode.update({"iat": int(iat.timestamp())})
     to_encode.update({"type": "refresh"})
 
     # Add entropy to the token to reduce the chance of a collision.
-    to_encode.update({"entropy": secrets.token_urlsafe(32)})
+    to_encode.update({"jti": secrets.token_urlsafe(32)})
 
     return jwt.encode(
         to_encode,
