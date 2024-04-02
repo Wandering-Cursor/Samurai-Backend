@@ -22,6 +22,10 @@ tasks_read = Security(
     get_current_active_account,
     scopes=[Permissions.TASKS_READ],
 )
+tasks_update = Security(
+    get_current_active_account,
+    scopes=[Permissions.TASKS_UPDATE],
+)
 
 user_projects_router = APIRouter(
     prefix="/projects",

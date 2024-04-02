@@ -1,6 +1,7 @@
 from typing import Annotated
 
-from fastapi import Depends
+import pydantic
+from fastapi import Body, Depends
 
 from samurai_backend.dependencies import (
     account_type,
@@ -15,8 +16,10 @@ from samurai_backend.organization.schemas.user_task import (
     UserTaskSearch,
     UserTaskSearchInput,
     UserTaskSearchOutput,
+    UserTaskStatusUpdateInput,
 )
-from samurai_backend.user_projects.router import tasks_read, user_projects_router
+from samurai_backend.user_projects.operations import task as task_operations
+from samurai_backend.user_projects.router import tasks_read, tasks_update, user_projects_router
 
 
 @user_projects_router.get(
@@ -26,7 +29,7 @@ from samurai_backend.user_projects.router import tasks_read, user_projects_route
     ],
 )
 async def get_project_tasks(
-    project_id: str,
+    project_id: pydantic.UUID4,
     search_input: Annotated[UserTaskSearchInput, Depends()],
     session: Annotated[database_session_type, Depends(database_session)],
     account: Annotated[account_type, Depends(get_current_account)],
@@ -48,7 +51,7 @@ async def get_project_tasks(
     ],
 )
 async def get_task(
-    task_id: str,
+    task_id: pydantic.UUID4,
     session: Annotated[database_session_type, Depends(database_session)],
     account: Annotated[account_type, Depends(get_current_account)],
 ) -> UserTaskRepresentation:
@@ -60,6 +63,40 @@ async def get_task(
 
     if task_entity is None:
         raise SamuraiNotFoundError
+
+    return UserTaskRepresentation.model_validate(
+        task_entity,
+        from_attributes=True,
+    )
+
+
+@user_projects_router.put(
+    "/task/{task_id}/status",
+    dependencies=[
+        tasks_update,
+    ],
+)
+async def update_task_status(
+    task_id: pydantic.UUID4,
+    update: Annotated[UserTaskStatusUpdateInput, Body()],
+    session: Annotated[database_session_type, Depends(database_session)],
+    account: Annotated[account_type, Depends(get_current_account)],
+) -> UserTaskRepresentation:
+    task_entity = task_get.get_task_by_id(
+        session=session,
+        task_id=task_id,
+        account_id=account.account_id,
+    )
+
+    if task_entity is None:
+        raise SamuraiNotFoundError
+
+    task_entity = task_operations.update_task_state(
+        session=session,
+        task_id=task_id,
+        update=update,
+        updater=account,
+    )
 
     return UserTaskRepresentation.model_validate(
         task_entity,

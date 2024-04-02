@@ -26,3 +26,18 @@ class SamuraiNotFoundError(SamuraiAPIError):
     error_name: str = "NotFoundError"
     status_code: int = 404
     detail: str = "Resource Not Found"
+
+
+class SamuraiInvalidRequestError(SamuraiAPIError):
+    error_name: str = "InvalidRequestError"
+    status_code: int = 400
+    detail: str = "Invalid Request"
+
+    def __init__(
+        self: SamuraiAPIError,
+        detail_override: str | None = None,
+    ) -> None:
+        if detail_override is not None:
+            self.detail = detail_override
+
+        super().__init__()

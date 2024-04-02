@@ -135,3 +135,6 @@ class AccountModel(BaseAccountModel, table=True):
         obj.set_password(account.password)
 
         return obj
+
+    def has_permission(self: "AccountModel", permission_name: str) -> bool:
+        return any(permission.name == permission_name for permission in self.permissions)

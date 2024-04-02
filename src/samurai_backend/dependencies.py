@@ -8,15 +8,16 @@ from jose import JWTError, jwt
 from sqlmodel import Session
 
 from samurai_backend.account.get.account import get_account
-from samurai_backend.account.schemas.account.account import AccountSchema, AccountSearchSchema
+from samurai_backend.account.schemas.account.account import AccountSearchSchema
 from samurai_backend.core.schemas import TokenData
 from samurai_backend.db import get_db_session_async
+from samurai_backend.models.account.account import AccountModel
 from samurai_backend.settings import security_settings, settings
 
 database_session_type = Session
 database_session = get_db_session_async
 
-account_type = AccountSchema
+account_type = AccountModel
 
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -101,7 +102,7 @@ def get_current_account(
     db: Annotated[Session, Depends(database_session)],
     security_scopes: SecurityScopes,
     token: Annotated[str, Depends(oauth2_scheme)],
-) -> AccountSchema:
+) -> account_type:
     """
     Returns the current account from the database.
     """
@@ -166,18 +167,18 @@ def get_current_account(
                 headers={"WWW-Authenticate": authenticate_value},
             )
 
-    return AccountSchema.model_validate(account)
+    return account
 
 
 def get_current_active_account(
     current_account: Annotated[
-        AccountSchema,
+        account_type,
         Security(
             get_current_account,
             scopes=[],
         ),
     ],
-) -> AccountSchema:
+) -> account_type:
     """
     Returns the current active account.
     """

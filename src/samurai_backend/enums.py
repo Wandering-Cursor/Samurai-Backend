@@ -31,3 +31,11 @@ class Permissions(StrEnum):
     COMMENTS_UPDATE = "comments:update"
     COMMENTS_DELETE = "comments:delete"
     COMMENTS_CREATE = "comments:create"
+
+
+class TaskState(StrEnum):
+    OPEN = "open"
+    RESUBMIT = "resubmit"
+    IN_PROGRESS = "in_progress"
+    IN_REVIEW = "in_review"
+    DONE = "done"
