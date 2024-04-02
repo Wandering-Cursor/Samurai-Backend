@@ -34,7 +34,9 @@ def authenticate(
         db,
         search=AccountSearchSchema(
             username=username,
-            email=username,
+            email=username
+            if "@" in username
+            else None,  # Check if username is an email not to raise an error
         ),
     )
     if not account:
