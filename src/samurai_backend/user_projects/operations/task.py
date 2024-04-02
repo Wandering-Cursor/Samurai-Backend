@@ -1,12 +1,16 @@
 import pydantic
 from sqlmodel import Session
 
+from samurai_backend.core.operations import delete_entity, store_entity
 from samurai_backend.enums import Permissions, TaskState
 from samurai_backend.errors import SamuraiInvalidRequestError, SamuraiNotFoundError
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.user_projects.task import UserTaskModel
 from samurai_backend.organization.get.user_task import get_task_by_id
-from samurai_backend.organization.schemas.user_task import UserTaskStatusUpdateInput
+from samurai_backend.organization.schemas.user_task import (
+    UserTaskRepresentation,
+    UserTaskStatusUpdateInput,
+)
 
 
 def _check_status_update_valid(
@@ -79,3 +83,44 @@ def update_task_state(
     session.commit()
 
     return task
+
+
+def update_task(
+    session: Session,
+    old_entity: UserTaskModel,
+    update: UserTaskRepresentation,
+) -> UserTaskModel:
+    if old_entity.project_id != update.project_id:
+        raise SamuraiInvalidRequestError(
+            detail_override="Cannot change project",
+        )
+
+    updated_task = UserTaskModel(
+        task_id=old_entity.task_id,
+        **update.model_dump(),
+    )
+
+    session.add(updated_task)
+    session.commit()
+
+    return updated_task
+
+
+def delete_task(
+    session: Session,
+    task: UserTaskModel,
+) -> None:
+    delete_entity(
+        session=session,
+        entity=task,
+    )
+
+
+def create_task(
+    session: Session,
+    task: UserTaskModel,
+) -> UserTaskModel:
+    return store_entity(
+        db=session,
+        entity=task,
+    )

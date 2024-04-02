@@ -27,6 +27,19 @@ tasks_update = Security(
     scopes=[Permissions.TASKS_UPDATE],
 )
 
+tasks_editor_update = Security(
+    get_current_active_account,
+    scopes=[Permissions.TASKS_EDITOR_UPDATE],
+)
+tasks_editor_delete = Security(
+    get_current_active_account,
+    scopes=[Permissions.TASKS_EDITOR_DELETE],
+)
+tasks_editor_create = Security(
+    get_current_active_account,
+    scopes=[Permissions.TASKS_EDITOR_CREATE],
+)
+
 user_projects_router = APIRouter(
     prefix="/projects",
     dependencies=[
@@ -34,5 +47,5 @@ user_projects_router = APIRouter(
             get_current_active_account,
         )
     ],
-    tags=["student", "teacher", "overseer", "projects"],
+    tags=["teacher", "overseer", "projects"],
 )
