@@ -60,7 +60,6 @@ def authenticate(
             data=token_data,
             expires_delta=access_token_ttl,
         ),
-        token_type="bearer",
     ), create_refresh_token(
         data=token_data,
     )
@@ -90,7 +89,5 @@ def authenticate_by_refresh_token(
     return Token(
         access_token=create_access_token(
             data=token_data,
-            expires_delta=timedelta(minutes=MAX_TOKEN_TLL),
         ),
-        token_type="bearer",
     )
