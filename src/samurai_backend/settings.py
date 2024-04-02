@@ -24,7 +24,7 @@ class SecuritySettings(BaseSettings):
     max_access_token_ttl: int = 60 * 24 * 31
     cookie_domain: str = ".obscurial.art"
 
-    cors_allow_origins: list[str] = ["*"]
+    cors_allow_origins: list[str] = []
     cors_allow_origin_regex: str = r"(((http|https):\/\/)?localhost.*)"
     cors_allow_credentials: bool = True
     cors_allow_methods: list[str] = ["*"]

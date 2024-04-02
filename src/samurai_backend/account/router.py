@@ -6,6 +6,7 @@ from samurai_backend.account import operations as account_operations
 from samurai_backend.account.get import account as account_get
 from samurai_backend.account.schemas.account.account import AccountSearchSchema
 from samurai_backend.dependencies import database_session, database_session_type
+from samurai_backend.errors import SamuraiNotFoundError
 
 from .schemas.register import (
     ConfirmEmail,
@@ -33,7 +34,7 @@ async def register_account(
     )
 
     if not account:
-        raise ValueError("Invalid registration code.")
+        raise SamuraiNotFoundError
 
     account_operations.register_account(
         db=db,
