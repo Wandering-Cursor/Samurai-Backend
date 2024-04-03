@@ -4,11 +4,15 @@ from typing import TYPE_CHECKING
 import pydantic
 from sqlmodel import Field, Relationship
 
-from samurai_backend.models.projects.project import BaseProject
+from samurai_backend.models.projects.project import BaseProject, CreateProject
 
 if TYPE_CHECKING:
     from .task import UserTaskModel
     from .user_project_link import UserProjectLinkModel
+
+
+class CreateUserProject(CreateProject):
+    account_links: list[pydantic.UUID4] = []
 
 
 class UserProjectModel(BaseProject, table=True):

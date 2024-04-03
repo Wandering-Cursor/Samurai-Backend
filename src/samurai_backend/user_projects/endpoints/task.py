@@ -11,6 +11,7 @@ from samurai_backend.dependencies import (
 )
 from samurai_backend.enums import Permissions
 from samurai_backend.errors import SamuraiNotFoundError
+from samurai_backend.models.user_projects.task import UserTaskCreate, UserTaskModel
 from samurai_backend.organization.get import user_task as task_get
 from samurai_backend.organization.schemas.user_task import (
     UserTaskRepresentation,
@@ -116,7 +117,7 @@ async def update_task_status(
 )
 async def update_task(
     task_id: pydantic.UUID4,
-    update: Annotated[UserTaskRepresentation, Body()],
+    update: Annotated[UserTaskCreate, Body()],
     session: Annotated[database_session_type, Depends(database_session)],
     account: Annotated[account_type, Depends(get_current_account)],
 ) -> UserTaskRepresentation:
@@ -175,12 +176,17 @@ async def delete_task(
     ],
 )
 async def create_task(
-    task: Annotated[UserTaskRepresentation, Body()],
+    task: Annotated[UserTaskCreate, Body()],
     session: Annotated[database_session_type, Depends(database_session)],
 ) -> UserTaskRepresentation:
+    task_entity = UserTaskModel.model_validate(
+        task,
+        from_attributes=True,
+    )
+
     task_entity = task_operations.create_task(
         session=session,
-        task=task,
+        task=task_entity,
     )
 
     return UserTaskRepresentation.model_validate(

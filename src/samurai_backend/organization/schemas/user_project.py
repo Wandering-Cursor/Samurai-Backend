@@ -45,6 +45,7 @@ class ShortUserProjectRepresentation(ShortProjectRepresentation):
 
 class UserProjectRepresentation(ProjectRepresentation):
     tasks: list[UserTaskRepresentation]
+    account_links: list[UserProjectLinkRepresentation]
 
 
 class UserProjectSearchOutput(BasePaginatedResponse):
