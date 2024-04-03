@@ -1,4 +1,8 @@
 from enum import Enum, StrEnum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from fastapi import Security
 
 
 class AccountType(Enum):
@@ -31,6 +35,44 @@ class Permissions(StrEnum):
     COMMENTS_UPDATE = "comments:update"
     COMMENTS_DELETE = "comments:delete"
     COMMENTS_CREATE = "comments:create"
+
+    @property
+    def description(self: "Permissions") -> str:
+        message = ""
+
+        default = self.value.replace("_", " ").title()
+        if ":" in default:
+            split = default.split(":")
+            permission_name = split[0].replace("_", " ").title()
+            action = split[1].replace("_", " ").title()
+
+            message = f"A {permission_name} user that can do: {action}"
+        else:
+            message = f"A user that can operate {default}."
+
+        return message
+
+    @property
+    def as_security(self: "Permissions") -> "Security":
+        from fastapi import Security
+
+        from samurai_backend.dependencies import get_current_active_account
+
+        return Security(
+            get_current_active_account,
+            scopes=[self],
+        )
+
+    @classmethod
+    def blank_security(cls) -> "Security":
+        from fastapi import Security
+
+        from samurai_backend.dependencies import get_current_active_account
+
+        return Security(
+            get_current_active_account,
+            scopes=[],
+        )
 
 
 class TaskState(StrEnum):

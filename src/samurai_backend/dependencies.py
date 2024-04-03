@@ -11,6 +11,7 @@ from samurai_backend.account.get.account import get_account
 from samurai_backend.account.schemas.account.account import AccountSearchSchema
 from samurai_backend.core.schemas import TokenData
 from samurai_backend.db import get_db_session_async
+from samurai_backend.enums import Permissions
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.settings import security_settings, settings
 
@@ -22,13 +23,14 @@ account_type = AccountModel
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/auth/token/form",
-    scopes={
-        "admin": "Administrator level scope",
-        "projects": "All actions are allowed on projects",
-        "projects:read": "Read-only access to projects",
-        "projects:update": "Update access to projects",
-        "projects:delete": "Delete access to projects",
-    },
+    scopes={permission.value: permission.description for permission in Permissions},
+    description=(
+        "Scopes cannot be issued per token (at the moment).\n"
+        "User can be assigned a scope, which is stored in the database.\n"
+        "If you have a scope with no : in it, it is a general scope.\n"
+        "If you have a scope with a : in it, it is a specific scope.\n"
+        "If you have a general scope, you can perform all actions of this scope.\n"
+    ),
 )
 
 

@@ -1,5 +1,6 @@
 from samurai_backend.core.operations import store_entity
 from samurai_backend.db import get_db_session
+from samurai_backend.enums import Permissions
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.account.account_permission import AccountPermission
 
@@ -18,7 +19,7 @@ def create_admin() -> None:
         registration_code=None,
         is_email_verified=True,
         permissions=[
-            AccountPermission(name="admin"),
+            AccountPermission(name=Permissions.ADMIN.value),
         ],
         account_type="admin",
     )
