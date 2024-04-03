@@ -1,7 +1,15 @@
+import datetime
+from typing import TYPE_CHECKING
+
 from passlib.context import CryptContext
 from sqlalchemy import func
 from sqlmodel import Session
 from sqlmodel.sql.expression import SelectOfScalar
+
+from samurai_backend.settings import settings
+
+if TYPE_CHECKING:
+    from samurai_backend.models.base import BaseModel
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
@@ -29,3 +37,15 @@ def get_count(session: Session, q: SelectOfScalar) -> int:
     for count in iterator:
         return count
     return 0
+
+
+def current_time() -> datetime.datetime:
+    return datetime.datetime.now(tz=settings.timezone)
+
+
+def update_time(
+    mapper: object,  # noqa
+    connection: object,  # noqa
+    target: "BaseModel",
+) -> None:
+    target.updated_at = current_time()

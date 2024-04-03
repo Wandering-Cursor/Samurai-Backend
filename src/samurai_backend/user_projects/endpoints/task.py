@@ -9,7 +9,9 @@ from samurai_backend.dependencies import (
     database_session_type,
     get_current_account,
 )
+from samurai_backend.enums import Permissions
 from samurai_backend.errors import SamuraiNotFoundError
+from samurai_backend.models.user_projects.task import UserTaskCreate, UserTaskModel
 from samurai_backend.organization.get import user_task as task_get
 from samurai_backend.organization.schemas.user_task import (
     UserTaskRepresentation,
@@ -19,20 +21,13 @@ from samurai_backend.organization.schemas.user_task import (
     UserTaskStatusUpdateInput,
 )
 from samurai_backend.user_projects.operations import task as task_operations
-from samurai_backend.user_projects.router import (
-    tasks_editor_create,
-    tasks_editor_delete,
-    tasks_editor_update,
-    tasks_read,
-    tasks_update,
-    user_projects_router,
-)
+from samurai_backend.user_projects.router import user_projects_router
 
 
 @user_projects_router.get(
     "/tasks/{project_id}",
     dependencies=[
-        tasks_read,
+        Permissions.TASKS_READ.as_security,
     ],
     tags=["student"],
 )
@@ -55,7 +50,7 @@ async def get_project_tasks(
 @user_projects_router.get(
     "/task/{task_id}",
     dependencies=[
-        tasks_read,
+        Permissions.TASKS_READ.as_security,
     ],
     tags=["student"],
 )
@@ -82,7 +77,7 @@ async def get_task(
 @user_projects_router.put(
     "/task/{task_id}/status",
     dependencies=[
-        tasks_update,
+        Permissions.TASKS_UPDATE.as_security,
     ],
     tags=["student"],
 )
@@ -117,12 +112,12 @@ async def update_task_status(
 @user_projects_router.put(
     "/task/{task_id}",
     dependencies=[
-        tasks_editor_update,
+        Permissions.TASKS_EDITOR_UPDATE.as_security,
     ],
 )
 async def update_task(
     task_id: pydantic.UUID4,
-    update: Annotated[UserTaskRepresentation, Body()],
+    update: Annotated[UserTaskCreate, Body()],
     session: Annotated[database_session_type, Depends(database_session)],
     account: Annotated[account_type, Depends(get_current_account)],
 ) -> UserTaskRepresentation:
@@ -150,7 +145,7 @@ async def update_task(
 @user_projects_router.delete(
     "/task/{task_id}",
     dependencies=[
-        tasks_editor_delete,
+        Permissions.TASKS_EDITOR_DELETE.as_security,
     ],
     status_code=204,
 )
@@ -177,16 +172,21 @@ async def delete_task(
 @user_projects_router.post(
     "/task",
     dependencies=[
-        tasks_editor_create,
+        Permissions.TASKS_EDITOR_CREATE.as_security,
     ],
 )
 async def create_task(
-    task: Annotated[UserTaskRepresentation, Body()],
+    task: Annotated[UserTaskCreate, Body()],
     session: Annotated[database_session_type, Depends(database_session)],
 ) -> UserTaskRepresentation:
+    task_entity = UserTaskModel.model_validate(
+        task,
+        from_attributes=True,
+    )
+
     task_entity = task_operations.create_task(
         session=session,
-        task=task,
+        task=task_entity,
     )
 
     return UserTaskRepresentation.model_validate(

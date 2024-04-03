@@ -1,16 +1,11 @@
-from fastapi import APIRouter, Security
+from fastapi import APIRouter
 
-from samurai_backend.dependencies import (
-    get_current_active_account,
-)
+from samurai_backend.enums import Permissions
 
 admin_router = APIRouter(
     prefix="/admin",
     dependencies=[
-        Security(
-            get_current_active_account,
-            scopes=["admin"],
-        )
+        Permissions.ADMIN.as_security,
     ],
     tags=["admin"],
 )

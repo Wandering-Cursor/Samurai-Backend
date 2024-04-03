@@ -1,12 +1,16 @@
 import uuid
 
 import pydantic
-from sqlmodel import Field, Relationship, SQLModel
+from sqlalchemy.event import listen
+from sqlmodel import Field, Relationship
+
+from samurai_backend.models.base import BaseModel
+from samurai_backend.utils import update_time
 
 from .faculty import FacultyModel
 
 
-class BaseDepartment(SQLModel):
+class BaseDepartment(BaseModel):
     name: str = Field(unique=True, index=True)
     description: str | None = Field(default=None, nullable=True)
 
@@ -48,3 +52,6 @@ class DepartmentModel(BaseDepartment, table=True):
     )
 
     faculties: list[FacultyModel] = Relationship(back_populates="department")
+
+
+listen(DepartmentModel, "before_update", update_time)

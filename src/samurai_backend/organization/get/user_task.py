@@ -48,6 +48,8 @@ def search_tasks(
 ) -> UserTaskSearchOutput:
     query = select(
         UserTaskModel,
+    ).order_by(
+        UserTaskModel.updated_at.desc(),
     )
 
     query = query.where(

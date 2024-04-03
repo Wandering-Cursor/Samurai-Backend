@@ -33,6 +33,8 @@ def search_projects(
 ) -> ProjectSearchOutput:
     query = select(
         ProjectModel,
+    ).order_by(
+        ProjectModel.updated_at.desc(),
     )
 
     if search_input.faculty_id:

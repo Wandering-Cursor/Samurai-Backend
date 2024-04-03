@@ -1,8 +1,10 @@
 import pydantic
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field
+
+from samurai_backend.models.base import BaseModel
 
 
-class AccountPermissionAccountLink(SQLModel, table=True):
+class AccountPermissionAccountLink(BaseModel, table=True):
     """
     Describes a permission that is assigned to an account.
     """

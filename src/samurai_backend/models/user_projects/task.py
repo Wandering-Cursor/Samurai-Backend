@@ -4,8 +4,13 @@ import pydantic
 from sqlmodel import Field, Relationship
 
 from samurai_backend.enums import TaskState
-from samurai_backend.models.projects.task import BaseTask, TaskRepresentation
+from samurai_backend.models.projects.task import BaseTask, CreateTask, TaskRepresentation
 from samurai_backend.models.user_projects.project import UserProjectModel
+
+
+class UserTaskCreate(CreateTask):
+    state: TaskState
+    project_id: pydantic.UUID4
 
 
 class UserTaskRepresentation(TaskRepresentation):

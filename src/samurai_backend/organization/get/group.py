@@ -33,6 +33,8 @@ def get_group_search(
 ) -> GroupSearchOutput:
     query = select(
         GroupModel,
+    ).order_by(
+        GroupModel.updated_at.desc(),
     )
 
     if search.faculty_id:

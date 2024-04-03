@@ -14,7 +14,9 @@ if TYPE_CHECKING:
 def get_permissions(
     db: Session,
 ) -> list[AccountPermission]:
-    query = select(AccountPermission)
+    query = select(AccountPermission).order_by(
+        AccountPermission.updated_at.desc(),
+    )
     return db.exec(query).all()
 
 
