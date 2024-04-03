@@ -48,7 +48,9 @@ def get_accounts(db: Session, search: AccountSearchPaginationSchema) -> AccountS
     """
     Returns a list of users from the database.
     """
-    query = select(AccountModel)
+    query = select(AccountModel).order_by(
+        AccountModel.updated_at.desc(),
+    )
 
     if search.account_id:
         query = query.filter(AccountModel.account_id == search.account_id)

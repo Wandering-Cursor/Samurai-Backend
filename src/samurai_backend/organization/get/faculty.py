@@ -33,6 +33,8 @@ def get_faculty_search(
 ) -> FacultySearchOutput:
     query = select(
         FacultyModel,
+    ).order_by(
+        FacultyModel.updated_at.desc(),
     )
 
     if search.department_id:

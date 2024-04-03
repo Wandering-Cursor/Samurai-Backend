@@ -42,6 +42,8 @@ def get_departments_search(
     """
     query = select(
         DepartmentModel,
+    ).order_by(
+        DepartmentModel.updated_at.desc(),
     )
 
     if search.name:

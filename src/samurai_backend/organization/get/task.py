@@ -33,6 +33,8 @@ def search_tasks(
 ) -> TaskSearchOutput:
     query = select(
         TaskModel,
+    ).order_by(
+        TaskModel.updated_at.desc(),
     )
 
     if search_input.project_id:

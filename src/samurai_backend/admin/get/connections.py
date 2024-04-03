@@ -14,7 +14,9 @@ if TYPE_CHECKING:
 def get_connections(
     db: Session,
 ) -> list[ConnectionModel]:
-    query = select(ConnectionModel)
+    query = select(ConnectionModel).order_by(
+        ConnectionModel.updated_at.desc(),
+    )
     return db.exec(query).all()
 
 
