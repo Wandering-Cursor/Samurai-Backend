@@ -3,9 +3,10 @@ import uuid
 from typing import TYPE_CHECKING
 
 import pydantic
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, Relationship
 
 from samurai_backend.enums import AccountType
+from samurai_backend.models.base import BaseModel
 from samurai_backend.utils import get_password_hash
 
 from .account_permission_link import AccountPermissionAccountLink
@@ -43,7 +44,7 @@ def default_password_generator() -> str:
     return secrets.token_urlsafe(64)
 
 
-class BaseAccountModel(SQLModel):
+class BaseAccountModel(BaseModel):
     account_id: pydantic.UUID4 = Field(
         default_factory=uuid.uuid4,
         primary_key=True,

@@ -1,7 +1,9 @@
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, Relationship
+
+from samurai_backend.models.base import BaseModel
 
 from .connection_link import ConnectionLinkModel
 
@@ -9,7 +11,7 @@ if TYPE_CHECKING:
     from .account import AccountModel
 
 
-class ConnectionCreate(SQLModel):
+class ConnectionCreate(BaseModel):
     group_id: uuid.UUID | None = Field(
         default=None,
         foreign_key="groupmodel.group_id",

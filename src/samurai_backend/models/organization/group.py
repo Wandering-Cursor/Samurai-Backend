@@ -2,13 +2,15 @@ import uuid
 from typing import TYPE_CHECKING
 
 import pydantic
-from sqlmodel import Field, Relationship, SQLModel, UniqueConstraint
+from sqlmodel import Field, Relationship, UniqueConstraint
+
+from samurai_backend.models.base import BaseModel
 
 if TYPE_CHECKING:
     from .faculty import FacultyModel
 
 
-class GroupCreate(SQLModel):
+class GroupCreate(BaseModel):
     faculty_id: pydantic.UUID4 = Field(
         foreign_key="facultymodel.faculty_id",
     )

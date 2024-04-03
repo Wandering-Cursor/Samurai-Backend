@@ -1,8 +1,10 @@
 import pydantic
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field
+
+from samurai_backend.models.base import BaseModel
 
 
-class ConnectionLinkModel(SQLModel, table=True):
+class ConnectionLinkModel(BaseModel, table=True):
     account_id: pydantic.UUID4 = Field(
         foreign_key="accountmodel.account_id",
         primary_key=True,

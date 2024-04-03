@@ -2,9 +2,10 @@ import uuid
 from typing import TYPE_CHECKING
 
 import pydantic
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, Relationship
 
 from samurai_backend.enums import Permissions
+from samurai_backend.models.base import BaseModel
 
 from .account_permission_link import AccountPermissionAccountLink
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
     from .account import AccountModel
 
 
-class CreatePermission(SQLModel):
+class CreatePermission(BaseModel):
     name: Permissions = Field(unique=True, index=True)
     description: str = Field(default="No description")
 

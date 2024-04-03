@@ -2,7 +2,9 @@ import secrets
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, Relationship
+
+from samurai_backend.models.base import BaseModel
 
 if TYPE_CHECKING:
     from .account import AccountModel
@@ -12,7 +14,7 @@ def generate_registration_code() -> str:
     return secrets.token_urlsafe(16)
 
 
-class RegistrationEmailCode(SQLModel, table=True):
+class RegistrationEmailCode(BaseModel, table=True):
     account_id: uuid.UUID = Field(
         description="To which account the registration code belongs to.",
         foreign_key="accountmodel.account_id",
