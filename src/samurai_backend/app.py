@@ -1,4 +1,5 @@
 import json
+from importlib import metadata
 
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
@@ -17,11 +18,28 @@ from samurai_backend.middleware import add_cors_middleware
 from samurai_backend.settings import settings
 from samurai_backend.user_projects.router import user_projects_router
 
+dev_server = {
+    "url": "http://localhost:8000",
+    "description": "Local development server",
+}
+
+servers = []
+if settings.debug:
+    servers.append(dev_server)
+
+servers += [
+    {
+        "url": "https://api.obscurial.art",
+        "description": "Production server",
+    },
+]
+
+
 app = FastAPI(
     debug=settings.debug,
     title="Samurai Backend",
     summary="Backend for the Samurai project",
-    version="0.8.3",
+    version=metadata.version("samurai_backend"),
     swagger_ui_parameters={
         "defaultModelRendering": "model",
         "displayRequestDuration": True,
@@ -32,16 +50,7 @@ app = FastAPI(
     },
     docs_url=None,
     redoc_url=None,
-    servers=[
-        {
-            "url": "http://localhost:8000",
-            "description": "Local development server",
-        },
-        {
-            "url": "https://api.obscurial.art",
-            "description": "Production server",
-        },
-    ],
+    servers=servers,
 )
 
 

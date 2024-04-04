@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    debug: bool = False
+    debug: bool = True
     database_url: str = "postgresql://local:local@127.0.0.1:5432/DevDB"
     timezone_name: str = "UTC"
     script_nonce: str = "FakeNonce"
