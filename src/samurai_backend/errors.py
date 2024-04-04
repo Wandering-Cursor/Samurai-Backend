@@ -1,12 +1,18 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 
 class SamuraiAPIError(HTTPException):
-    status_code: int = 400
+    status_code: int = status.HTTP_400_BAD_REQUEST
     error_name: str = "BaseError"
     detail: str | dict = "Base Error"
 
-    def __init__(self: "SamuraiAPIError") -> None:
+    def __init__(
+        self: "SamuraiAPIError",
+        detail_override: str | None = None,
+    ) -> None:
+        if detail_override is not None:
+            self.detail = detail_override
+
         super().__init__(
             status_code=self.status_code,
             detail=self.detail,
@@ -18,26 +24,23 @@ class SamuraiAPIError(HTTPException):
 
 class SamuraiIntegrityError(SamuraiAPIError):
     error_name: str = "IntegrityError"
-    status_code: int = 409
+    status_code: int = status.HTTP_409_CONFLICT
     detail: str = "Database Integrity Error"
 
 
 class SamuraiNotFoundError(SamuraiAPIError):
     error_name: str = "NotFoundError"
-    status_code: int = 404
+    status_code: int = status.HTTP_404_NOT_FOUND
     detail: str = "Resource Not Found"
 
 
 class SamuraiInvalidRequestError(SamuraiAPIError):
     error_name: str = "InvalidRequestError"
-    status_code: int = 400
+    status_code: int = status.HTTP_400_BAD_REQUEST
     detail: str = "Invalid Request"
 
-    def __init__(
-        self: SamuraiAPIError,
-        detail_override: str | None = None,
-    ) -> None:
-        if detail_override is not None:
-            self.detail = detail_override
 
-        super().__init__()
+class SamuraiForbiddenError(SamuraiAPIError):
+    error_name: str = "ForbiddenError"
+    status_code: int = status.HTTP_403_FORBIDDEN
+    detail: str = "Forbidden"

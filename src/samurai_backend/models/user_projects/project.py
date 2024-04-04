@@ -20,6 +20,7 @@ class UserProjectModel(BaseProject, table=True):
         default_factory=uuid.uuid4,
         primary_key=True,
         index=True,
+        unique=True,
     )
 
     account_links: list["UserProjectLinkModel"] = Relationship(back_populates="user_project")

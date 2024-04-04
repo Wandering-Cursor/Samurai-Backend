@@ -73,11 +73,14 @@ def search_projects(
     if related_account_id:
         # Perform a conditional join on the UserProjectLinkModel
         # If this breaks in the future :shrug:
-        query = query.where(
+        query = query.join(
+            UserProjectLinkModel,
+            UserProjectModel.project_id == UserProjectLinkModel.user_project_id,
+        ).where(
             UserProjectLinkModel.account_id == related_account_id,
         )
 
-    total = get_count(session, query)
+    total = get_count(session, query, join=False)
     query = query.offset(search_input.offset).limit(search_input.page_size)
 
     rows = session.exec(query)

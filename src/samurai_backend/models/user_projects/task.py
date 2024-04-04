@@ -5,6 +5,7 @@ from sqlmodel import Field, Relationship
 
 from samurai_backend.enums import TaskState
 from samurai_backend.models.projects.task import BaseTask, CreateTask, TaskRepresentation
+from samurai_backend.models.user_projects.comment import CommentModel
 from samurai_backend.models.user_projects.project import UserProjectModel
 
 
@@ -15,6 +16,12 @@ class UserTaskCreate(CreateTask):
 
 class UserTaskRepresentation(TaskRepresentation):
     state: TaskState
+    comments: list = pydantic.Field(default_factory=list, exclude=True)
+
+    @pydantic.computed_field
+    @property
+    def comment_count(self) -> int:
+        return len(self.comments)
 
 
 class UserTaskModel(BaseTask, table=True):
@@ -30,3 +37,4 @@ class UserTaskModel(BaseTask, table=True):
 
     project_id: pydantic.UUID4 = Field(foreign_key="userprojectmodel.project_id", index=True)
     project: UserProjectModel = Relationship(back_populates="tasks")
+    comments: list[CommentModel] = Relationship(back_populates="task")
