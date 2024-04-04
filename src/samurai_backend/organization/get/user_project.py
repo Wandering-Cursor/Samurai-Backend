@@ -6,6 +6,7 @@ from sqlmodel import select
 
 from samurai_backend.core.schemas import PaginationMetaInformation
 from samurai_backend.models.user_projects.project import UserProjectModel
+from samurai_backend.models.user_projects.user_project_link import UserProjectLinkModel
 from samurai_backend.organization.schemas.user_project import (
     ProjectSearchInput,
     UserProjectSearchOutput,
@@ -30,9 +31,29 @@ def get_project_by_id(
     ).first()
 
 
+def get_linked_project_by_id(
+    session: Session,
+    project_id: pydantic.UUID4,
+    account_id: pydantic.UUID4,
+) -> UserProjectModel | None:
+    return session.exec(
+        select(
+            UserProjectModel,
+        )
+        .join(
+            UserProjectLinkModel,
+        )
+        .where(
+            UserProjectModel.project_id == project_id,
+            UserProjectLinkModel.account_id == account_id,
+        )
+    ).first()
+
+
 def search_projects(
     session: Session,
     search_input: ProjectSearchInput,
+    related_account_id: pydantic.UUID4 | None = None,
 ) -> UserProjectSearchOutput:
     query = select(
         UserProjectModel,
@@ -47,6 +68,13 @@ def search_projects(
     if search_input.name:
         query = query.where(
             UserProjectModel.name.icontains(search_input.name),
+        )
+
+    if related_account_id:
+        # Perform a conditional join on the UserProjectLinkModel
+        # If this breaks in the future :shrug:
+        query = query.where(
+            UserProjectLinkModel.account_id == related_account_id,
         )
 
     total = get_count(session, query)

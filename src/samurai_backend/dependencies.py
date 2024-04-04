@@ -155,19 +155,16 @@ def get_current_account(
         is_scope_specific = ":" in scope
         general_scope = scope.split(":")[0] if is_scope_specific else scope
 
-        if is_scope_specific and general_scope not in token_data.scopes:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Not enough permissions",
-                headers={"WWW-Authenticate": authenticate_value},
-            )
+        if scope in token_data.scopes:
+            continue
+        if general_scope in token_data.scopes:
+            continue
 
-        if not is_scope_specific and scope not in token_data.scopes:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Not enough permissions",
-                headers={"WWW-Authenticate": authenticate_value},
-            )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not enough permissions",
+            headers={"WWW-Authenticate": authenticate_value},
+        )
 
     return account
 

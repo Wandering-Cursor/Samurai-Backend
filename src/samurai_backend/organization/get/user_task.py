@@ -29,14 +29,15 @@ def get_task_by_id(
             UserTaskModel,
         ).where(
             UserTaskModel.task_id == task_id,
+            UserTaskModel.project.has(
+                UserProjectModel.account_links.any(
+                    UserProjectLinkModel.account_id == account_id,
+                ),
+            ),
         )
     ).first()
 
     if not value:
-        return None
-
-    project: UserProjectModel = value.project
-    if not any(account_link.account_id == account_id for account_link in project.account_links):
         return None
 
     return value
@@ -58,6 +59,7 @@ def search_tasks(
                 UserProjectLinkModel.account_id == search_input.account_id,
             ),
         ),
+        UserTaskModel.project_id == search_input.project_id,
     )
 
     if search_input.name:
