@@ -7,12 +7,13 @@ from sqlmodel import select
 
 from samurai_backend.account.schemas.account.account import (
     AccountSearchResultVerbose,
+    AccountSearchSchema,
     VerboseAccountRepresentation,
 )
 from samurai_backend.core.schemas import PaginationMetaInformation
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.account.connection import ConnectionModel
-from samurai_backend.utils import get_count
+from samurai_backend.utils.get_count import get_count
 
 if TYPE_CHECKING:
     import pydantic
@@ -20,11 +21,25 @@ if TYPE_CHECKING:
 
     from samurai_backend.account.schemas.account.account import (
         AccountSearchPaginationSchema,
-        AccountSearchSchema,
     )
 
 
-def get_account(db: Session, search: AccountSearchSchema) -> AccountModel | None:
+def get_account_by_id(
+    session: Session,
+    account_id: pydantic.UUID4,
+) -> AccountModel | None:
+    return get_account(
+        session,
+        AccountSearchSchema(
+            account_id=account_id,
+        ),
+    )
+
+
+def get_account(
+    session: Session,
+    search: AccountSearchSchema,
+) -> AccountModel | None:
     """
     Returns a user from the database.
     """
@@ -36,7 +51,7 @@ def get_account(db: Session, search: AccountSearchSchema) -> AccountModel | None
             AccountModel.registration_code == search.registration_code,
         ),
     )
-    user = db.exec(query).first()
+    user = session.exec(query).first()
 
     if not user:
         return None
@@ -89,10 +104,9 @@ def get_all_accounts_by_group(db: Session, group_id: pydantic.UUID4) -> list[Acc
     query = select(ConnectionModel).filter(ConnectionModel.group_id == group_id)
     query = db.exec(query)
 
-    query = select(AccountModel).filter(
-        AccountModel.account_id.in_(row.account.account_id for row in query.all())
-    )
+    accounts = []
+    for row in query.all():
+        if row.accounts:
+            accounts += row.accounts
 
-    query = db.exec(query)
-
-    return query.all()
+    return accounts

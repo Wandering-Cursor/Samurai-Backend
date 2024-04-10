@@ -5,7 +5,7 @@ from sqlalchemy.event import listen
 from sqlmodel import Field, Relationship
 
 from samurai_backend.models.base import BaseModel
-from samurai_backend.utils import update_time
+from samurai_backend.utils.update_time import update_time
 
 from .faculty import FacultyModel
 

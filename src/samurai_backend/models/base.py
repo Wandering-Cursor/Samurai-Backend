@@ -4,7 +4,7 @@ import sqlalchemy as sa
 import sqlmodel
 from sqlalchemy.event import listen
 
-from samurai_backend.utils import current_time
+from samurai_backend.utils.current_time import current_time
 
 
 class BaseModel(sqlmodel.SQLModel):

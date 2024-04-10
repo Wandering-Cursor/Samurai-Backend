@@ -38,7 +38,7 @@ class ConnectionBase(ConnectionCreate):
 
 
 class ConnectionModel(ConnectionBase, table=True):
-    account: "AccountModel" = Relationship(
+    accounts: list["AccountModel"] = Relationship(
         back_populates="connections",
         link_model=ConnectionLinkModel,
     )

@@ -7,12 +7,13 @@ from sqlmodel import Field, Relationship
 
 from samurai_backend.enums import AccountType
 from samurai_backend.models.base import BaseModel
-from samurai_backend.utils import get_password_hash
+from samurai_backend.utils.get_password_hash import get_password_hash
 
 from .account_permission_link import AccountPermissionAccountLink
 from .connection_link import ConnectionLinkModel
 
 if TYPE_CHECKING:
+    from samurai_backend.models.communication.chat_account_link import ChatAccountLinkModel
     from samurai_backend.models.user_projects.user_project_link import UserProjectLinkModel
 
     from .account_permission import AccountPermission
@@ -103,13 +104,16 @@ class AccountModel(BaseAccountModel, table=True):
         link_model=AccountPermissionAccountLink,
     )
     connections: list["ConnectionModel"] = Relationship(
-        back_populates="account",
+        back_populates="accounts",
         link_model=ConnectionLinkModel,
     )
     registration_email_code: "RegistrationEmailCode" = Relationship(
         back_populates="account",
     )
     user_project_links: list["UserProjectLinkModel"] = Relationship(
+        back_populates="account",
+    )
+    chat_links: list["ChatAccountLinkModel"] = Relationship(
         back_populates="account",
     )
 

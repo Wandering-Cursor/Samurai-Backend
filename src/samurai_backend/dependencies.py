@@ -144,7 +144,7 @@ def get_current_account(
         raise credentials_exception from e
 
     account = get_account(
-        db=db,
+        session=db,
         search=AccountSearchSchema(
             account_id=token_data.sub,
         ),

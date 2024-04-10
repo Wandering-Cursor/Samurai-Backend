@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql://local:local@127.0.0.1:5432/DevDB"
     timezone_name: str = "UTC"
     script_nonce: str = "FakeNonce"
+    logging_level: str = "DEBUG"
 
     @property
     def timezone(self) -> pytz.BaseTzInfo:

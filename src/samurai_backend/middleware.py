@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
 from samurai_backend.settings import security_settings
 
@@ -13,3 +14,15 @@ def add_cors_middleware(app: FastAPI) -> None:
         allow_methods=security_settings.cors_allow_methods,
         allow_headers=security_settings.cors_allow_headers,
     )
+
+
+def add_gzip_middleware(app: FastAPI) -> None:
+    app.add_middleware(
+        GZipMiddleware,
+    )
+
+
+# For future:
+# Consider creating a middleware that will log all requests and responses
+# Consider creating a middleware that will log request times
+#   (averaged over a period of time for each endpoint, to add monitoring)
