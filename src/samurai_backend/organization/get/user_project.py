@@ -50,6 +50,26 @@ def get_linked_project_by_id(
     ).first()
 
 
+def get_last_linked_project(
+    session: Session,
+    account_id: pydantic.UUID4,
+) -> UserProjectModel | None:
+    return session.exec(
+        select(
+            UserProjectModel,
+        )
+        .join(
+            UserProjectLinkModel,
+        )
+        .where(
+            UserProjectLinkModel.account_id == account_id,
+        )
+        .order_by(
+            UserProjectModel.updated_at.desc(),
+        )
+    ).first()
+
+
 def search_projects(
     session: Session,
     search_input: ProjectSearchInput,
