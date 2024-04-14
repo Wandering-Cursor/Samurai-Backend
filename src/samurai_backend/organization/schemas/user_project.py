@@ -54,8 +54,12 @@ class UserProjectRepresentation(ProjectRepresentation):
     @property
     def tasks_count_by_status(self: "UserProjectRepresentation") -> dict[TaskState, int]:
         result = defaultdict(int)
+        for state in TaskState:
+            result[state.value] = 0
+
         for task in self.tasks:
             result[task.state] += 1
+
         return result
 
 
