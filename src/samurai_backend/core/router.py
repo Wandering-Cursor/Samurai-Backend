@@ -114,7 +114,7 @@ async def refresh_token(
     refresh_body: RefreshTokenInput | None = refresh_body,
 ) -> JSONResponse:
     refresh_token_value = refresh_token
-    if refresh_body:
+    if refresh_body and refresh_body.refresh_token:
         refresh_token_value = refresh_body.refresh_token
 
     if not refresh_token_value:
