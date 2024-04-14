@@ -45,6 +45,35 @@ async def get_projects(
 
 
 @user_projects_router.get(
+    "/projects/current",
+    dependencies=[
+        Permissions.PROJECTS_READ.as_security,
+    ],
+    tags=["student"],
+)
+async def get_current_projects(
+    session: Annotated[database_session_type, Depends(database_session)],
+    account: Annotated[account_type, Depends(get_current_active_account)],
+) -> UserProjectRepresentation:
+    """
+    Get all available projects linked to the student.
+    """
+    project = project_get.get_last_linked_project(
+        session=session,
+        account_id=account.account_id,
+    )
+    if not project:
+        raise SamuraiNotFoundError(
+            detail_override="You do not have an assigned project.",
+        )
+
+    return UserProjectRepresentation.model_validate(
+        project,
+        from_attributes=True,
+    )
+
+
+@user_projects_router.get(
     "/projects/{project_id}",
     dependencies=[
         Permissions.PROJECTS_READ.as_security,
