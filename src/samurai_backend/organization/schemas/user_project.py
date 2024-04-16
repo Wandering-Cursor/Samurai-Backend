@@ -1,6 +1,9 @@
+from collections import defaultdict
+
 import pydantic
 
 from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
+from samurai_backend.enums import TaskState
 from samurai_backend.models.projects.project import (
     ProjectRepresentation,
     ShortProjectRepresentation,
@@ -46,6 +49,18 @@ class ShortUserProjectRepresentation(ShortProjectRepresentation):
 class UserProjectRepresentation(ProjectRepresentation):
     tasks: list[UserTaskRepresentation]
     account_links: list[UserProjectLinkRepresentation]
+
+    @pydantic.computed_field
+    @property
+    def tasks_count_by_status(self: "UserProjectRepresentation") -> dict[TaskState, int]:
+        result = defaultdict(int)
+        for state in TaskState:
+            result[state.value] = 0
+
+        for task in self.tasks:
+            result[task.state] += 1
+
+        return result
 
 
 class UserProjectSearchOutput(BasePaginatedResponse):
