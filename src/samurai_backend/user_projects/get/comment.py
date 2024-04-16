@@ -13,7 +13,7 @@ from samurai_backend.user_projects.schemas.comment import (
     CommentPaginatedResponse,
     CommentSearchSchema,
 )
-from samurai_backend.utils import get_count
+from samurai_backend.utils.get_count import get_count
 
 if TYPE_CHECKING:
     import pydantic

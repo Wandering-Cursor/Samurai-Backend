@@ -10,7 +10,7 @@ from samurai_backend.organization.schemas.department import (
     DepartmentSearchInput,
     DepartmentSearchOutput,
 )
-from samurai_backend.utils import get_count
+from samurai_backend.utils.get_count import get_count
 
 if TYPE_CHECKING:
     import pydantic

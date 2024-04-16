@@ -1,4 +1,5 @@
 import json
+from collections.abc import AsyncGenerator
 from importlib import metadata
 
 from fastapi import FastAPI
@@ -12,9 +13,11 @@ from fastapi.staticfiles import StaticFiles
 
 from samurai_backend.account.router import account_router
 from samurai_backend.admin.router import admin_router
+from samurai_backend.communication.router import communication_router
 from samurai_backend.core.router import auth_router
 from samurai_backend.error_handlers import add_error_handlers
-from samurai_backend.middleware import add_cors_middleware
+from samurai_backend.log import main_logger
+from samurai_backend.middleware import add_cors_middleware, add_gzip_middleware
 from samurai_backend.settings import settings
 from samurai_backend.user_projects.router import user_projects_router
 
@@ -35,6 +38,31 @@ servers += [
 ]
 
 
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    main_logger.info("Starting up...")
+
+    main_logger.debug("Adding error handlers")
+    add_error_handlers(app)
+
+    main_logger.debug("Mounting static files")
+    app.mount(
+        "/static",
+        StaticFiles(directory="static"),
+        name="static",
+    )
+
+    main_logger.debug("Including routers")
+    app.include_router(auth_router)
+    app.include_router(admin_router)
+    app.include_router(account_router)
+    app.include_router(user_projects_router)
+    app.include_router(communication_router)
+
+    yield
+
+    main_logger.info("Shutting down...")
+
+
 app = FastAPI(
     debug=settings.debug,
     title="Samurai Backend",
@@ -51,18 +79,12 @@ app = FastAPI(
     docs_url=None,
     redoc_url=None,
     servers=servers,
+    lifespan=lifespan,
 )
 
-
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-add_error_handlers(app)
+# Has to be outside the lifecycle function
 add_cors_middleware(app)
-
-app.include_router(auth_router)
-app.include_router(admin_router)
-app.include_router(account_router)
-app.include_router(user_projects_router)
+add_gzip_middleware(app)
 
 
 @app.get(
@@ -185,3 +207,10 @@ async def custom_redoc_html() -> HTMLResponse:
     </html>
     """
     return HTMLResponse(html)
+
+
+@app.get(
+    "/health",
+)
+async def health() -> dict[str, str]:
+    return {"status": "ok"}

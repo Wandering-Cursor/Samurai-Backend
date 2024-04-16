@@ -21,15 +21,12 @@ def __assign_per_student(
         account_id=student_id,
         user_project_id=user_project.project_id,
     )
-    session.add(user_project)
-    session.commit()
     user_project.account_links.append(link)
     session.add(link)
-    session.add(user_project)
-    session.commit()
 
     for task in project.tasks:
-        user_project.tasks.append(UserTaskModel(**task.model_dump(exclude={"task_id"})))
+        new_task = UserTaskModel(**task.model_dump(exclude={"task_id"}))
+        user_project.tasks.append(new_task)
     session.add(user_project)
     session.commit()
 
@@ -47,13 +44,14 @@ def assign_project(
     project: ProjectModel,
 ) -> ProjectAssignOutput:
     students_assigned = 0
+    project_copy = project.model_copy()
 
     if assign_input.students_ids:
         for student_id in assign_input.students_ids:
             __assign_per_student(
                 session=session,
                 student_id=student_id,
-                project=project,
+                project=project_copy,
             )
             students_assigned += 1
 
@@ -62,7 +60,7 @@ def assign_project(
             students_assigned += _assign_per_group(
                 session=session,
                 group_id=group_id,
-                project=project,
+                project=project_copy,
             )
 
     return ProjectAssignOutput(

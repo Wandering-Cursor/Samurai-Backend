@@ -13,7 +13,7 @@ from samurai_backend.dependencies import (
     decode_refresh_token,
 )
 from samurai_backend.settings import security_settings
-from samurai_backend.utils import verify_password
+from samurai_backend.utils.verify_password import verify_password
 
 MAX_TOKEN_TLL = security_settings.max_access_token_ttl
 

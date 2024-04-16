@@ -30,7 +30,7 @@ async def register_account(
     body: Annotated[RegisterAccount, Body()],
 ) -> RegisterAccountResponse:
     account = account_get.get_account(
-        db=db, search=AccountSearchSchema(registration_code=body.registration_code)
+        session=db, search=AccountSearchSchema(registration_code=body.registration_code)
     )
 
     if not account:

@@ -36,6 +36,18 @@ class Permissions(StrEnum):
     COMMENTS_DELETE = "comments:delete"
     COMMENTS_CREATE = "comments:create"
 
+    CHATS = "chat"
+    CHATS_READ = "chat:read"
+    CHATS_UPDATE = "chat:update"
+    CHATS_DELETE = "chat:delete"
+    CHATS_CREATE = "chat:create"
+
+    MESSAGES = "messages"
+    MESSAGES_READ = "messages:read"
+    MESSAGES_UPDATE = "messages:update"
+    MESSAGES_DELETE = "messages:delete"
+    MESSAGES_CREATE = "messages:create"
+
     @property
     def description(self: "Permissions") -> str:
         message = ""
