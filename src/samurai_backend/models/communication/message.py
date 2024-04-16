@@ -25,7 +25,7 @@ class MessageSeenBy(SQLModel, table=True):
 
 class MessageModel(FileOrTextMixin, table=True):
     message_id: uuid.UUID = Field(
-        default=uuid.uuid4,
+        default_factory=uuid.uuid4,
         primary_key=True,
     )
 
@@ -39,3 +39,12 @@ class MessageModel(FileOrTextMixin, table=True):
     seen_by: list[MessageSeenBy] = Relationship(
         back_populates="message",
     )
+
+    def add_seen_by(self, account_id: uuid.UUID) -> None:
+        """Add a user to the list of users who have seen the message."""
+        self.seen_by.append(
+            MessageSeenBy(
+                account_id=account_id,
+                message_id=self.message_id,
+            ),
+        )
