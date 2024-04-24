@@ -5,10 +5,12 @@ from typing import TYPE_CHECKING
 from samurai_backend.core.operations import store_entity
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.account.registration_code import RegistrationEmailCode
+from samurai_backend.third_party.email.tasks import send_registration_code_email
 
 from .get.registration_code import get_registration_code
 
 if TYPE_CHECKING:
+    from fastapi import BackgroundTasks
     from sqlmodel import Session
 
     from .schemas.register import RegisterAccount
@@ -18,6 +20,7 @@ def register_account(
     db: Session,
     account: AccountModel,
     registration_info: RegisterAccount,
+    tasks: BackgroundTasks,
 ) -> AccountModel:
     if account.registration_email_code is not None:
         return account
@@ -36,6 +39,11 @@ def register_account(
         account_id=account.account_id,
     )
     store_entity(db, registration_code)
+    tasks.add_task(
+        send_registration_code_email,
+        account.email,
+        registration_code.code,
+    )
 
     return account
 

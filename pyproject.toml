@@ -1,6 +1,6 @@
 [project]
 name = "Samurai-Backend"
-version = "0.10.0"
+version = "0.11.0"
 description = "Backend part of the Samurai project"
 authors = [
     {name = "Pavlo Pohorieltsev", email = "hdydpavel@gmail.com"},
@@ -17,7 +17,6 @@ dependencies = [
     "sqlmodel>=0.0.16",
     "alembic[tz]>=1.13.1",
     "asyncpg>=0.29.0",
-    "uvicorn>=0.28.0",
 ]
 requires-python = ">=3.12"
 readme = "README.md"
