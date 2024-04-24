@@ -1,6 +1,5 @@
 import json
 from collections.abc import AsyncGenerator
-from importlib import metadata
 
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
@@ -67,7 +66,7 @@ app = FastAPI(
     debug=settings.debug,
     title="Samurai Backend",
     summary="Backend for the Samurai project",
-    version=metadata.version("samurai_backend"),
+    version=settings.app_version,
     swagger_ui_parameters={
         "defaultModelRendering": "model",
         "displayRequestDuration": True,

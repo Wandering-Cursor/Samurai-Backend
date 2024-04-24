@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, BackgroundTasks, Body, Depends
 
 from samurai_backend.account import operations as account_operations
 from samurai_backend.account.get import account as account_get
@@ -28,6 +28,7 @@ account_router = APIRouter(
 async def register_account(
     db: Annotated[database_session_type, Depends(database_session)],
     body: Annotated[RegisterAccount, Body()],
+    background_tasks: BackgroundTasks,
 ) -> RegisterAccountResponse:
     account = account_get.get_account(
         session=db, search=AccountSearchSchema(registration_code=body.registration_code)
@@ -40,6 +41,7 @@ async def register_account(
         db=db,
         account=account,
         registration_info=body,
+        tasks=background_tasks,
     )
 
     return RegisterAccountResponse()
