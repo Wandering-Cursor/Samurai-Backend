@@ -26,6 +26,9 @@ class ChatModel(BaseModel, table=True):
     )
 
     def create_link(self: "ChatModel", session: "Session", account: "AccountModel") -> None:
+        if self.is_member(account):
+            return
+
         link = ChatAccountLinkModel(
             chat_id=self.chat_id,
             account_id=account.account_id,

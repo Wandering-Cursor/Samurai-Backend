@@ -101,4 +101,4 @@ async def delete_task(
     if not entity:
         raise SamuraiNotFoundError
 
-    delete_entity(db=session, entity=entity)
+    delete_entity(session=session, entity=entity)

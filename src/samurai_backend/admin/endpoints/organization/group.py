@@ -73,6 +73,6 @@ async def delete_group(
     group: Annotated[GroupModel, Depends(group_exists)],
 ) -> None:
     delete_entity(
-        db=session,
+        session=session,
         entity=group,
     )

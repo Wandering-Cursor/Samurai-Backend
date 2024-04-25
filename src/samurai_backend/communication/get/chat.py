@@ -4,7 +4,12 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import select
 
-from samurai_backend.communication.schemas.chat import ChatRepresentation, ChatsSearchResponse
+from samurai_backend.communication.schemas.chat import (
+    ChatParticipantsResponse,
+    ChatParticipantsSearchSchema,
+    ChatRepresentation,
+    ChatsSearchResponse,
+)
 from samurai_backend.errors import SamuraiNotFoundError
 from samurai_backend.models.communication.chat import ChatModel
 from samurai_backend.models.communication.chat_account_link import ChatAccountLinkModel
@@ -75,5 +80,30 @@ async def get_user_chats(
             total=total,
             page=search_params.page,
             page_size=search_params.page_size,
+        ),
+    )
+
+
+async def get_chat_participants(
+    session: Session,
+    chat: ChatModel,
+    search_schema: ChatParticipantsSearchSchema,
+) -> ChatParticipantsResponse:
+    query = select(ChatAccountLinkModel).filter(
+        ChatAccountLinkModel.chat_id == chat.chat_id,
+    )
+    total = get_count(session, query)
+    query = query.offset(search_schema.offset).limit(search_schema.page_size)
+
+    participants = session.exec(query)
+
+    return ChatParticipantsResponse(
+        content=ChatParticipantsResponse.to_representation(
+            [participant.account for participant in participants]
+        ),
+        meta=ChatParticipantsResponse.construct_meta(
+            total=total,
+            page=search_schema.page,
+            page_size=search_schema.page_size,
         ),
     )

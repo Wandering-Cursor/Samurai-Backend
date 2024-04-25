@@ -39,7 +39,7 @@ class Permissions(StrEnum):
     CHATS = "chat"
     CHATS_READ = "chat:read"
     CHATS_UPDATE = "chat:update"
-    CHATS_DELETE = "chat:delete"
+    CHATS_ADD_MEMBER = "chat:add_member"
     CHATS_CREATE = "chat:create"
 
     MESSAGES = "messages"

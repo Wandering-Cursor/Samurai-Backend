@@ -71,4 +71,4 @@ async def delete_faculty(
     db: Annotated[database_session_type, Depends(database_session)],
     faculty: Annotated[FacultyModel, Depends(faculty_exists)],
 ) -> None:
-    delete_entity(db=db, entity=faculty)
+    delete_entity(session=db, entity=faculty)
