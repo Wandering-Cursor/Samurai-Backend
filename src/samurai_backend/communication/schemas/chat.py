@@ -1,5 +1,7 @@
 import pydantic
 
+from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
+
 
 class ChatCreate(pydantic.BaseModel):
     name: str | None = pydantic.Field(
@@ -20,6 +22,16 @@ class ChatRepresentation(pydantic.BaseModel):
     def _links(self: "ChatRepresentation") -> dict[str, str]:
         return {
             "self": f"/chat/{self.chat_id}",
-            "messages": f"/chat/{self.chat_id}/messages",
+            "messages": f"/messages/{self.chat_id}",
             "participants": f"/chat/{self.chat_id}/participants",
         }
+
+
+class ChatsSearchSchema(PaginationSearchSchema):
+    name: str | None = pydantic.Field(
+        default=None,
+    )
+
+
+class ChatsSearchResponse(BasePaginatedResponse):
+    content: list[ChatRepresentation]

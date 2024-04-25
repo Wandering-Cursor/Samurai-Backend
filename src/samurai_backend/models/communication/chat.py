@@ -32,3 +32,6 @@ class ChatModel(BaseModel, table=True):
         )
         session.add(link)
         self.participant_links.append(link)
+
+    def is_member(self: "ChatModel", account: "AccountModel") -> bool:
+        return any(link.account_id == account.account_id for link in self.participant_links)

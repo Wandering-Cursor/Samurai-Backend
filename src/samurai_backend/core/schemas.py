@@ -75,3 +75,15 @@ class PaginationMetaInformation(pydantic.BaseModel):
 class BasePaginatedResponse(pydantic.BaseModel):
     meta: PaginationMetaInformation
     content: list
+
+    @staticmethod
+    def construct_meta(
+        total: int,
+        page: int,
+        page_size: int,
+    ) -> PaginationMetaInformation:
+        return PaginationMetaInformation(
+            total=total,
+            page=page,
+            page_size=page_size,
+        )
