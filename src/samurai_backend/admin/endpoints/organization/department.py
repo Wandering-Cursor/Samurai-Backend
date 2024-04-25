@@ -68,7 +68,7 @@ async def delete_department(
     department: Annotated[DepartmentModel, Depends(department_exists)],
 ) -> None:
     delete_entity(
-        db=db,
+        session=db,
         entity=department,
     )
 

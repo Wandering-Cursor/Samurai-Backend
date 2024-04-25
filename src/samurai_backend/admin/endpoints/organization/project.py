@@ -101,7 +101,7 @@ async def delete_project(
         raise SamuraiNotFoundError
 
     delete_entity(
-        db=session,
+        session=session,
         entity=project,
     )
 

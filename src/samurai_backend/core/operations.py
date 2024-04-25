@@ -40,12 +40,15 @@ def update_entity(
 
 
 def delete_entity(
-    db: Session,
+    session: Session,
     entity: SQLModel,
+    commit: bool = True,
 ) -> None:
     try:
-        db.delete(entity)
-        db.commit()
+        session.delete(entity)
+
+        if commit:
+            session.commit()
     except IntegrityError as e:
-        db.rollback()
+        session.rollback()
         raise SamuraiIntegrityError from e

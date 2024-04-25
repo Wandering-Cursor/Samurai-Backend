@@ -52,7 +52,7 @@ def get_departments_search(
         )
 
     total = get_count(session, query)
-    query = query.offset(search.search_page * search.page_size).limit(search.page_size)
+    query = query.offset(search.offset).limit(search.page_size)
 
     rows = session.exec(query)
 

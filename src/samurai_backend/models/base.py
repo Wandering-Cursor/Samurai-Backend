@@ -19,5 +19,8 @@ class BaseModel(sqlmodel.SQLModel):
         sa_type=sa.DateTime(timezone=True),
     )
 
+    def update_time(self) -> None:
+        self.updated_at = current_time()
+
 
 listen(BaseModel, "before_update", current_time)
