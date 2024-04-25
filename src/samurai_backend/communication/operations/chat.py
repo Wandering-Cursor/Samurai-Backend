@@ -23,3 +23,17 @@ async def create_chat(
     session.commit()
 
     return entity
+
+
+async def update_chat(
+    session: database_session_type,
+    chat: ChatModel,
+    chat_update: chat_schemas.ChatUpdate,
+) -> ChatModel:
+    chat.name = chat_update.name or chat.name
+    chat.update_time()
+
+    session.add(chat)
+    session.commit()
+
+    return chat

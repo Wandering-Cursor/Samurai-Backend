@@ -3,6 +3,13 @@ import pydantic
 from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
 
 
+class ChatUpdate(pydantic.BaseModel):
+    name: str | None = pydantic.Field(
+        default=None,
+        examples=[None, "My chat"],
+    )
+
+
 class ChatCreate(pydantic.BaseModel):
     name: str | None = pydantic.Field(
         default=None,

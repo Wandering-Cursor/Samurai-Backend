@@ -81,3 +81,34 @@ async def get_chat(
         chat_entity,
         from_attributes=True,
     )
+
+
+@communication_router.patch(
+    "/chat/{chat_id}",
+    dependencies=[
+        Permissions.CHATS_UPDATE.as_security,
+    ],
+)
+async def update_chat(
+    session: Annotated[database_session_type, Depends(database_session)],
+    chat_id: pydantic.UUID4,
+    chat_update: Annotated[chat_schemas.ChatUpdate, Body()],
+    current_user: Annotated[account_type, Depends(get_current_active_account)],
+) -> chat_schemas.ChatRepresentation:
+    """Update a chat by its ID. If the user is not a member of the chat, raise 404."""
+    chat = await chat_get.get_related_chat(
+        session=session,
+        chat_id=chat_id,
+        current_user=current_user,
+    )
+
+    chat_entity = await chat_ops.update_chat(
+        session=session,
+        chat=chat,
+        chat_update=chat_update,
+    )
+
+    return chat_schemas.ChatRepresentation.model_validate(
+        chat_entity,
+        from_attributes=True,
+    )
