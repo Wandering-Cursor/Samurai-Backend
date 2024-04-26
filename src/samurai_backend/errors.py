@@ -44,3 +44,28 @@ class SamuraiForbiddenError(SamuraiAPIError):
     error_name: str = "ForbiddenError"
     status_code: int = status.HTTP_403_FORBIDDEN
     detail: str = "Forbidden"
+
+
+class SamuraiValidationError(SamuraiAPIError):
+    error_name: str = "ValidationError"
+    status_code: int = status.HTTP_422_UNPROCESSABLE_ENTITY
+    detail: dict = {"msg": "Validation Error"}
+
+    def __init__(
+        self: "SamuraiValidationError",
+        detail: dict | None = None,
+        message: str | None = None,
+    ) -> None:
+        detail_override = {
+            "msg": "Validation Error",
+            "type": self.error_name,
+        }
+
+        if detail is not None:
+            detail_override = detail
+            if "msg" not in detail_override:
+                detail_override["msg"] = "Validation Error"
+        if message is not None:
+            detail_override["msg"] = message
+
+        super().__init__(detail_override=detail_override)
