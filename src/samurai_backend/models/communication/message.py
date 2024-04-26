@@ -1,8 +1,10 @@
 import datetime
+import html
 import uuid
 
 from sqlmodel import Field, Relationship, SQLModel
 
+from samurai_backend.errors import SamuraiValidationError
 from samurai_backend.models.common.file_or_text import FileOrTextMixin
 from samurai_backend.utils.current_time import current_time
 
@@ -48,3 +50,21 @@ class MessageModel(FileOrTextMixin, table=True):
                 message_id=self.message_id,
             ),
         )
+
+    def is_seen(
+        self: "MessageModel",
+        account_id: uuid.UUID,
+    ) -> bool:
+        """Check if the message is seen by the user."""
+        return any(seen_by.account_id == account_id for seen_by in self.seen_by)
+
+    def set_text(self: "MessageModel", text: str | None) -> None:
+        """Set the text of the message."""
+        if text is None:
+            return
+
+        escaped_text = html.escape(text)
+        if len(escaped_text.strip()) == 0:
+            raise SamuraiValidationError(message="Message text cannot be empty.")
+
+        self.text = escaped_text
