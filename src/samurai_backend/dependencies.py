@@ -2,7 +2,7 @@ import secrets
 from datetime import datetime, timedelta
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, Security, status
+from fastapi import Depends, Header, HTTPException, Security, status
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from jose import JWTError, jwt
 from sqlmodel import Session
@@ -193,3 +193,21 @@ def get_current_active_account(
         )
 
     return current_account
+
+
+def ws_get_current_active_account(
+    session: Annotated[Session, Depends(database_session)],
+    token: Annotated[str, Header(alias="Authorization")],
+    security_scopes: SecurityScopes,
+) -> account_type:
+    """
+    Returns the current active account.
+    """
+    token = token.replace("Bearer ", "")
+
+    current_account = get_current_account(
+        db=session,
+        security_scopes=security_scopes,
+        token=token,
+    )
+    return get_current_active_account(current_account)

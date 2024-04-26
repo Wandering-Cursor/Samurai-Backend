@@ -1,5 +1,7 @@
 from fastapi import HTTPException, status
 
+from samurai_backend.log import main_logger
+
 
 class SamuraiAPIError(HTTPException):
     status_code: int = status.HTTP_400_BAD_REQUEST
@@ -10,6 +12,7 @@ class SamuraiAPIError(HTTPException):
         self: "SamuraiAPIError",
         detail_override: str | None = None,
     ) -> None:
+        main_logger.error(f"{self.error_name}: {self.detail}", exc_info=True)
         if detail_override is not None:
             self.detail = detail_override
 
