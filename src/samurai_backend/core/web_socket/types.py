@@ -2,6 +2,7 @@ from typing import Literal
 
 import pydantic
 
+from samurai_backend.account.schemas.account_details_mixin import AccountByAccountIdMixin
 from samurai_backend.communication.schemas.message import (
     MessageRepresentation,
     MessageSeenByRepresentation,
@@ -53,9 +54,14 @@ class ChatEvent(pydantic.BaseModel):
         ).model_dump(mode="json")
 
 
+class TyperData(AccountByAccountIdMixin):
+    chat_id: pydantic.UUID4
+
+
 class MessageEvent(pydantic.BaseModel):
-    entity: MessageRepresentation | None = None
-    seen_by: MessageSeenByRepresentation | None
+    entity: MessageRepresentation | None = pydantic.Field(None)
+    seen_by: MessageSeenByRepresentation | None = pydantic.Field(None)
+    typer: TyperData | None = pydantic.Field(None)
 
     event_type: message_events
 

@@ -5,7 +5,7 @@ import pydantic
 from fastapi import Depends, Security, WebSocket, WebSocketDisconnect, WebSocketException
 
 from samurai_backend.communication.get.chat import get_related_chat
-from samurai_backend.communication.operations.message import mark_message_seen
+from samurai_backend.communication.operations.message import mark_message_seen, send_typing_ws_event
 from samurai_backend.core.router import ws_router
 from samurai_backend.core.web_socket.manager import web_socket_manager
 from samurai_backend.core.web_socket.types import (
@@ -101,7 +101,7 @@ async def chats_messages_endpoint(
     await web_socket_manager.connect(key, websocket)
     await web_socket_manager.send_personal_message(
         websocket,
-        ConnectedResponse(commands=["mark_as_read", "bye"]),
+        ConnectedResponse(commands=["typing", "mark_as_read", "bye"]),
     )
 
     try:
@@ -123,6 +123,12 @@ async def chats_messages_endpoint(
             if data.action == "bye":
                 await web_socket_manager.disconnect(key, websocket)
                 break
+            if data.action == "typing":
+                await send_typing_ws_event(
+                    chat_id=chat_id,
+                    current_user=account,
+                )
+                continue
             if data.action == "mark_as_read":
                 if not isinstance(data.data, dict) or "message_id" not in data.data:
                     await web_socket_manager.invalid_command(websocket, "message_id is required")
