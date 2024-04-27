@@ -1,6 +1,9 @@
 from typing import TYPE_CHECKING
 
-from fastapi import WebSocket
+from fastapi import WebSocket, WebSocketDisconnect, WebSocketException
+
+from samurai_backend.core.web_socket.types import WSError
+from samurai_backend.log import main_logger
 
 if TYPE_CHECKING:
     from pydantic import BaseModel
@@ -28,8 +31,11 @@ class ConnectionManager:
 
     async def disconnect(self, key: str, websocket: WebSocket) -> None:
         self.active_connections[key].remove(websocket)
-        await websocket.send_json({"message": "disconnected"})
-        await websocket.close()
+        try:
+            await websocket.send_json({"message": "disconnected"})
+            await websocket.close()
+        except (WebSocketException, WebSocketDisconnect, Exception) as e:
+            main_logger.error("Disconnect error", extra={"error": e}, exc_info=True)
 
     async def send_personal_message(
         self,
@@ -39,6 +45,19 @@ class ConnectionManager:
         message = self._convert_to_dict(message)
 
         await websocket.send_json(message)
+
+    async def invalid_command(
+        self,
+        websocket: WebSocket,
+        error: dict | str,
+    ) -> None:
+        await self.send_personal_message(
+            websocket,
+            WSError(
+                error="Invalid data",
+                message=error,
+            ),
+        )
 
     async def broadcast(
         self,

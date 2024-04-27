@@ -2,14 +2,24 @@ from typing import Literal
 
 import pydantic
 
+from samurai_backend.communication.schemas.message import (
+    MessageRepresentation,
+    MessageSeenByRepresentation,
+)
+
 
 class WSKeys:
     @staticmethod
-    def chats_key(account_id: int) -> str:
+    def chats_key(account_id: pydantic.UUID4) -> str:
         return f"chats:{account_id}"
+
+    @staticmethod
+    def messages_key(chat_id: pydantic.UUID4) -> str:
+        return f"messages:{chat_id}"
 
 
 chat_event = Literal["created", "updated", "member_added", "member_left"]
+message_events = Literal["created", "updated", "typing", "read"]
 
 
 class WebSocketCommand(pydantic.BaseModel):
@@ -41,3 +51,26 @@ class ChatEvent(pydantic.BaseModel):
             self.chat_entity,
             from_attributes=True,
         ).model_dump(mode="json")
+
+
+class MessageEvent(pydantic.BaseModel):
+    entity: MessageRepresentation | None = None
+    seen_by: MessageSeenByRepresentation | None
+
+    event_type: message_events
+
+    @pydantic.field_validator("seen_by", mode="before")
+    @classmethod
+    def validate_seen_by(cls, value: dict | None) -> MessageSeenByRepresentation | None:
+        if value is None:
+            return None
+
+        return MessageSeenByRepresentation.model_validate(value, from_attributes=True)
+
+    @pydantic.field_validator("entity", mode="before")
+    @classmethod
+    def validate_entity(cls, value: dict | None) -> MessageRepresentation | None:
+        if value is None:
+            return None
+
+        return MessageRepresentation.model_validate(value, from_attributes=True)

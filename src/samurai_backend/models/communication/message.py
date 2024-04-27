@@ -42,14 +42,16 @@ class MessageModel(FileOrTextMixin, table=True):
         back_populates="message",
     )
 
-    def add_seen_by(self, account_id: uuid.UUID) -> None:
+    def add_seen_by(self, account_id: uuid.UUID) -> MessageSeenBy:
         """Add a user to the list of users who have seen the message."""
-        self.seen_by.append(
-            MessageSeenBy(
-                account_id=account_id,
-                message_id=self.message_id,
-            ),
+        seen_by = MessageSeenBy(
+            account_id=account_id,
+            message_id=self.message_id,
         )
+
+        self.seen_by.append(seen_by)
+
+        return seen_by
 
     def is_seen(
         self: "MessageModel",
