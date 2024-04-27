@@ -10,13 +10,13 @@ from samurai_backend.account.schemas.account.account import (
     AccountSearchSchema,
     AccountSetPermissionsInput,
 )
+from samurai_backend.account.schemas.account.account_model_schema import AccountModelSchema
 from samurai_backend.admin.operations.connections import add_connections
 from samurai_backend.admin.operations.permissions import set_permissions
 from samurai_backend.admin.router import admin_router
 from samurai_backend.core.operations import store_entity
 from samurai_backend.dependencies import database_session, database_session_type
 from samurai_backend.models.account.account import AccountModel, CreateAccountModel
-from samurai_backend.models.account.account_model_schema import AccountModelSchema
 
 
 @admin_router.post(

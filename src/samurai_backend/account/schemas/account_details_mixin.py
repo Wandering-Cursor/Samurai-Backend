@@ -2,7 +2,7 @@ import pydantic
 
 from samurai_backend.models.account.account import AccountModel
 
-from .account.account import AccountRepresentation, AccountSearchSchema
+from .account.account_representation import AccountRepresentation
 
 
 class AccountDetailsMixin(pydantic.BaseModel):
@@ -14,6 +14,8 @@ class AccountDetailsMixin(pydantic.BaseModel):
     def _account(self: "AccountDetailsMixin") -> AccountModel:
         from samurai_backend.account.get.account import get_account
         from samurai_backend.db import get_db_session
+
+        from .account.account import AccountSearchSchema
 
         generator = get_db_session()
         session = next(generator)
@@ -30,11 +32,3 @@ class AccountDetailsMixin(pydantic.BaseModel):
             self._account,
             from_attributes=True,
         )
-
-
-class AccountByAccountIdMixin(AccountDetailsMixin):
-    account_id: pydantic.UUID4
-
-    @property
-    def _account_id(self: "AccountByAccountIdMixin") -> pydantic.UUID4:
-        return self.account_id

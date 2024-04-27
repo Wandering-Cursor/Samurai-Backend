@@ -1,6 +1,8 @@
 import pydantic
 
-from samurai_backend.account.schemas.account.account import AccountRepresentation
+from samurai_backend.account.schemas.account.account_representation import (
+    AccountRepresentation,
+)
 from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
 
 

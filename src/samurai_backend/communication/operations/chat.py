@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 from samurai_backend.account.get.account import get_account_by_id
-from samurai_backend.account.schemas.account_details_mixin import AccountByAccountIdMixin
+from samurai_backend.account.schemas.account_by_account_id_mixin import AccountByAccountIdMixin
 from samurai_backend.communication.get.chat import get_chat
 from samurai_backend.communication.operations.message import remove_all_messages_by_chat_id
 from samurai_backend.communication.schemas import chat as chat_schemas

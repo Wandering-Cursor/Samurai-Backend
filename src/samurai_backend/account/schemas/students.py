@@ -1,7 +1,7 @@
 import pydantic
 
-from .account import AccountRepresentation
+from .account import account_representation
 
 
-class StudentRepresentation(AccountRepresentation):
+class StudentRepresentation(account_representation):
     group_id: pydantic.UUID4

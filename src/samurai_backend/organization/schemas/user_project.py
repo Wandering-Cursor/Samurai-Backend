@@ -9,7 +9,7 @@ from samurai_backend.models.projects.project import (
     ShortProjectRepresentation,
 )
 from samurai_backend.models.user_projects.task import UserTaskRepresentation
-from samurai_backend.models.user_projects.user_project_link import UserProjectLinkRepresentation
+from samurai_backend.user_projects.schemas.user_project_link import UserProjectLinkRepresentation
 
 
 class ProjectSearchInput(PaginationSearchSchema):

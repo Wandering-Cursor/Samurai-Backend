@@ -8,7 +8,6 @@ from jose import JWTError, jwt
 from sqlmodel import Session
 
 from samurai_backend.account.get.account import get_account
-from samurai_backend.account.schemas.account.account import AccountSearchSchema
 from samurai_backend.core.schemas import TokenData
 from samurai_backend.db import get_db_session_async
 from samurai_backend.enums import Permissions
@@ -108,6 +107,8 @@ def get_current_account(
     """
     Returns the current account from the database.
     """
+    from samurai_backend.account.schemas.account.account import AccountSearchSchema
+
     authenticate_value = "Bearer"
     if security_scopes.scopes:
         authenticate_value = f"Bearer scope={security_scopes.scope_str}"

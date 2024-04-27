@@ -13,6 +13,7 @@ class SamuraiAPIError(HTTPException):
         detail_override: str | None = None,
     ) -> None:
         main_logger.error(f"{self.error_name}: {self.detail}", exc_info=True)
+
         if detail_override is not None:
             self.detail = detail_override
 

@@ -5,11 +5,6 @@ from typing import TYPE_CHECKING
 from sqlalchemy import or_
 from sqlmodel import select
 
-from samurai_backend.account.schemas.account.account import (
-    AccountSearchResultVerbose,
-    AccountSearchSchema,
-    VerboseAccountRepresentation,
-)
 from samurai_backend.core.schemas import PaginationMetaInformation
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.account.connection import ConnectionModel
@@ -21,6 +16,8 @@ if TYPE_CHECKING:
 
     from samurai_backend.account.schemas.account.account import (
         AccountSearchPaginationSchema,
+        AccountSearchResultVerbose,
+        AccountSearchSchema,
     )
 
 
@@ -28,6 +25,8 @@ def get_account_by_id(
     session: Session,
     account_id: pydantic.UUID4,
 ) -> AccountModel | None:
+    from samurai_backend.account.schemas.account.account import AccountSearchSchema
+
     return get_account(
         session,
         AccountSearchSchema(
@@ -63,6 +62,11 @@ def get_accounts(db: Session, search: AccountSearchPaginationSchema) -> AccountS
     """
     Returns a list of users from the database.
     """
+    from samurai_backend.account.schemas.account.account import (
+        AccountSearchResultVerbose,
+        VerboseAccountRepresentation,
+    )
+
     query = select(AccountModel).order_by(
         AccountModel.updated_at.desc(),
     )

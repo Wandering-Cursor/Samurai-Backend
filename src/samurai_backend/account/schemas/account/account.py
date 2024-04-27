@@ -1,20 +1,8 @@
 import pydantic
 
-from samurai_backend.core.schemas import BasePaginatedResponse, BaseSchema, PaginationSearchSchema
+from samurai_backend.account.schemas.account.account_representation import AccountRepresentation
+from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
 from samurai_backend.enums import AccountType
-
-
-class BaseAccount(BaseSchema):
-    account_id: pydantic.UUID4
-    email: pydantic.EmailStr
-
-
-class AccountRepresentation(BaseAccount):
-    username: str
-
-    first_name: str
-    middle_name: str | None = None
-    last_name: str
 
 
 class VerboseAccountRepresentation(AccountRepresentation):

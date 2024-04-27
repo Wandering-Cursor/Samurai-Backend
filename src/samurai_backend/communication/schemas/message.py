@@ -3,7 +3,7 @@ import uuid
 
 import pydantic
 
-from samurai_backend.account.schemas.account_details_mixin import AccountByAccountIdMixin
+from samurai_backend.account.schemas.account_by_account_id_mixin import AccountByAccountIdMixin
 from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
 
 

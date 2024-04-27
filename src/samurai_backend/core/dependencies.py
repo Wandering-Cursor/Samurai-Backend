@@ -5,7 +5,6 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from samurai_backend.account.get.account import get_account
-from samurai_backend.account.schemas.account.account import AccountSearchSchema
 from samurai_backend.core.schemas import Token, TokenData
 from samurai_backend.dependencies import (
     create_access_token,
@@ -28,6 +27,8 @@ def authenticate(
     access_token_ttl_min: int | None = None,
 ) -> tuple[Token, str]:
     """Returns an Authentication Token and a Refresh Token."""
+    from samurai_backend.account.schemas.account.account import AccountSearchSchema
+
     auth_error = ValueError("Could not authenticate user.")
 
     account = get_account(
@@ -72,6 +73,8 @@ def authenticate_by_refresh_token(
     refresh_token: str,
 ) -> Token:
     """Returns a new Authentication Token."""
+    from samurai_backend.account.schemas.account.account import AccountSearchSchema
+
     token_data = decode_refresh_token(
         token=refresh_token,
     )
