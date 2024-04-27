@@ -30,3 +30,11 @@ class AccountDetailsMixin(pydantic.BaseModel):
             self._account,
             from_attributes=True,
         )
+
+
+class AccountByAccountIdMixin(AccountDetailsMixin):
+    account_id: pydantic.UUID4
+
+    @property
+    def _account_id(self: "AccountByAccountIdMixin") -> pydantic.UUID4:
+        return self.account_id

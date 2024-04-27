@@ -3,7 +3,7 @@ import uuid
 
 import pydantic
 
-from samurai_backend.account.schemas.account.account import AccountRepresentation
+from samurai_backend.account.schemas.account_details_mixin import AccountByAccountIdMixin
 from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
 
 
@@ -94,28 +94,16 @@ class MessagesSearchResponse(BasePaginatedResponse):
     content: list[MessageRepresentation]
 
 
-class MessageSeenByRepresentation(pydantic.BaseModel):
-    account_id: pydantic.UUID4
+class MessageSeenByRepresentation(AccountByAccountIdMixin):
     message_id: pydantic.UUID4
     at_time: datetime.datetime
-
-    session: object = pydantic.Field(exclude=True)
-
-    @pydantic.computed_field
-    def account(self: "MessageSeenByRepresentation") -> AccountRepresentation:
-        from samurai_backend.account.get.account import get_account_by_id
-
-        return AccountRepresentation.model_validate(
-            get_account_by_id(self.session, self.account_id),
-            from_attributes=True,
-        )
 
 
 class MessageSeenByResponse(pydantic.BaseModel):
     seen_by: list[MessageSeenByRepresentation]
 
     @staticmethod
-    def from_seen_by(session: object, viewers: list) -> "MessageSeenByResponse":
+    def from_seen_by(viewers: list) -> "MessageSeenByResponse":
         seen_by = []
 
         for viewer in viewers:
@@ -124,7 +112,6 @@ class MessageSeenByResponse(pydantic.BaseModel):
                     account_id=viewer.account_id,
                     message_id=viewer.message_id,
                     at_time=viewer.at_time,
-                    session=session,
                 )
             )
 

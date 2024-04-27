@@ -25,9 +25,11 @@ class ChatModel(BaseModel, table=True):
         back_populates="chat",
     )
 
-    def create_link(self: "ChatModel", session: "Session", account: "AccountModel") -> None:
+    def create_link(
+        self: "ChatModel", session: "Session", account: "AccountModel"
+    ) -> ChatAccountLinkModel | None:
         if self.is_member(account):
-            return
+            return None
 
         link = ChatAccountLinkModel(
             chat_id=self.chat_id,
@@ -35,6 +37,7 @@ class ChatModel(BaseModel, table=True):
         )
         session.add(link)
         self.participant_links.append(link)
+        return link
 
     def is_member(self: "ChatModel", account: "AccountModel") -> bool:
         return any(link.account_id == account.account_id for link in self.participant_links)

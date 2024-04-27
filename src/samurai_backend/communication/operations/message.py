@@ -2,6 +2,8 @@ from pydantic.types import UUID4
 from sqlmodel import delete
 
 from samurai_backend.communication.schemas import message as message_schema
+from samurai_backend.core.web_socket.manager import web_socket_manager
+from samurai_backend.core.web_socket.types import MessageEvent, TyperData, WSKeys
 from samurai_backend.dependencies import account_type, database_session_type
 from samurai_backend.errors import (
     SamuraiForbiddenError,
@@ -28,6 +30,8 @@ async def create_message(
 
     session.add(message_entity)
     session.commit()
+
+    await send_new_message_ws_event(message_entity)
 
     return message_entity
 
@@ -78,6 +82,8 @@ async def update_message(
     session.add(message_entity)
     session.commit()
 
+    await send_message_updated_ws_event(message_entity)
+
     return message_entity
 
 
@@ -85,7 +91,7 @@ async def mark_message_seen(
     session: database_session_type,
     message_id: UUID4,
     current_user: account_type,
-) -> MessageModel:
+) -> tuple[MessageModel, MessageSeenBy | None]:
     """Mark a message as seen."""
     message_entity = session.get(MessageModel, message_id)
 
@@ -93,11 +99,74 @@ async def mark_message_seen(
         raise SamuraiNotFoundError
 
     if message_entity.is_seen(current_user.account_id):
-        return message_entity
+        return message_entity, None
 
-    message_entity.add_seen_by(current_user.account_id)
+    seen_by = message_entity.add_seen_by(current_user.account_id)
 
     session.add(message_entity)
     session.commit()
 
-    return message_entity
+    await send_message_read_ws_event(message_entity, seen_by)
+
+    return message_entity, seen_by
+
+
+async def send_new_message_ws_event(
+    message_entity: MessageModel,
+) -> None:
+    """Send a new message WebSocket event."""
+    await web_socket_manager.broadcast(
+        WSKeys.messages_key(message_entity.chat_id),
+        MessageEvent(
+            entity=message_entity,
+            event_type="created",
+        ),
+    )
+
+
+async def send_message_updated_ws_event(
+    message_entity: MessageModel,
+) -> None:
+    """Send a message updated WebSocket event."""
+    await web_socket_manager.broadcast(
+        WSKeys.messages_key(message_entity.chat_id),
+        MessageEvent(
+            entity=message_entity,
+            event_type="updated",
+        ),
+    )
+
+
+async def send_message_read_ws_event(
+    message_entity: MessageModel,
+    seen_by: MessageSeenBy | None,
+) -> None:
+    """Send a message read WebSocket event."""
+    if not seen_by:
+        return
+
+    await web_socket_manager.broadcast(
+        WSKeys.messages_key(message_entity.chat_id),
+        MessageEvent(
+            entity=message_entity,
+            seen_by=seen_by,
+            event_type="read",
+        ),
+    )
+
+
+async def send_typing_ws_event(
+    chat_id: UUID4,
+    current_user: account_type,
+) -> None:
+    """Send a typing WebSocket event."""
+    await web_socket_manager.broadcast(
+        WSKeys.messages_key(chat_id),
+        MessageEvent(
+            event_type="typing",
+            typer=TyperData(
+                account_id=current_user.account_id,
+                chat_id=chat_id,
+            ),
+        ),
+    )

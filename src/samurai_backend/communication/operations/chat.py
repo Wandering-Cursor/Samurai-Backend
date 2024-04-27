@@ -1,10 +1,13 @@
 from typing import TYPE_CHECKING
 
 from samurai_backend.account.get.account import get_account_by_id
+from samurai_backend.account.schemas.account_details_mixin import AccountByAccountIdMixin
 from samurai_backend.communication.get.chat import get_chat
 from samurai_backend.communication.operations.message import remove_all_messages_by_chat_id
 from samurai_backend.communication.schemas import chat as chat_schemas
 from samurai_backend.core.operations import delete_entity
+from samurai_backend.core.web_socket.manager import web_socket_manager
+from samurai_backend.core.web_socket.types import ChatEvent, WSKeys, chat_event
 from samurai_backend.dependencies import account_type, database_session_type
 from samurai_backend.log import events_logger
 from samurai_backend.models.communication.chat import ChatModel
@@ -13,6 +16,23 @@ if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
     from pydantic.types import UUID4
+
+
+async def chat_updated_event(
+    chat: ChatModel,
+    event: chat_event,
+    additional_context: dict | None = None,
+) -> None:
+    for link in chat.participant_links:
+        await web_socket_manager.broadcast(
+            WSKeys.chats_key(link.account_id),
+            ChatEvent(
+                chat_id=chat.chat_id,
+                chat_entity=chat,
+                event_type=event,
+                additional_context=additional_context,
+            ).model_dump(),
+        )
 
 
 async def create_chat(
@@ -33,6 +53,8 @@ async def create_chat(
 
     session.commit()
 
+    await chat_updated_event(chat=entity, event="created")
+
     return entity
 
 
@@ -47,6 +69,8 @@ async def update_chat(
     session.add(chat)
     session.commit()
 
+    await chat_updated_event(chat=chat, event="updated")
+
     return chat
 
 
@@ -55,14 +79,31 @@ async def add_chat_member(
     chat: ChatModel,
     add_member_input: chat_schemas.ChatAddMember,
 ) -> ChatModel:
+    new_members = []
+
     for account_id in add_member_input.account_ids:
         account = get_account_by_id(session=session, account_id=account_id)
         if not account:
             continue
 
-        chat.create_link(session=session, account=account)
+        link = chat.create_link(session=session, account=account)
+        if link:
+            new_members.append(account)
 
     session.commit()
+
+    await chat_updated_event(
+        chat=chat,
+        event="member_added",
+        additional_context={
+            "new_members": [
+                AccountByAccountIdMixin(
+                    account_id=account.account_id,
+                ).model_dump(mode="json")
+                for account in new_members
+            ],
+        },
+    )
 
     return chat
 
@@ -79,12 +120,21 @@ async def leave_chat(
     if not link:
         return False
 
+    await chat_updated_event(
+        chat=chat,
+        event="member_left",
+        additional_context={
+            "member": AccountByAccountIdMixin(
+                account_id=account.account_id,
+            ).model_dump(mode="json"),
+        },
+    )
+
     chat.participant_links.remove(link)
     delete_entity(session=session, entity=link)
 
     session.add(chat)
     session.commit()
-
     return True
 
 

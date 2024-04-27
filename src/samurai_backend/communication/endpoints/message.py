@@ -81,7 +81,7 @@ async def get_message_seen_by(
     if message_entity is None:
         raise SamuraiNotFoundError
 
-    return message_schema.MessageSeenByResponse.from_seen_by(session, message_entity.seen_by)
+    return message_schema.MessageSeenByResponse.from_seen_by(message_entity.seen_by)
 
 
 @communication_router.post(
