@@ -39,3 +39,7 @@ class AccountSearchResultVerbose(BasePaginatedResponse):
 
 class AccountSetPermissionsInput(pydantic.BaseModel):
     permissions: list[pydantic.UUID4]
+
+
+class AccountSetConnectionsInput(pydantic.BaseModel):
+    connections: list[pydantic.UUID4]

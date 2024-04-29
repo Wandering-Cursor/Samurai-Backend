@@ -4,12 +4,7 @@ import pydantic
 from fastapi import Body, Depends
 
 from samurai_backend.account.get import account as account_get
-from samurai_backend.account.schemas.account.account import (
-    AccountSearchPaginationSchema,
-    AccountSearchResultVerbose,
-    AccountSearchSchema,
-    AccountSetPermissionsInput,
-)
+from samurai_backend.account.schemas.account import account as account_schemas
 from samurai_backend.account.schemas.account.account_model_schema import AccountModelSchema
 from samurai_backend.admin.operations.connections import add_connections
 from samurai_backend.admin.operations.permissions import set_permissions
@@ -53,7 +48,7 @@ async def create_account(
 )
 async def get_account(
     db: Annotated[database_session_type, Depends(database_session)],
-    search: Annotated[AccountSearchSchema, Depends()],
+    search: Annotated[account_schemas.AccountSearchSchema, Depends()],
 ) -> AccountModelSchema:
     return AccountModelSchema.model_validate(
         account_get.get_account(db, search=search),
@@ -67,8 +62,8 @@ async def get_account(
 )
 async def get_all_accounts(
     db: Annotated[database_session_type, Depends(database_session)],
-    search_query: Annotated[AccountSearchPaginationSchema, Depends()],
-) -> AccountSearchResultVerbose:
+    search_query: Annotated[account_schemas.AccountSearchPaginationSchema, Depends()],
+) -> account_schemas.AccountSearchResultVerbose:
     return account_get.get_accounts(db, search=search_query)
 
 
@@ -78,12 +73,12 @@ async def get_all_accounts(
 async def set_permissions_endpoint(
     db: Annotated[database_session_type, Depends(database_session)],
     account_id: pydantic.UUID4,
-    permission_input: Annotated[AccountSetPermissionsInput, Body()],
+    permission_input: Annotated[account_schemas.AccountSetPermissionsInput, Body()],
 ) -> AccountModelSchema:
     """Update permissions for the specified account"""
     account = account_get.get_account(
         db,
-        search=AccountSearchSchema(
+        search=account_schemas.AccountSearchSchema(
             account_id=account_id,
         ),
     )
@@ -92,6 +87,35 @@ async def set_permissions_endpoint(
         db=db,
         entity=account,
         permissions=permission_input.permissions,
+    )
+    account = store_entity(db=db, entity=account)
+
+    return AccountModelSchema.model_validate(
+        account,
+        from_attributes=True,
+    )
+
+
+@admin_router.post(
+    "/account/{account_id}/connections",
+)
+async def set_connections_endpoint(
+    db: Annotated[database_session_type, Depends(database_session)],
+    account_id: pydantic.UUID4,
+    connection_input: Annotated[account_schemas.AccountSetConnectionsInput, Body()],
+) -> AccountModelSchema:
+    """Update permissions for the specified account"""
+    account = account_get.get_account(
+        db,
+        search=account_schemas.AccountSearchSchema(
+            account_id=account_id,
+        ),
+    )
+
+    account = add_connections(
+        db=db,
+        entity=account,
+        connections=connection_input.connections,
     )
     account = store_entity(db=db, entity=account)
 
