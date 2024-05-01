@@ -7,12 +7,14 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     debug: bool = True
     app_version: str = metadata.version("samurai_backend")
-    database_url: str = "postgresql://local:local@127.0.0.1:5432/DevDB"
+    database_url: str = "postgresql+psycopg://local:local@127.0.0.1:5432/DevDB"
     timezone_name: str = "UTC"
     script_nonce: str = "FakeNonce"
     logging_level: str = "DEBUG"
     events_logging_level: str = "DEBUG"
     email_service_api_key: str | None = None
+
+    otel_exporter_endpoint: str = "http://localhost:4317"
 
     @property
     def timezone(self) -> pytz.BaseTzInfo:

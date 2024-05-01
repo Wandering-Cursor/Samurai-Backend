@@ -33,6 +33,8 @@ services:
       - security_env
       - settings_env
     entrypoint: /app/compose/backend.sh
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   postgres-data:

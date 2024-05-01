@@ -17,6 +17,7 @@ from samurai_backend.core.router import auth_router, ws_router
 from samurai_backend.error_handlers import add_error_handlers
 from samurai_backend.log import main_logger
 from samurai_backend.middleware import add_cors_middleware, add_gzip_middleware
+from samurai_backend.otel import setup_otel
 from samurai_backend.settings import settings
 from samurai_backend.user_projects.router import user_projects_router
 
@@ -85,6 +86,7 @@ app = FastAPI(
 # Has to be outside the lifecycle function
 add_cors_middleware(app)
 add_gzip_middleware(app)
+setup_otel(app)
 
 
 @app.get(
