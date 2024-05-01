@@ -163,3 +163,4 @@ cython_debug/
 
 # Docker compose secrets folder
 compose/.secrets/*
+compose/otel/tempo-data/*
