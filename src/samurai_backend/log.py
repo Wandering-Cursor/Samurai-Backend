@@ -20,5 +20,9 @@ def handler_factory() -> logging.Handler:
     return handler
 
 
-main_logger.addHandler(handler_factory())
-events_logger.addHandler(handler_factory())
+for logger in logging.Logger.manager.loggerDict.values():
+    if isinstance(logger, logging.Logger):
+        if logger.name.startswith("uvicorn."):
+            logger.handlers.clear()
+
+        logger.addHandler(handler_factory())
