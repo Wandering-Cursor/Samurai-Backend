@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     events_logging_level: str = "DEBUG"
     email_service_api_key: str | None = None
 
-    otel_exporter_endpoint: str = "http://localhost:4317"
+    otel_exporter_endpoint: str = "http://localhost:4318/v1/traces"
     otel_auth_header: str | None = None
 
     @property
