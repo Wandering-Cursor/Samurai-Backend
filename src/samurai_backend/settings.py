@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     email_service_api_key: str | None = None
 
     otel_exporter_endpoint: str = "http://localhost:4317"
+    otel_auth_header: str | None = None
 
     @property
     def timezone(self) -> pytz.BaseTzInfo:

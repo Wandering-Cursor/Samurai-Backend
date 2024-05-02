@@ -40,12 +40,16 @@ def setup_otel(app: "FastAPI") -> None:
         }
     )
     trace_provider = TracerProvider(resource=resource)
+
+    headers = {"Authorization": settings.otel_auth_header} if settings.otel_auth_header else {}
     processor = BatchSpanProcessor(
         OTLPSpanExporter(
             endpoint=settings.otel_exporter_endpoint,
+            headers=headers,
             insecure=True,
         )
     )
+
     trace_provider.add_span_processor(processor)
     trace.set_tracer_provider(trace_provider)
 
