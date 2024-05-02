@@ -46,7 +46,6 @@ def setup_otel(app: "FastAPI") -> None:
         OTLPSpanExporter(
             endpoint=settings.otel_exporter_endpoint,
             headers=headers,
-            insecure=True,
         )
     )
 
