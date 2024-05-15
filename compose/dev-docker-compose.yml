@@ -12,6 +12,14 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
+  db-viewer:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: mail@mail.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    ports:
+      - "5050:80"
+
   redis:
     image: redis:latest
     volumes:

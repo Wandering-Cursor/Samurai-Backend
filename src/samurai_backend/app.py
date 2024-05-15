@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from samurai_backend.account.router import account_router
 from samurai_backend.admin.router import admin_router
 from samurai_backend.communication.router import communication_router
-from samurai_backend.core.router import auth_router, ws_router
+from samurai_backend.core.router import auth_router, common_router, ws_router
 from samurai_backend.error_handlers import add_error_handlers
 from samurai_backend.log import main_logger
 from samurai_backend.middleware import add_cors_middleware, add_gzip_middleware
@@ -58,6 +58,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     app.include_router(account_router)
     app.include_router(user_projects_router)
     app.include_router(communication_router)
+    app.include_router(common_router)
 
     yield
 

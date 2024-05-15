@@ -1,12 +1,12 @@
 [project]
 name = "Samurai-Backend"
-version = "0.12.4"
+version = "0.12.5"
 description = "Backend part of the Samurai project"
 authors = [
     {name = "Pavlo Pohorieltsev", email = "hdydpavel@gmail.com"},
 ]
 dependencies = [
-    "fastapi[all]>=0.110.3",
+    "fastapi[all]>=0.111.0",
     "pydantic-settings>=2.2.1",
     "sqlalchemy>=2.0.28",
     "python-multipart>=0.0.9",
@@ -33,7 +33,7 @@ license = {text = "MIT"}
 
 [project.optional-dependencies]
 dev = [
-    "ruff>=0.3.5",
+    "ruff>=0.4.4",
     "pre-commit>=3.7.0",
     "pyright>=1.1.357",
 ]
