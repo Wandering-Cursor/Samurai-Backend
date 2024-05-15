@@ -6,6 +6,7 @@ import sqlmodel
 from samurai_backend.models.base import BaseModel
 
 if TYPE_CHECKING:
+    from samurai_backend.models.communication.message import MessageModel
     from samurai_backend.models.user_projects.comment import CommentModel
 
 
@@ -29,7 +30,12 @@ class FileModel(BaseModel, table=True):
         exclude=True,
     )
 
+    uploaded_by_id: uuid.UUID = sqlmodel.Field(
+        foreign_key="accountmodel.account_id",
+    )
+
     comment: "CommentModel" = sqlmodel.Relationship(back_populates="file")
+    message: "MessageModel" = sqlmodel.Relationship(back_populates="file")
 
 
 class FileOrTextMixin(BaseModel):

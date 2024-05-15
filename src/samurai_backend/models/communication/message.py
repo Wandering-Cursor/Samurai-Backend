@@ -5,7 +5,7 @@ import uuid
 from sqlmodel import Field, Relationship, SQLModel
 
 from samurai_backend.errors import SamuraiValidationError
-from samurai_backend.models.common.file_or_text import FileOrTextMixin
+from samurai_backend.models.common.file_or_text import FileModel, FileOrTextMixin
 from samurai_backend.utils.current_time import current_time
 
 
@@ -41,6 +41,8 @@ class MessageModel(FileOrTextMixin, table=True):
     seen_by: list[MessageSeenBy] = Relationship(
         back_populates="message",
     )
+
+    file: FileModel = Relationship(back_populates="message")
 
     def add_seen_by(self, account_id: uuid.UUID) -> MessageSeenBy:
         """Add a user to the list of users who have seen the message."""

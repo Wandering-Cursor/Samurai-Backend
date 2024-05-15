@@ -1,18 +1,24 @@
 import datetime
 from typing import Annotated
+from urllib.parse import quote
 
-from fastapi import Body, Cookie, Depends, Form
-from fastapi.responses import JSONResponse
+import pydantic
+from fastapi import Body, Cookie, Depends, Form, UploadFile
+from fastapi.responses import JSONResponse, StreamingResponse
 
+from samurai_backend.core.dependencies import authenticate, authenticate_by_refresh_token
+from samurai_backend.core.get import get_file_by_id, get_file_iterator
+from samurai_backend.core.operations import store_file
+from samurai_backend.core.router import auth_router, common_router
 from samurai_backend.core.schemas import GetToken, RefreshTokenInput, Token
+from samurai_backend.core.schemas.common import FileRepresentation
 from samurai_backend.dependencies import (
+    account_type,
     database_session,
     database_session_type,
 )
+from samurai_backend.enums import Permissions
 from samurai_backend.settings import security_settings
-
-from .dependencies import authenticate, authenticate_by_refresh_token
-from .router import auth_router
 
 
 def perform_login(db: database_session_type, auth_data: GetToken) -> JSONResponse:
@@ -156,3 +162,46 @@ async def logout() -> JSONResponse:
         samesite="lax",
     )
     return response
+
+
+@common_router.get(
+    "/file/{file_id}",
+    dependencies=[
+        Permissions.blank_security(),
+    ],
+)
+async def get_file(
+    db_session: Annotated[database_session_type, Depends(database_session)],
+    file_id: pydantic.UUID4,
+) -> StreamingResponse:
+    """Download a file by its ID."""
+    file_entity = get_file_by_id(
+        session=db_session,
+        file_id=file_id,
+    )
+
+    return StreamingResponse(
+        content=get_file_iterator(file_entity),
+        headers={
+            "Content-Disposition": f"attachment; filename={quote(file_entity.file_name)}",
+            "Content-Type": file_entity.file_type,
+        },
+    )
+
+
+@common_router.post(
+    "/file",
+)
+async def create_file(
+    user_dependency: Annotated[account_type, Permissions.blank_security()],
+    db_session: Annotated[database_session_type, Depends(database_session)],
+    file: UploadFile,
+) -> FileRepresentation:
+    """Upload a new file."""
+    return FileRepresentation.model_validate(
+        store_file(
+            session=db_session,
+            upload=file,
+            user=user_dependency,
+        )
+    )

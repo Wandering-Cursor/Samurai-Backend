@@ -13,6 +13,17 @@ auth_router = APIRouter(
     tags=["auth"],
 )
 
+common_router = APIRouter(
+    prefix="/common",
+    tags=["common"],
+    responses={
+        401: {
+            "description": "Unauthorized, or invalid credentials.",
+            "model": ErrorSchema,
+        }
+    },
+)
+
 ws_router = APIRouter(
     prefix="/ws",
     tags=["ws"],
