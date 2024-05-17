@@ -9,7 +9,6 @@ from samurai_backend.models.account.account_permission import AccountPermission
 def create_admin() -> None:
     email = input("Enter admin email: ")
     password = input("Enter admin password: ")
-
     db_generator = get_db_session()
     db = next(db_generator)
     all_permissions = get_permissions(db)
@@ -25,7 +24,6 @@ def create_admin() -> None:
         admin_permission = AccountPermission(
             name=Permissions.ADMIN.value,
         )
-
     admin = AccountModel(
         email=email,
         username=email,
@@ -39,7 +37,6 @@ def create_admin() -> None:
         account_type=AccountType.ADMIN,
     )
     admin.set_password(password)
-
     store_entity(db, admin)
     print(f"Admin account created with email: {email}")  # noqa: T201
 

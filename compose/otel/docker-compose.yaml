@@ -1,3 +1,5 @@
+name: "samurai-backend"
+
 services:
 
   # Tempo runs as user 10001, and docker compose creates the volume as root.
