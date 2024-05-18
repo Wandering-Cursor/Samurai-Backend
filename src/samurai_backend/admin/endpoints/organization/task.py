@@ -73,7 +73,7 @@ async def update_task(
     if not entity:
         raise SamuraiNotFoundError
 
-    entity = TaskModel.model_validate(task, from_attributes=True, entity=entity)
+    entity = TaskModel.model_validate(task, from_attributes=True)
     entity.task_id = task_id
 
     return TaskRepresentation.model_validate(

@@ -46,6 +46,17 @@ class TaskRepresentation(BaseTask):
     task_id: pydantic.UUID4
 
 
+class TaskRepresentationShortDescription(TaskRepresentation):
+    @pydantic.field_validator("description", mode="before")
+    @classmethod
+    def convert_description(cls, value: str | None) -> str | None:
+        max_length = 128
+
+        if value is None:
+            return None
+        return value[:max_length] + "..." if len(value) > max_length else value
+
+
 class TaskModel(BaseTask, table=True):
     task_id: pydantic.UUID4 = Field(
         default_factory=uuid.uuid4,
