@@ -74,11 +74,18 @@ def get_accounts(db: Session, search: AccountSearchPaginationSchema) -> AccountS
     if search.account_id:
         query = query.filter(AccountModel.account_id == search.account_id)
 
-    if search.email:
-        query = query.filter(AccountModel.email == search.email)
+    if search.email or search.username:
+        arguments = []
+        if search.email:
+            arguments.append(AccountModel.email.icontains(search.email))
+        if search.username:
+            arguments.append(AccountModel.username.icontains(search.username))
 
-    if search.username:
-        query = query.filter(AccountModel.username == search.username)
+        email_or_username_filter = or_(
+            *arguments,
+        )
+
+        query = query.filter(email_or_username_filter)
 
     if search.account_type:
         query = query.filter(AccountModel.account_type == search.account_type)
