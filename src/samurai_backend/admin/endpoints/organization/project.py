@@ -11,6 +11,7 @@ from samurai_backend.models.projects.project import (
     CreateProject,
     ProjectModel,
     ProjectRepresentation,
+    ProjectRepresentationFull,
 )
 from samurai_backend.organization.get import project as project_get
 from samurai_backend.organization.operations import project as project_operations
@@ -37,7 +38,7 @@ async def create_project(
 async def get_project(
     session: Annotated[database_session_type, Depends(database_session)],
     project_id: pydantic.UUID4,
-) -> ProjectRepresentation:
+) -> ProjectRepresentationFull:
     project = project_get.get_project_by_id(
         session,
         project_id,
@@ -45,7 +46,7 @@ async def get_project(
     if not project:
         raise SamuraiNotFoundError
 
-    return ProjectRepresentation.model_validate(
+    return ProjectRepresentationFull.model_validate(
         project,
         from_attributes=True,
     )
@@ -71,11 +72,11 @@ async def update_project(
     session: Annotated[database_session_type, Depends(database_session)],
     project_id: pydantic.UUID4,
     project: Annotated[CreateProject, Body()],
-) -> ProjectRepresentation:
+) -> ProjectRepresentationFull:
     entity = ProjectModel.model_validate(project, from_attributes=True)
     entity.project_id = project_id
 
-    return ProjectRepresentation.model_validate(
+    return ProjectRepresentationFull.model_validate(
         update_entity(
             db=session,
             entity=entity,

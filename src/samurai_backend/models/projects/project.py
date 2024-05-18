@@ -4,7 +4,7 @@ import pydantic
 from sqlmodel import Field, Relationship
 
 from .base import BaseNamed
-from .task import TaskModel
+from .task import TaskModel, TaskRepresentationShortDescription
 
 
 class BaseProject(BaseNamed):
@@ -19,7 +19,18 @@ class CreateProject(BaseProject):
 
 class ShortProjectRepresentation(BaseProject):
     project_id: pydantic.UUID4
-    tasks: list = pydantic.Field(default_factory=list, exclude=True)
+    tasks: list[TaskRepresentationShortDescription] = pydantic.Field(
+        default_factory=list, exclude=True
+    )
+
+    @pydantic.field_validator("description", mode="before")
+    @classmethod
+    def convert_description(cls, value: str | None) -> str | None:
+        max_length = 128
+
+        if value is None:
+            return None
+        return value[:max_length] + "..." if len(value) > max_length else value
 
     @pydantic.computed_field
     @property
@@ -35,13 +46,19 @@ class ShortProjectRepresentation(BaseProject):
         }
 
 
-class ProjectRepresentation(ShortProjectRepresentation):
+class ProjectRepresentationFull(BaseProject):
     project_id: pydantic.UUID4
-    tasks: list[TaskModel] = pydantic.Field(description="Tasks of the project (up to 5)")
+    tasks: list[TaskRepresentationShortDescription] = pydantic.Field(
+        description="Tasks of the project"
+    )
 
+
+class ProjectRepresentation(ProjectRepresentationFull):
     @pydantic.field_validator("tasks", mode="before")
     @classmethod
-    def convert_tasks(cls, value: list[TaskModel | dict]) -> list[TaskModel]:
+    def convert_tasks(
+        cls, value: list[TaskRepresentationShortDescription | dict]
+    ) -> list[TaskRepresentationShortDescription]:
         return value[:5]
 
 
