@@ -21,7 +21,7 @@ class AdminAccountRepresentation(VerboseAccountRepresentation):
 
 class AccountSearchSchema(pydantic.BaseModel):
     account_id: pydantic.UUID4 | None = None
-    email: pydantic.EmailStr | None = None
+    email: str | None = None
     username: str | None = None
 
     account_type: AccountType | None = None
