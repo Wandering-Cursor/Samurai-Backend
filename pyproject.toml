@@ -1,6 +1,6 @@
 [project]
 name = "Samurai-Backend"
-version = "0.12.5"
+version = "0.12.6"
 description = "Backend part of the Samurai project"
 authors = [
     {name = "Pavlo Pohorieltsev", email = "hdydpavel@gmail.com"},
