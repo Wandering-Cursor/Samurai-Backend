@@ -41,9 +41,6 @@ servers += [
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     main_logger.info("Starting up...")
 
-    main_logger.debug("Adding error handlers")
-    add_error_handlers(app)
-
     main_logger.debug("Mounting static files")
     app.mount(
         "/static",
@@ -85,6 +82,8 @@ app = FastAPI(
 )
 
 # Has to be outside the lifecycle function
+main_logger.debug("Adding error handlers")
+add_error_handlers(app)
 add_cors_middleware(app)
 add_gzip_middleware(app)
 setup_otel(app)

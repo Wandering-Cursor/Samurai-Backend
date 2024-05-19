@@ -1,3 +1,4 @@
+import pydantic
 from fastapi import HTTPException, status
 
 from samurai_backend.log import main_logger
@@ -73,3 +74,14 @@ class SamuraiValidationError(SamuraiAPIError):
             detail_override["msg"] = message
 
         super().__init__(detail_override=detail_override)
+
+
+class SamuraiErrorModel(pydantic.BaseModel):
+    detail: list | dict | str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "detail": "Resource Not Found",
+            }
+        }

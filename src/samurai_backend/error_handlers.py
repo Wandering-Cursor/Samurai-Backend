@@ -7,9 +7,15 @@ from pydantic import ValidationError
 
 
 def validation_exception_handler(_: Request, exc: ValidationError) -> JSONResponse:
+    errors = exc.errors()
+    for error in errors:
+        ctx = error.get("ctx", {})
+        if "error" in ctx and isinstance(ctx["error"], ValueError):
+            ctx["error"] = str(ctx["error"])
+
     raise HTTPException(
         status_code=422,
-        detail=exc.errors(),
+        detail=errors,
         headers={
             "X-Error": "Validation Error",
         },
@@ -19,8 +25,8 @@ def validation_exception_handler(_: Request, exc: ValidationError) -> JSONRespon
 def jose_exception_handler(_: Request, exc: JOSEError) -> JSONResponse:
     logging.exception(exc.__cause__, exc_info=True)
     logging.exception(str(exc), exc_info=True)
-    return JSONResponse(
-        content={
+    raise HTTPException(
+        detail={
             "detail": "Unauthorized",
         },
         status_code=401,
