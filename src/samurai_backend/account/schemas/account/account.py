@@ -59,3 +59,33 @@ class AccountSimpleSearchSchema(pydantic.BaseModel):
         if not any([self.account_id, self.email, self.username]):
             raise SamuraiInvalidRequestError("At least one search parameter must be provided.")
         return self
+
+
+class AccountCreateConnectionForBatch(pydantic.BaseModel):
+    group_id: pydantic.UUID4 | None = None
+    faculty_id: pydantic.UUID4 | None = None
+    department_id: pydantic.UUID4 | None = None
+
+
+class AccountCreateInputForBatch(pydantic.BaseModel):
+    account_type: AccountType = AccountType.STUDENT
+
+    first_name: str = pydantic.Field(max_length=256)
+    middle_name: str | None = pydantic.Field(default=None, max_length=256)
+    last_name: str = pydantic.Field(max_length=256)
+
+    is_email_verified: bool = False
+
+    connections: list[AccountCreateConnectionForBatch] = pydantic.Field(default_factory=list)
+    permissions: list[pydantic.UUID4] = pydantic.Field(default_factory=list)
+
+    class Config:
+        from_attributes = True
+
+
+class AccountBatchCreateInput(pydantic.BaseModel):
+    accounts: list[AccountCreateInputForBatch]
+
+
+class AccountBatchCreateOutput(pydantic.BaseModel):
+    status: str = "success"

@@ -1,9 +1,10 @@
 from typing import Annotated
 
 import pydantic
-from fastapi import Body, Depends
+from fastapi import BackgroundTasks, Body, Depends
 
 from samurai_backend.account.get import account as account_get
+from samurai_backend.account.operations import create_batch_accounts
 from samurai_backend.account.schemas.account import account as account_schemas
 from samurai_backend.account.schemas.account.account_model_schema import AccountModelSchema
 from samurai_backend.admin.operations.connections import add_connections
@@ -30,10 +31,10 @@ async def create_account(
     )
 
     if account_data.permissions:
-        account = set_permissions(db=db, entity=account, permissions=account_data.permissions)
+        account = set_permissions(session=db, entity=account, permissions=account_data.permissions)
         account = store_entity(db=db, entity=account)
     if account_data.connections:
-        account = add_connections(db=db, entity=account, connections=account_data.connections)
+        account = add_connections(session=db, entity=account, connections=account_data.connections)
         account = store_entity(db=db, entity=account)
 
     return AccountModelSchema.model_validate(
@@ -84,7 +85,7 @@ async def set_permissions_endpoint(
     )
 
     account = set_permissions(
-        db=db,
+        session=db,
         entity=account,
         permissions=permission_input.permissions,
     )
@@ -113,7 +114,7 @@ async def set_connections_endpoint(
     )
 
     account = add_connections(
-        db=db,
+        session=db,
         entity=account,
         connections=connection_input.connections,
     )
@@ -123,3 +124,18 @@ async def set_connections_endpoint(
         account,
         from_attributes=True,
     )
+
+
+@admin_router.post(
+    "/account/batch",
+)
+async def batch_create_accounts(
+    accounts_data: Annotated[account_schemas.AccountBatchCreateInput, Body()],
+    background_tasks: BackgroundTasks,
+) -> account_schemas.AccountBatchCreateOutput:
+    background_tasks.add_task(
+        create_batch_accounts,
+        accounts_data=accounts_data,
+    )
+
+    return account_schemas.AccountBatchCreateOutput()

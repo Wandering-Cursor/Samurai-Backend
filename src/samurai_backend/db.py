@@ -20,6 +20,13 @@ def make_engine() -> Engine:
 engine = make_engine()
 
 
+def get_db_session_object() -> Session:
+    """
+    Returns a database session.
+    """
+    return Session(engine)
+
+
 def get_db_session() -> Generator[Session, None, None]:
     """
     Returns a database session.
