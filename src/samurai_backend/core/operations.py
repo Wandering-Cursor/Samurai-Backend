@@ -27,7 +27,7 @@ def store_entity(
 
 
 def update_entity(
-    db: Session,
+    session: Session,
     entity: SQLModel,
     primary_key: str,
 ) -> SQLModel:
@@ -38,12 +38,12 @@ def update_entity(
             .where(getattr(entity_class, primary_key) == getattr(entity, primary_key))
             .values(**entity.model_dump(exclude={primary_key}))
         )
-        db.exec(update_query)
-        db.commit()
+        session.exec(update_query)
+        session.commit()
 
         return entity
     except (IntegrityError, InvalidRequestError) as e:
-        db.rollback()
+        session.rollback()
         raise SamuraiIntegrityError from e
 
 

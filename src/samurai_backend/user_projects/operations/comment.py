@@ -63,7 +63,7 @@ def update_comment(
     )
 
     update_entity(
-        db=session,
+        session=session,
         entity=new_comment,
         primary_key="comment_id",
     )

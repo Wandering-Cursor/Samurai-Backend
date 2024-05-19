@@ -55,7 +55,7 @@ async def update_faculty(
     data["faculty_id"] = faculty_id
 
     new_faculty = update_entity(
-        db=db,
+        session=db,
         entity=FacultyModel.model_validate(data),
         primary_key="faculty_id",
     )

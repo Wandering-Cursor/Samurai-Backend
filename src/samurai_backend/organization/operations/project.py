@@ -1,7 +1,11 @@
 import pydantic
 from sqlmodel import Session
 
-from samurai_backend.account.get.account import get_all_accounts_by_group
+from samurai_backend.account.get.account import (
+    get_all_accounts_by_faculty,
+    get_all_accounts_by_group,
+)
+from samurai_backend.enums import AccountType
 from samurai_backend.models.projects.project import ProjectModel
 from samurai_backend.models.user_projects.project import UserProjectModel
 from samurai_backend.models.user_projects.task import UserTaskModel
@@ -10,11 +14,47 @@ from samurai_backend.organization.schemas.project import ProjectAssignInput, Pro
 
 
 def __get_students_from_group(session: Session, group_id: pydantic.UUID4) -> list[pydantic.UUID4]:
-    return [account.account_id for account in get_all_accounts_by_group(session, group_id)]
+    return [
+        account.account_id
+        for account in get_all_accounts_by_group(
+            session,
+            group_id,
+            account_type=AccountType.STUDENT,
+        )
+    ]
+
+
+def __get_overseer_from_faculty(
+    session: Session, faculty_id: pydantic.UUID4
+) -> list[pydantic.UUID4]:
+    return [
+        account.account_id
+        for account in get_all_accounts_by_faculty(
+            session,
+            faculty_id,
+            account_type=AccountType.OVERSEER,
+        )
+    ]
+
+
+def __make_user_project_links(
+    user_project_id: pydantic.UUID4,
+    account_ids: list[pydantic.UUID4],
+) -> list[UserProjectLinkModel]:
+    return [
+        UserProjectLinkModel(
+            account_id=account_id,
+            user_project_id=user_project_id,
+        )
+        for account_id in account_ids
+    ]
 
 
 def __assign_per_student(
-    session: Session, student_id: pydantic.UUID4, project: ProjectModel
+    session: Session,
+    student_id: pydantic.UUID4,
+    project: ProjectModel,
+    teacher_ids: list[pydantic.UUID4],
 ) -> None:
     user_project = UserProjectModel(**project.model_dump(exclude={"project_id"}), account_links=[])
     link = UserProjectLinkModel(
@@ -22,6 +62,18 @@ def __assign_per_student(
         user_project_id=user_project.project_id,
     )
     user_project.account_links.append(link)
+    user_project.account_links.extend(
+        __make_user_project_links(
+            user_project_id=user_project.project_id,
+            account_ids=teacher_ids,
+        )
+    )
+    user_project.account_links.extend(
+        __make_user_project_links(
+            user_project_id=user_project.project_id,
+            account_ids=__get_overseer_from_faculty(session, project.faculty_id),
+        )
+    )
     session.add(link)
 
     for task in project.tasks:
@@ -31,10 +83,15 @@ def __assign_per_student(
     session.commit()
 
 
-def _assign_per_group(session: Session, group_id: pydantic.UUID4, project: ProjectModel) -> int:
+def _assign_per_group(
+    session: Session,
+    group_id: pydantic.UUID4,
+    project: ProjectModel,
+    teacher_ids: list[pydantic.UUID4],
+) -> int:
     students = __get_students_from_group(session, group_id)
     for student in students:
-        __assign_per_student(session, student, project)
+        __assign_per_student(session, student, project, teacher_ids=teacher_ids)
     return len(students)
 
 
@@ -45,6 +102,7 @@ def assign_project(
 ) -> ProjectAssignOutput:
     students_assigned = 0
     project_copy = project.model_copy()
+    teacher_ids = assign_input.teachers_ids or []
 
     if assign_input.students_ids:
         for student_id in assign_input.students_ids:
@@ -52,6 +110,7 @@ def assign_project(
                 session=session,
                 student_id=student_id,
                 project=project_copy,
+                teacher_ids=teacher_ids,
             )
             students_assigned += 1
 
@@ -61,6 +120,7 @@ def assign_project(
                 session=session,
                 group_id=group_id,
                 project=project_copy,
+                teacher_ids=teacher_ids,
             )
 
     return ProjectAssignOutput(
