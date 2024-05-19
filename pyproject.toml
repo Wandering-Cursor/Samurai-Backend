@@ -23,10 +23,12 @@ dependencies = [
     "opentelemetry-instrumentation-psycopg>=0.45b0",
     "opentelemetry-instrumentation-fastapi>=0.45b0",
     "opentelemetry-instrumentation-httpx>=0.45b0",
-    "opentelemetry-instrumentation-logging>=0.45b0",  # May be used, but not required for now.
+    "opentelemetry-instrumentation-logging>=0.45b0",
     "opentelemetry-exporter-otlp-proto-grpc>=1.24.0",
     "opentelemetry-exporter-otlp-proto-http>=1.24.0",
 ]
+# opentelemetry-instrumentation-logging May be used, but not required for now.
+
 requires-python = ">=3.12"
 readme = "README.md"
 license = {text = "MIT"}
