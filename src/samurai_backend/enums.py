@@ -15,6 +15,8 @@ class AccountType(Enum):
 class Permissions(StrEnum):
     ADMIN = "admin"
 
+    ACCOUNTS_SEARCH = "accounts:search"
+
     PROJECTS = "projects"
     PROJECTS_READ = "projects:read"
     PROJECTS_UPDATE = "projects:update"

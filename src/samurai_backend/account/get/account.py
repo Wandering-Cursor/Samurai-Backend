@@ -18,6 +18,7 @@ if TYPE_CHECKING:
         AccountSearchPaginationSchema,
         AccountSearchResultVerbose,
         AccountSearchSchema,
+        AccountSimpleSearchSchema,
     )
 
 
@@ -42,12 +43,22 @@ def get_account(
     """
     Returns a user from the database.
     """
+    filters = []
+    if search.account_id:
+        filters.append(AccountModel.account_id == search.account_id)
+
+    if search.email:
+        filters.append(AccountModel.email == search.email)
+
+    if search.username:
+        filters.append(AccountModel.username == search.username)
+
+    if search.registration_code:
+        filters.append(AccountModel.registration_code == search.registration_code)
+
     query = select(AccountModel).filter(
         or_(
-            AccountModel.account_id == search.account_id,
-            AccountModel.email == search.email,
-            AccountModel.username == search.username,
-            AccountModel.registration_code == search.registration_code,
+            *filters,
         ),
     )
     user = session.exec(query).first()
@@ -121,3 +132,21 @@ def get_all_accounts_by_group(db: Session, group_id: pydantic.UUID4) -> list[Acc
             accounts += row.accounts
 
     return accounts
+
+
+def get_account_by_simple_search(
+    session: Session,
+    search: AccountSimpleSearchSchema,
+) -> AccountModel | None:
+    query = select(AccountModel)
+
+    if search.account_id:
+        query = query.filter(AccountModel.account_id == search.account_id)
+
+    if search.email:
+        query = query.filter(AccountModel.email == search.email)
+
+    if search.username:
+        query = query.filter(AccountModel.username == search.username)
+
+    return session.exec(query).first()
