@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from jose.exceptions import JOSEError
 from pydantic import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 
 
 def validation_exception_handler(_: Request, exc: ValidationError) -> JSONResponse:
@@ -68,4 +69,5 @@ def add_error_handlers(app: FastAPI) -> None:
     app.add_exception_handler(ValidationError, validation_exception_handler)
     app.add_exception_handler(JOSEError, jose_exception_handler)
     app.add_exception_handler(HTTPException, http_exception_handler)
+    app.add_exception_handler(SQLAlchemyError, any_exception_handler)
     app.add_exception_handler(Exception, any_exception_handler)

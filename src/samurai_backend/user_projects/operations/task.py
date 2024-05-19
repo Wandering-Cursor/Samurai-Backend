@@ -1,7 +1,7 @@
 import pydantic
 from sqlmodel import Session
 
-from samurai_backend.core.operations import delete_entity, store_entity
+from samurai_backend.core.operations import delete_entity, store_entity, update_entity
 from samurai_backend.enums import Permissions, TaskState
 from samurai_backend.errors import SamuraiInvalidRequestError, SamuraiNotFoundError
 from samurai_backend.models.account.account import AccountModel
@@ -100,10 +100,11 @@ def update_task(
         **update.model_dump(),
     )
 
-    session.add(updated_task)
-    session.commit()
-
-    return updated_task
+    return update_entity(
+        session=session,
+        entity=updated_task,
+        primary_key="task_id",
+    )
 
 
 def delete_task(

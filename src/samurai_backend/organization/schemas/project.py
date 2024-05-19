@@ -15,6 +15,7 @@ class ProjectSearchOutput(BasePaginatedResponse):
 
 class ProjectAssignBody(pydantic.BaseModel):
     students_ids: list[pydantic.UUID4] | None = None
+    teachers_ids: list[pydantic.UUID4] | None = None
     group_ids: list[pydantic.UUID4] | None = None
 
     @pydantic.model_validator(mode="after")

@@ -20,6 +20,7 @@ if TYPE_CHECKING:
         AccountSearchSchema,
         AccountSimpleSearchSchema,
     )
+    from samurai_backend.enums import AccountType
 
 
 def get_account_by_id(
@@ -122,8 +123,42 @@ def get_accounts(db: Session, search: AccountSearchPaginationSchema) -> AccountS
     )
 
 
-def get_all_accounts_by_group(db: Session, group_id: pydantic.UUID4) -> list[AccountModel]:
+def get_all_accounts_by_group(
+    db: Session,
+    group_id: pydantic.UUID4,
+    account_type: AccountType | None = None,
+) -> list[AccountModel]:
     query = select(ConnectionModel).filter(ConnectionModel.group_id == group_id)
+    if account_type:
+        query = query.filter(
+            ConnectionModel.accounts.any(
+                AccountModel.account_type == account_type,
+            )
+        )
+
+    query = db.exec(query)
+
+    accounts = []
+    for row in query.all():
+        if row.accounts:
+            accounts += row.accounts
+
+    return accounts
+
+
+def get_all_accounts_by_faculty(
+    db: Session,
+    faculty_id: pydantic.UUID4,
+    account_type: AccountType | None = None,
+) -> list[AccountModel]:
+    query = select(ConnectionModel).filter(ConnectionModel.faculty_id == faculty_id)
+    if account_type:
+        query = query.filter(
+            ConnectionModel.accounts.any(
+                AccountModel.account_type == account_type,
+            )
+        )
+
     query = db.exec(query)
 
     accounts = []

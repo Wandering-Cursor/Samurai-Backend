@@ -78,7 +78,7 @@ async def update_task(
 
     return TaskRepresentation.model_validate(
         update_entity(
-            db=session,
+            session=session,
             entity=entity,
             primary_key="task_id",
         ),

@@ -78,7 +78,7 @@ async def update_project(
 
     return ProjectRepresentationFull.model_validate(
         update_entity(
-            db=session,
+            session=session,
             entity=entity,
             primary_key="project_id",
         ),

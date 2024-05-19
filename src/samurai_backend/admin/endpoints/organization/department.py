@@ -51,7 +51,7 @@ async def update_department(
     department_obj.department_id = department_id
     return DepartmentRepresentation.model_validate(
         update_entity(
-            db=db,
+            session=db,
             entity=department_obj,
             primary_key="department_id",
         ),
