@@ -82,6 +82,9 @@ class BaseAccountModel(BaseModel):
     is_active: bool = Field(default=True)
     is_email_verified: bool = Field(default=False)
 
+    class Config:
+        from_attributes = True
+
 
 class CreateAccountModel(BaseAccountModel):
     password: str = Field(

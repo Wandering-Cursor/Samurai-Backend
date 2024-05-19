@@ -5,7 +5,7 @@ import logging
 from samurai_backend.settings import settings
 
 main_logger = logging.getLogger("samurai_backend")
-events_logger = logging.getLogger("samurai_backend.events")
+events_logger = logging.getLogger("samurai_backend_events")
 
 main_logger.setLevel(settings.logging_level)
 events_logger.setLevel(settings.events_logging_level)

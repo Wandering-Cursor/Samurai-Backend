@@ -55,10 +55,28 @@ async def get_connections(
 
 
 def get_connection(
-    db: Session,
+    session: Session,
     connection_id: pydantic.UUID4,
 ) -> ConnectionModel | None:
     query = select(ConnectionModel).filter(
         ConnectionModel.connection_id == connection_id,
     )
-    return db.exec(query).first()
+    return session.exec(query).first()
+
+
+def get_connection_by_parameters(
+    session: Session,
+    group_id: pydantic.UUID4 | None,
+    faculty_id: pydantic.UUID4 | None,
+    department_id: pydantic.UUID4 | None,
+) -> ConnectionModel | None:
+    query = select(ConnectionModel)
+
+    if group_id:
+        query = query.filter(ConnectionModel.group_id == group_id)
+    if faculty_id:
+        query = query.filter(ConnectionModel.faculty_id == faculty_id)
+    if department_id:
+        query = query.filter(ConnectionModel.department_id == department_id)
+
+    return session.exec(query).first()

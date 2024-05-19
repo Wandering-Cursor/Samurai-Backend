@@ -1,6 +1,6 @@
 [project]
 name = "Samurai-Backend"
-version = "0.13.0"
+version = "0.14.0"
 description = "Backend part of the Samurai project"
 authors = [
     {name = "Pavlo Pohorieltsev", email = "hdydpavel@gmail.com"},
@@ -23,7 +23,7 @@ dependencies = [
     "opentelemetry-instrumentation-psycopg>=0.45b0",
     "opentelemetry-instrumentation-fastapi>=0.45b0",
     "opentelemetry-instrumentation-httpx>=0.45b0",
-    "opentelemetry-instrumentation-logging>=0.45b0",
+    "opentelemetry-instrumentation-logging>=0.45b0",  # May be used, but not required for now.
     "opentelemetry-exporter-otlp-proto-grpc>=1.24.0",
     "opentelemetry-exporter-otlp-proto-http>=1.24.0",
 ]

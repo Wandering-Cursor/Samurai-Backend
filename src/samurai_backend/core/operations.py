@@ -1,4 +1,5 @@
 import os
+from typing import TypeVar
 
 from fastapi import UploadFile
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
@@ -11,11 +12,13 @@ from samurai_backend.dependencies import (
 from samurai_backend.errors import SamuraiIntegrityError, SamuraiInvalidRequestError
 from samurai_backend.models.common.file_or_text import FileModel
 
+T = TypeVar("T", bound=SQLModel)
+
 
 def store_entity(
     db: Session,
-    entity: SQLModel,
-) -> SQLModel:
+    entity: T,
+) -> T:
     try:
         db.add(entity)
         db.commit()
@@ -28,9 +31,9 @@ def store_entity(
 
 def update_entity(
     session: Session,
-    entity: SQLModel,
+    entity: T,
     primary_key: str,
-) -> SQLModel:
+) -> T:
     try:
         entity_class = entity.__class__
         update_query = (
@@ -49,7 +52,7 @@ def update_entity(
 
 def delete_entity(
     session: Session,
-    entity: SQLModel,
+    entity: T,
     commit: bool = True,
 ) -> None:
     try:

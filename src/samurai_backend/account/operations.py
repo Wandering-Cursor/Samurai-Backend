@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import secrets
 from typing import TYPE_CHECKING
 
 from samurai_backend.core.operations import store_entity
+from samurai_backend.db import get_db_session_object
+from samurai_backend.log import events_logger
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.account.registration_code import RegistrationEmailCode
 from samurai_backend.third_party.email.tasks import send_registration_code_email
@@ -13,7 +16,8 @@ if TYPE_CHECKING:
     from fastapi import BackgroundTasks
     from sqlmodel import Session
 
-    from .schemas.register import RegisterAccount
+    from samurai_backend.account.schemas.account import account as account_schemas
+    from samurai_backend.account.schemas.register import RegisterAccount
 
 
 def register_account(
@@ -72,3 +76,41 @@ def confirm_email(
     store_entity(db, registration_code)
 
     return True
+
+
+def create_batch_accounts(
+    accounts_data: account_schemas.AccountBatchCreateInput,
+) -> None:
+    from samurai_backend.admin.operations.connections import add_connections_for_batch
+    from samurai_backend.admin.operations.permissions import set_permissions
+
+    accounts_count = len(accounts_data.accounts)
+
+    events_logger.info(f"Creating batch accounts: {accounts_count} entities pending.")
+    session = get_db_session_object()
+
+    for index, account_data in enumerate(accounts_data.accounts):
+        account = AccountModel(
+            account_type=account_data.account_type,
+            first_name=account_data.first_name,
+            last_name=account_data.last_name,
+            middle_name=account_data.middle_name,
+            is_email_verified=account_data.is_email_verified,
+        )
+        account.set_password(secrets.token_hex(32))
+        account = store_entity(session, account)
+
+        account = add_connections_for_batch(
+            session=session,
+            entity=account,
+            connections=account_data.connections,
+            commit=False,
+        )
+        account = set_permissions(
+            session=session,
+            entity=account,
+            permissions=account_data.permissions,
+        )
+        events_logger.info(f"Account created: {account.account_id} ({index + 1}/{accounts_count})")
+
+    session.commit()
