@@ -96,6 +96,12 @@ async def search_accounts(
     search: Annotated[account_schema.AccountSimpleSearchSchema, Depends()],
     session: Annotated[database_session_type, Depends(database_session)],
 ) -> account_schema.VerboseAccountRepresentation:
+    """
+    This endpoint allows anyone with authorization to look for another user,
+    for search you can provide: account_id, email or username.
+    Match has to be exact, otherwise, the user will not be found.
+    Only one result per search is returned.
+    """
     account = account_get.get_account_by_simple_search(
         session=session,
         search=search,
