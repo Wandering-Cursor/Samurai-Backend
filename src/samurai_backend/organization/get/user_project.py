@@ -71,7 +71,7 @@ def get_last_linked_project(
             UserProjectLinkModel.account_id == account_id,
         )
         .order_by(
-            UserProjectModel.updated_at.desc(),
+            UserProjectModel.updated_at.asc(),
         )
     ).first()
 
@@ -84,7 +84,7 @@ def search_projects(
     query = select(
         UserProjectModel,
     ).order_by(
-        UserProjectModel.updated_at.desc(),
+        UserProjectModel.updated_at.asc(),
     )
 
     if search_input.faculty_id:
