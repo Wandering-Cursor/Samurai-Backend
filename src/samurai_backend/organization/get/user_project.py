@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING
 
-from sqlalchemy import func
+from sqlalchemy import case, func
 from sqlmodel import select
 
 from samurai_backend.account.schemas.account_by_account_id_mixin import AccountByAccountIdMixin
@@ -193,16 +193,15 @@ def get_projects_stats_by_task(
     faculty_id: pydantic.UUID4,
     query: user_project_schemas.ProjectsStatsByTaskInput,
 ) -> user_project_schemas.ProjectsStatsByTask:
-    outer_function = func.max
-    if query.order_direction == user_project_schemas.OrderDirection.DESC:
-        outer_function = func.min
-
     subquery = (
         select(
             UserProjectModel.project_id,
-            func.count(UserTaskModel.task_id).label("tasks_count"),
+            func.sum(case((UserTaskModel.state == query.order_by_state.value, 1), else_=0)).label(
+                "tasks_count"
+            ),
         )
-        .join(UserTaskModel)
+        .select_from(UserProjectModel)
+        .join(UserTaskModel, UserProjectModel.project_id == UserTaskModel.project_id)
         .where(UserProjectModel.faculty_id == faculty_id)
         .group_by(UserProjectModel.project_id)
         .subquery()
@@ -213,8 +212,8 @@ def get_projects_stats_by_task(
             UserProjectModel,
         )
         .join(subquery, UserProjectModel.project_id == subquery.c.project_id)
-        .order_by(outer_function(subquery.c.tasks_count))
-        .group_by(UserProjectModel)
+        .order_by(getattr(subquery.c.tasks_count, query.order_direction)())
+        .group_by(UserProjectModel, subquery.c.tasks_count)
         .limit(query.limit)
     )
 
