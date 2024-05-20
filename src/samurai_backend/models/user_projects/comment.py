@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 import pydantic
+import sqlalchemy as sa
 from sqlmodel import Field, Relationship
 
 from samurai_backend.models.common.file_or_text import FileModel, FileOrTextMixin
@@ -28,8 +29,11 @@ class CommentModel(FileOrTextMixin, table=True):
         index=True,
     )
     sender_id: UUID = Field(
-        foreign_key="accountmodel.account_id",
-        index=True,
+        sa_column=sa.Column(
+            sa.UUID(),
+            sa.ForeignKey("accountmodel.account_id", ondelete="CASCADE"),
+            index=True,
+        ),
     )
 
     file: FileModel = Relationship(back_populates="comment")

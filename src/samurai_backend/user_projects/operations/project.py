@@ -24,3 +24,12 @@ def assign_to_accounts(
     session.commit()
 
     return project
+
+
+def delete_project(
+    session: Session,
+    project: UserProjectModel,
+) -> None:
+    session.delete(project)
+
+    session.commit()
