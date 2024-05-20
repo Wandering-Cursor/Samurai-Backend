@@ -137,3 +137,31 @@ async def create_project(
         project_entity,
         from_attributes=True,
     )
+
+
+@user_projects_router.delete(
+    "/projects/{project_id}",
+    dependencies=[
+        Permissions.ADMIN.as_security,
+    ],
+)
+async def delete_project(
+    session: Annotated[database_session_type, Depends(database_session)],
+    project_id: pydantic.UUID4,
+) -> dict[str, str]:
+    """
+    Delete a project.
+    """
+    project = project_get.get_project_by_id(
+        session=session,
+        project_id=project_id,
+    )
+    if not project:
+        raise SamuraiNotFoundError
+
+    project_operations.delete_project(
+        session=session,
+        project=project,
+    )
+
+    return {"message": "Project deleted."}

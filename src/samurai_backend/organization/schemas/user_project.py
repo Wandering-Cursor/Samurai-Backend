@@ -5,7 +5,7 @@ import pydantic
 
 from samurai_backend.account.schemas.account_by_account_id_mixin import AccountByAccountIdMixin
 from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
-from samurai_backend.enums import TaskState
+from samurai_backend.enums import OrderDirection, TaskState
 from samurai_backend.models.projects.project import (
     ProjectRepresentation,
     ShortProjectRepresentation,
@@ -104,3 +104,24 @@ ProjectsStatsByTeacher = Annotated[
     list[ProjectStatsByTeacher],
     pydantic.Field(default_factory=list),
 ]
+
+
+class ProjectsTasksStats(pydantic.BaseModel):
+    project_id: pydantic.UUID4
+    name: str
+    students: list[AccountByAccountIdMixin]
+    teachers: list[AccountByAccountIdMixin]
+    tasks: dict[TaskState, int]
+    tasks_total: int
+
+
+ProjectsStatsByTask = Annotated[
+    list[ProjectsTasksStats],
+    pydantic.Field(default_factory=list),
+]
+
+
+class ProjectsStatsByTaskInput(pydantic.BaseModel):
+    order_by_state: TaskState = TaskState.DONE
+    order_direction: OrderDirection = OrderDirection.ASC
+    limit: int = pydantic.Field(default=10, ge=1)
