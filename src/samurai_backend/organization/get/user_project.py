@@ -227,8 +227,13 @@ def get_projects_stats_by_task(
 
         for link in project.account_links:
             entity = AccountByAccountIdMixin(account_id=link.account.account_id)
-            append_to = students if link.account.account_type == AccountType.STUDENT else teachers
-            append_to.append(entity)
+            match link.account.account_type:
+                case AccountType.STUDENT:
+                    students.append(entity)
+                case AccountType.TEACHER:
+                    teachers.append(entity)
+                case _:
+                    continue
 
         result.append(
             user_project_schemas.ProjectsTasksStats(
