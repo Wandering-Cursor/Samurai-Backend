@@ -1,4 +1,5 @@
 from samurai_backend.account.schemas.account.base_account import BaseAccount
+from samurai_backend.enums import AccountType
 
 
 class AccountRepresentation(BaseAccount):
@@ -7,3 +8,5 @@ class AccountRepresentation(BaseAccount):
     first_name: str
     middle_name: str | None = None
     last_name: str
+
+    account_type: AccountType

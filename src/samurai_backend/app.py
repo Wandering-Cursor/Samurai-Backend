@@ -19,7 +19,7 @@ from samurai_backend.log import main_logger
 from samurai_backend.middleware import add_cors_middleware, add_gzip_middleware
 from samurai_backend.otel import setup_otel
 from samurai_backend.settings import settings
-from samurai_backend.user_projects.router import user_projects_router
+from samurai_backend.user_projects.router import stats_projects_router, user_projects_router
 
 dev_server = {
     "url": "http://localhost:8000",
@@ -53,6 +53,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     app.include_router(ws_router)
     app.include_router(admin_router)
     app.include_router(account_router)
+    user_projects_router.include_router(stats_projects_router)
     app.include_router(user_projects_router)
     app.include_router(communication_router)
     app.include_router(common_router)

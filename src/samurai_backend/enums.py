@@ -50,6 +50,8 @@ class Permissions(StrEnum):
     MESSAGES_DELETE = "messages:delete"
     MESSAGES_CREATE = "messages:create"
 
+    PROJECTS_STATS = "projects_stats"
+
     @property
     def description(self: "Permissions") -> str:
         message = ""
