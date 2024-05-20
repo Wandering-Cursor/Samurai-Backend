@@ -9,8 +9,8 @@ from samurai_backend.dependencies import (
     database_session_type,
     get_current_active_account,
 )
-from samurai_backend.enums import Permissions
-from samurai_backend.errors import SamuraiNotFoundError
+from samurai_backend.enums import AccountType, Permissions
+from samurai_backend.errors import SamuraiInvalidRequestError, SamuraiNotFoundError
 from samurai_backend.models.user_projects.project import CreateUserProject, UserProjectModel
 from samurai_backend.organization.get import user_project as project_get
 from samurai_backend.organization.schemas.user_project import (
@@ -37,10 +37,15 @@ async def get_projects(
     """
     Get all available projects by specifying the search criteria.
     """
+    if search.account_id and account.account_type == AccountType.STUDENT:
+        raise SamuraiInvalidRequestError(
+            detail_override="You are not allowed to search by account_id.",
+        )
+
     return project_get.search_projects(
         session=session,
         search_input=search,
-        related_account_id=account.account_id,
+        related_account_id=search.account_id or account.account_id,
     )
 
 

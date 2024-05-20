@@ -1,7 +1,9 @@
 from collections import defaultdict
+from typing import Annotated
 
 import pydantic
 
+from samurai_backend.account.schemas.account_by_account_id_mixin import AccountByAccountIdMixin
 from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
 from samurai_backend.enums import TaskState
 from samurai_backend.models.projects.project import (
@@ -13,6 +15,10 @@ from samurai_backend.user_projects.schemas.user_project_link import UserProjectL
 
 
 class ProjectSearchInput(PaginationSearchSchema):
+    account_id: pydantic.UUID4 | None = pydantic.Field(
+        default=None,
+        description="If not specified, searches for projects related to the current account",
+    )
     faculty_id: pydantic.UUID4 | None = None
     name: str | None = None
 
@@ -65,3 +71,19 @@ class UserProjectRepresentation(ProjectRepresentation):
 
 class UserProjectSearchOutput(BasePaginatedResponse):
     content: list[ShortUserProjectRepresentation]
+
+
+class ProjectStatsEntity(pydantic.BaseModel):
+    total: int
+
+
+class ProjectStatsByTeacher(AccountByAccountIdMixin):
+    projects: ProjectStatsEntity
+    tasks: dict[TaskState, int]
+    tasks_total: int
+
+
+ProjectsStatsByTeacher = Annotated[
+    list[ProjectStatsByTeacher],
+    pydantic.Field(default_factory=list),
+]
