@@ -142,7 +142,7 @@ async def create_project(
 @user_projects_router.delete(
     "/projects/{project_id}",
     dependencies=[
-        Permissions.PROJECTS_DELETE.as_security,
+        Permissions.ADMIN.as_security,
     ],
 )
 async def delete_project(

@@ -6,6 +6,6 @@ user_projects_router = APIRouter(
 )
 
 stats_projects_router = APIRouter(
-    prefix="",
+    prefix="/stats",
     tags=["stats"],
 )

@@ -97,3 +97,8 @@ class TaskState(StrEnum):
     IN_PROGRESS = "in_progress"
     IN_REVIEW = "in_review"
     DONE = "done"
+
+
+class OrderDirection(StrEnum):
+    ASC = "asc"
+    DESC = "desc"

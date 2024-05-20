@@ -3,10 +3,12 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING
 
+from sqlalchemy import func
 from sqlmodel import select
 
+from samurai_backend.account.schemas.account_by_account_id_mixin import AccountByAccountIdMixin
 from samurai_backend.core.schemas import PaginationMetaInformation
-from samurai_backend.enums import AccountType
+from samurai_backend.enums import AccountType, TaskState
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.account.connection import ConnectionModel
 from samurai_backend.models.user_projects.project import UserProjectModel
@@ -121,6 +123,13 @@ def search_projects(
     )
 
 
+def _get_tasks_states(tasks: list[UserTaskModel]) -> dict[TaskState, int]:
+    tasks_by_state = defaultdict(int)
+    for task in tasks:
+        tasks_by_state[task.state] += 1
+    return tasks_by_state
+
+
 def get_projects_stats_by_teacher(
     session: Session,
     faculty_id: pydantic.UUID4,
@@ -165,16 +174,71 @@ def get_projects_stats_by_teacher(
             )
         )
 
-        tasks_by_state = defaultdict(int)
-        for task in tasks:
-            tasks_by_state[task.state] += 1
+        tasks_states = _get_tasks_states(tasks)
 
         result.append(
             user_project_schemas.ProjectStatsByTeacher(
                 account_id=teacher.account_id,
                 projects=user_project_schemas.ProjectStatsEntity(total=projects_total),
-                tasks=tasks_by_state,
-                tasks_total=sum(tasks_by_state.values()),
+                tasks=tasks_states,
+                tasks_total=sum(tasks_states.values()),
+            )
+        )
+
+    return result
+
+
+def get_projects_stats_by_task(
+    session: Session,
+    faculty_id: pydantic.UUID4,
+    query: user_project_schemas.ProjectsStatsByTaskInput,
+) -> user_project_schemas.ProjectsStatsByTask:
+    outer_function = func.max
+    if query.order_direction == user_project_schemas.OrderDirection.DESC:
+        outer_function = func.min
+
+    subquery = (
+        select(
+            UserProjectModel.project_id,
+            func.count(UserTaskModel.task_id).label("tasks_count"),
+        )
+        .join(UserTaskModel)
+        .where(UserProjectModel.faculty_id == faculty_id)
+        .group_by(UserProjectModel.project_id)
+        .subquery()
+    )
+
+    projects_query = (
+        select(
+            UserProjectModel,
+        )
+        .join(subquery, UserProjectModel.project_id == subquery.c.project_id)
+        .order_by(outer_function(subquery.c.tasks_count))
+        .group_by(UserProjectModel)
+        .limit(query.limit)
+    )
+
+    projects_data = session.exec(projects_query)
+
+    result: user_project_schemas.ProjectsStatsByTask = []
+
+    for project in projects_data:
+        students = []
+        teachers = []
+
+        for link in project.account_links:
+            entity = AccountByAccountIdMixin(account_id=link.account.account_id)
+            append_to = students if link.account.account_type == AccountType.STUDENT else teachers
+            append_to.append(entity)
+
+        result.append(
+            user_project_schemas.ProjectsTasksStats(
+                project_id=project.project_id,
+                name=project.name,
+                students=students,
+                teachers=teachers,
+                tasks=_get_tasks_states(project.tasks),
+                tasks_total=len(project.tasks),
             )
         )
 
