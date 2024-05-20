@@ -25,6 +25,23 @@ class ProjectSearchInput(PaginationSearchSchema):
 
 class ShortUserProjectRepresentation(ShortProjectRepresentation):
     account_links: list[UserProjectLinkRepresentation]
+    tasks: list[UserTaskRepresentation] = pydantic.Field(
+        exclude=True,
+        default_factory=list,
+    )
+
+    @pydantic.computed_field
+    @property
+    def tasks_count(self: "ShortUserProjectRepresentation") -> dict[TaskState, int]:
+        result = defaultdict(int)
+
+        for state in TaskState:
+            result[state.value] = 0
+
+        for task in self.tasks:
+            result[task.state] += 1
+
+        return result
 
     @pydantic.computed_field
     @property
