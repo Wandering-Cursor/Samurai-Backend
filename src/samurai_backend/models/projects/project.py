@@ -34,7 +34,7 @@ class ShortProjectRepresentation(BaseProject):
 
     @pydantic.computed_field
     @property
-    def tasks_count(self) -> int:
+    def tasks_total(self) -> int:
         return len(self.tasks)
 
     @pydantic.computed_field

@@ -4,7 +4,10 @@ from typing import TYPE_CHECKING
 import pydantic
 from sqlmodel import Field, Relationship
 
-from samurai_backend.models.projects.project import BaseProject, CreateProject
+from samurai_backend.models.projects.project import (
+    BaseProject,
+    CreateProject,
+)
 
 if TYPE_CHECKING:
     from .task import UserTaskModel

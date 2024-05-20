@@ -50,6 +50,8 @@ class Permissions(StrEnum):
     MESSAGES_DELETE = "messages:delete"
     MESSAGES_CREATE = "messages:create"
 
+    PROJECTS_STATS = "projects_stats"
+
     @property
     def description(self: "Permissions") -> str:
         message = ""
@@ -95,3 +97,8 @@ class TaskState(StrEnum):
     IN_PROGRESS = "in_progress"
     IN_REVIEW = "in_review"
     DONE = "done"
+
+
+class OrderDirection(StrEnum):
+    ASC = "asc"
+    DESC = "desc"

@@ -1,6 +1,7 @@
 import uuid
 
 import pydantic
+import sqlalchemy as sa
 from sqlmodel import Field, Relationship
 
 from samurai_backend.enums import TaskState
@@ -35,6 +36,14 @@ class UserTaskModel(BaseTask, table=True):
         index=True,
     )
 
-    project_id: pydantic.UUID4 = Field(foreign_key="userprojectmodel.project_id", index=True)
+    project_id: pydantic.UUID4 = Field(
+        sa_column=sa.Column(
+            sa.UUID(),
+            sa.ForeignKey("userprojectmodel.project_id", ondelete="CASCADE"),
+            index=True,
+        ),
+    )
     project: UserProjectModel = Relationship(back_populates="tasks")
-    comments: list[CommentModel] = Relationship(back_populates="task")
+    comments: list[CommentModel] = Relationship(
+        back_populates="task",
+    )
