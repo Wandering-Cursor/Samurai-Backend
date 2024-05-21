@@ -189,6 +189,22 @@ async def get_file(
     )
 
 
+@common_router.get(
+    "/file/{file_id}/info",
+)
+async def get_file_info(
+    db_session: Annotated[database_session_type, Depends(database_session)],
+    file_id: pydantic.UUID4,
+) -> FileRepresentation:
+    """Get information about a file by its ID."""
+    return FileRepresentation.model_validate(
+        get_file_by_id(
+            session=db_session,
+            file_id=file_id,
+        )
+    )
+
+
 @common_router.post(
     "/file",
 )
