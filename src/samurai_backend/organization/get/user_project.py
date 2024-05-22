@@ -108,7 +108,7 @@ def search_projects(
             UserProjectLinkModel.account_id == related_account_id,
         )
 
-    total = get_count(session, query, join=False)
+    total = get_count(session, query)
     query = query.offset(search_input.offset).limit(search_input.page_size)
 
     rows = session.exec(query)
@@ -160,7 +160,7 @@ def get_projects_stats_by_teacher(
                 UserProjectLinkModel.account_id == teacher.account_id,
             )
         )
-        projects_total = get_count(session, projects_query, join=False)
+        projects_total = get_count(session, projects_query)
 
         tasks = session.exec(
             select(
