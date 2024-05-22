@@ -7,16 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  stop-containers:
-    runs-on: self-hosted
-
-    steps:
-      - name: Stop containers
-        run: docker compose -f "compose/prod-docker-compose.yml" down
-
   start-containers:
-    if: always()
-    needs: stop-containers
     runs-on: self-hosted
 
     steps:
@@ -40,4 +31,4 @@ jobs:
           echo "${{ secrets.POSTGRES_PASSWORD }}" > compose/.secrets/POSTGRES_PASSWORD
 
       - name: Start containers
-        run: docker compose -f "compose/prod-docker-compose.yml" up -d
+        run: docker compose -f "compose/prod-docker-compose.yml" up -d --remove-orphans
