@@ -1,9 +1,10 @@
 from typing import Annotated
 
 import pydantic
-from fastapi import Body, Depends
+from fastapi import BackgroundTasks, Body, Depends
 
 from samurai_backend.admin.router import admin_router
+from samurai_backend.admin.schemas.project import BatchCreateProject
 from samurai_backend.core.operations import delete_entity, store_entity, update_entity
 from samurai_backend.dependencies import database_session, database_session_type
 from samurai_backend.errors import SamuraiNotFoundError
@@ -132,3 +133,21 @@ async def assign_project(
         assign_input=assign_input,
         project=project,
     )
+
+
+@admin_router.post(
+    "/project/batch",
+)
+async def batch_create_projects(
+    session: Annotated[database_session_type, Depends(database_session)],
+    projects: Annotated[list[BatchCreateProject], Body()],
+    background_tasks: Annotated[BackgroundTasks, BackgroundTasks()],
+) -> str:
+    for project in projects:
+        background_tasks.add_task(
+            project_operations.create_project_from_batch,
+            session=session,
+            template=project,
+        )
+
+    return "ok"

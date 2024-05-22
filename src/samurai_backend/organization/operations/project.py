@@ -5,8 +5,11 @@ from samurai_backend.account.get.account import (
     get_all_accounts_by_faculty,
     get_all_accounts_by_group,
 )
+from samurai_backend.admin.schemas.project import BatchCreateProject
 from samurai_backend.enums import AccountType
+from samurai_backend.log import events_logger
 from samurai_backend.models.projects.project import ProjectModel
+from samurai_backend.models.projects.task import TaskModel
 from samurai_backend.models.user_projects.project import UserProjectModel
 from samurai_backend.models.user_projects.task import UserTaskModel
 from samurai_backend.models.user_projects.user_project_link import UserProjectLinkModel
@@ -125,4 +128,39 @@ def assign_project(
 
     return ProjectAssignOutput(
         students_assigned=students_assigned,
+    )
+
+
+def create_project_from_batch(
+    session: Session,
+    template: BatchCreateProject,
+) -> None:
+    events_logger.info(
+        "Creating project from batch",
+        extra={"project_name": template.name},
+    )
+
+    project = ProjectModel(
+        name=template.name,
+        description=template.description,
+        faculty_id=template.faculty_id,
+    )
+
+    session.add(project)
+
+    for task in template.tasks:
+        task_entity = TaskModel(
+            name=task.name,
+            description=task.description,
+            priority=task.priority,
+            reviewer=task.reviewer,
+            due_date=task.due_date,
+            project_id=project.project_id,
+        )
+        session.add(task_entity)
+
+    session.commit()
+    events_logger.info(
+        "Project created from batch",
+        extra={"project_name": template.name},
     )
