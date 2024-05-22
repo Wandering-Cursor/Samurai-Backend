@@ -183,7 +183,7 @@ async def get_file(
     return StreamingResponse(
         content=get_file_iterator(file_entity),
         headers={
-            "Content-Disposition": f"attachment; filename={quote(file_entity.file_name)}",
+            "Content-Disposition": f'attachment; filename="{quote(file_entity.file_name)}"',
             "Content-Type": file_entity.file_type,
         },
     )
