@@ -132,3 +132,20 @@ async def assign_project(
         assign_input=assign_input,
         project=project,
     )
+
+
+@admin_router.post("/project/batch")
+async def batch_create_projects(
+    session: Annotated[database_session_type, Depends(database_session)],
+    projects: list[Annotated[CreateProject, Body()]],
+) -> list[ProjectRepresentation]:
+    return [
+        ProjectRepresentation.model_validate(
+            store_entity(
+                db=session,
+                entity=ProjectModel.model_validate(project, from_attributes=True),
+            ),
+            from_attributes=True,
+        )
+        for project in projects
+    ]
