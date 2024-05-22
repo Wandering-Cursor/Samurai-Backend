@@ -26,12 +26,18 @@ def get_file_by_id(
 def get_file_data_from_entity(
     file: FileModel,
 ) -> bytes:
-    with open(file.file_path, "rb") as f:
-        return f.read()
+    try:
+        with open(file.file_path, "rb") as f:
+            return f.read()
+    except FileNotFoundError as e:
+        raise SamuraiNotFoundError(f"File with id {file.file_id} not found.") from e
 
 
 def get_file_iterator(  # noqa: ANN201
     file: FileModel,
 ):
-    with open(file.file_path, "rb") as f:
-        yield from f
+    try:
+        with open(file.file_path, "rb") as f:
+            yield from f
+    except FileNotFoundError as e:
+        raise SamuraiNotFoundError(f"File with id {file.file_id} not found.") from e
