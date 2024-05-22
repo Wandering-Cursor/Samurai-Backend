@@ -13,6 +13,12 @@ def add_cors_middleware(app: FastAPI) -> None:
         allow_credentials=security_settings.cors_allow_credentials,
         allow_methods=security_settings.cors_allow_methods,
         allow_headers=security_settings.cors_allow_headers,
+        expose_headers=[
+            "Content-Disposition",
+            "content-disposition",
+            "content-type",
+            "Content-Type",
+        ],
     )
 
 
