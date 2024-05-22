@@ -42,10 +42,17 @@ async def get_projects(
             detail_override="You are not allowed to search by account_id.",
         )
 
+    # This is done so admins can see all projects.
+    account_id = None
+    if search.account_id:
+        account_id = search.account_id
+    if account.account_type != AccountType.ADMIN:
+        account_id = account.account_id
+
     return project_get.search_projects(
         session=session,
         search_input=search,
-        related_account_id=search.account_id or account.account_id,
+        related_account_id=account_id,
     )
 
 
