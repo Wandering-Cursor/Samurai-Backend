@@ -34,7 +34,7 @@ services:
     volumes:
       - .:/app/compose/
       # Change this location if you want to store files in a different location
-      - ./files/:/app/files/
+      - ./../files/:/app/files/
     secrets:
       - security_env
       - settings_env
