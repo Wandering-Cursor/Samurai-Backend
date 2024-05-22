@@ -4,7 +4,9 @@ from samurai_backend.models.account.connection import ConnectionModel
 from samurai_backend.models.account.registration_code import RegistrationEmailCode
 
 
-class AccountModelSchema(BaseAccountModel):
+class AccountModelSchema(
+    BaseAccountModel,
+):
     permissions: list[AccountPermission]
     connections: list[ConnectionModel]
     registration_email_code: RegistrationEmailCode | None

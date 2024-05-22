@@ -1,5 +1,6 @@
 import pydantic
 
+from samurai_backend.account.schemas.account_details_mixin import AccountDetailsMixin
 from samurai_backend.core.schemas import (
     BasePaginatedResponse,
     PaginationSearchSchema,
@@ -15,8 +16,12 @@ class CreateComment(CreateCommentModel):
     updated_at: None = pydantic.Field(default=None, exclude=True)
 
 
-class CommentRepresentation(CreateCommentModel):
+class CommentRepresentation(CreateCommentModel, AccountDetailsMixin):
     comment_id: pydantic.UUID4
+
+    @property
+    def _account_id(self: "CommentRepresentation") -> pydantic.UUID4:
+        return self.sender_id
 
 
 class CommentSearchSchema(PaginationSearchSchema):
