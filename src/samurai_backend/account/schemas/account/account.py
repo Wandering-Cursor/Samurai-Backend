@@ -6,7 +6,9 @@ from samurai_backend.enums import AccountType
 from samurai_backend.errors import SamuraiInvalidRequestError
 
 
-class VerboseAccountRepresentation(AccountRepresentation):
+class VerboseAccountRepresentation(
+    AccountRepresentation,
+):
     is_active: bool
 
     account_type: AccountType
@@ -15,7 +17,9 @@ class VerboseAccountRepresentation(AccountRepresentation):
         from_attributes = True
 
 
-class AdminAccountRepresentation(VerboseAccountRepresentation):
+class AdminAccountRepresentation(
+    VerboseAccountRepresentation,
+):
     is_email_verified: bool
     registration_code: str | None
 
