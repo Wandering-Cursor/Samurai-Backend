@@ -35,7 +35,7 @@ async def get_messages(
     )
 
     if search_schema.file_only:
-        query = query.where(MessageModel.file_id is not None)
+        query = query.where(MessageModel.file_id != None) # noqa: E711
 
     if search_schema.text:
         query = query.where(MessageModel.text.icontains(search_schema.text))
