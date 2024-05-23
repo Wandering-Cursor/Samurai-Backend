@@ -2,8 +2,9 @@ from typing import Annotated
 
 import pydantic
 from fastapi import Depends
+from sqlmodel import Session
 
-from samurai_backend.dependencies import database_session, database_session_type
+from samurai_backend.db import get_db_session_async
 from samurai_backend.errors import SamuraiNotFoundError
 from samurai_backend.models.organization.department import DepartmentModel
 from samurai_backend.models.organization.faculty import FacultyModel
@@ -14,7 +15,7 @@ from samurai_backend.organization.get.group import get_group_by_id
 
 
 def department_exists(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[Session, Depends(get_db_session_async)],
     department_id: pydantic.UUID4,
 ) -> DepartmentModel:
     department = get_department_by_id(db, department_id)
@@ -24,7 +25,7 @@ def department_exists(
 
 
 def faculty_exists(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[Session, Depends(get_db_session_async)],
     faculty_id: pydantic.UUID4,
 ) -> FacultyModel:
     faculty = get_faculty_by_id(db, faculty_id)
@@ -34,7 +35,7 @@ def faculty_exists(
 
 
 def group_exists(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[Session, Depends(get_db_session_async)],
     group_id: pydantic.UUID4,
 ) -> GroupModel:
     group = get_group_by_id(db, group_id)

@@ -1,7 +1,7 @@
 import pydantic
 
-from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
 from samurai_backend.models.organization.department import DepartmentRepresentation
+from samurai_backend.schemas import BasePaginatedResponse, PaginationSearchSchema
 
 
 class DepartmentSearchInput(PaginationSearchSchema):

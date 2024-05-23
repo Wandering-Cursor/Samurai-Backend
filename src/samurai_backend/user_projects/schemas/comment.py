@@ -1,11 +1,11 @@
 import pydantic
 
 from samurai_backend.account.schemas.account_details_mixin import AccountDetailsMixin
-from samurai_backend.core.schemas import (
+from samurai_backend.models.user_projects.comment import CreateComment as CreateCommentModel
+from samurai_backend.schemas import (
     BasePaginatedResponse,
     PaginationSearchSchema,
 )
-from samurai_backend.models.user_projects.comment import CreateComment as CreateCommentModel
 
 
 class CreateComment(CreateCommentModel):

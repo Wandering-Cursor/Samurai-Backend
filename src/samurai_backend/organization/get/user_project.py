@@ -7,8 +7,7 @@ from sqlalchemy import case, func
 from sqlmodel import select
 
 from samurai_backend.account.schemas.account_by_account_id_mixin import AccountByAccountIdMixin
-from samurai_backend.core.schemas import PaginationMetaInformation
-from samurai_backend.enums import AccountType, TaskState
+from samurai_backend.enums.account_type import AccountType
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.account.connection import ConnectionModel
 from samurai_backend.models.user_projects.project import UserProjectModel
@@ -19,11 +18,14 @@ from samurai_backend.organization.schemas.user_project import (
     ProjectSearchInput,
     UserProjectSearchOutput,
 )
+from samurai_backend.schemas import PaginationMetaInformation
 from samurai_backend.utils.get_count import get_count
 
 if TYPE_CHECKING:
     import pydantic
     from sqlmodel import Session
+
+    from samurai_backend.enums.task_state import TaskState
 
 
 def get_project_by_id(

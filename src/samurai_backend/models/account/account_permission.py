@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import pydantic
 from sqlmodel import Field, Relationship
 
-from samurai_backend.enums import Permissions
+from samurai_backend.enums.permissions import Permissions
 from samurai_backend.models.base import BaseModel
 
 from .account_permission_link import AccountPermissionAccountLink

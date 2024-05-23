@@ -1,15 +1,6 @@
-from enum import Enum, StrEnum
-from typing import TYPE_CHECKING
+from enum import StrEnum
 
-if TYPE_CHECKING:
-    from fastapi import Security
-
-
-class AccountType(Enum):
-    ADMIN = "admin"
-    STUDENT = "student"
-    TEACHER = "teacher"
-    OVERSEER = "overseer"
+from fastapi import Security
 
 
 class Permissions(StrEnum):
@@ -69,10 +60,10 @@ class Permissions(StrEnum):
         return message
 
     @property
-    def as_security(self: "Permissions") -> "Security":
-        from fastapi import Security
-
-        from samurai_backend.dependencies import get_current_active_account
+    def as_security(self: "Permissions") -> Security:
+        from samurai_backend.dependencies.get_current_active_account import (
+            get_current_active_account,
+        )
 
         return Security(
             get_current_active_account,
@@ -80,25 +71,12 @@ class Permissions(StrEnum):
         )
 
     @classmethod
-    def blank_security(cls) -> "Security":
-        from fastapi import Security
-
-        from samurai_backend.dependencies import get_current_active_account
+    def blank_security(cls: "Permissions") -> Security:
+        from samurai_backend.dependencies.get_current_active_account import (
+            get_current_active_account,
+        )
 
         return Security(
             get_current_active_account,
             scopes=[],
         )
-
-
-class TaskState(StrEnum):
-    OPEN = "open"
-    RESUBMIT = "resubmit"
-    IN_PROGRESS = "in_progress"
-    IN_REVIEW = "in_review"
-    DONE = "done"
-
-
-class OrderDirection(StrEnum):
-    ASC = "asc"
-    DESC = "desc"

@@ -1,7 +1,7 @@
 import pydantic
 
-from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
 from samurai_backend.models.account.connection import ConnectionBase
+from samurai_backend.schemas import BasePaginatedResponse, PaginationSearchSchema
 
 
 class ConnectionRepresentation(ConnectionBase):

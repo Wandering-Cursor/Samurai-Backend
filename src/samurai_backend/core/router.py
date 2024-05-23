@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from samurai_backend.core.schemas import ErrorSchema
+from samurai_backend.schemas import ErrorSchema
 
 auth_router = APIRouter(
     prefix="/auth",

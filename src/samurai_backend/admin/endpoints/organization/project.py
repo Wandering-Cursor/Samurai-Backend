@@ -2,11 +2,12 @@ from typing import Annotated
 
 import pydantic
 from fastapi import BackgroundTasks, Body, Depends
+from sqlmodel import Session as DatabaseSessionType
 
 from samurai_backend.admin.router import admin_router
 from samurai_backend.admin.schemas.project import BatchCreateProject
 from samurai_backend.core.operations import delete_entity, store_entity, update_entity
-from samurai_backend.dependencies import database_session, database_session_type
+from samurai_backend.db import get_db_session_async
 from samurai_backend.errors import SamuraiNotFoundError
 from samurai_backend.models.projects.project import (
     CreateProject,
@@ -23,7 +24,7 @@ from samurai_backend.organization.schemas import project as project_schemas
     "/project",
 )
 async def create_project(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     project: Annotated[CreateProject, Body()],
 ) -> ProjectRepresentation:
     entity = ProjectModel.model_validate(project, from_attributes=True)
@@ -37,7 +38,7 @@ async def create_project(
     "/project/{project_id}",
 )
 async def get_project(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     project_id: pydantic.UUID4,
 ) -> ProjectRepresentationFull:
     project = project_get.get_project_by_id(
@@ -57,7 +58,7 @@ async def get_project(
     "/projects",
 )
 async def search_projects(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     search: Annotated[project_schemas.ProjectSearchInput, Depends()],
 ) -> project_schemas.ProjectSearchOutput:
     return project_get.search_projects(
@@ -70,7 +71,7 @@ async def search_projects(
     "/project/{project_id}",
 )
 async def update_project(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     project_id: pydantic.UUID4,
     project: Annotated[CreateProject, Body()],
 ) -> ProjectRepresentationFull:
@@ -92,7 +93,7 @@ async def update_project(
     status_code=204,
 )
 async def delete_project(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     project_id: pydantic.UUID4,
 ) -> None:
     project = project_get.get_project_by_id(
@@ -112,7 +113,7 @@ async def delete_project(
     "/project/{project_id}/assign",
 )
 async def assign_project(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     project_id: pydantic.UUID4,
     body: Annotated[project_schemas.ProjectAssignBody, Body()],
 ) -> project_schemas.ProjectAssignOutput:
@@ -139,7 +140,7 @@ async def assign_project(
     "/project/batch",
 )
 async def batch_create_projects(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     projects: Annotated[list[BatchCreateProject], Body()],
     background_tasks: Annotated[BackgroundTasks, BackgroundTasks()],
 ) -> str:

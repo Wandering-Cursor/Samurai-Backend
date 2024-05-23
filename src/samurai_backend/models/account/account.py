@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pydantic
 from sqlmodel import Field, Relationship
 
-from samurai_backend.enums import AccountType
+from samurai_backend.enums.account_type import AccountType
 from samurai_backend.models.base import BaseModel
 from samurai_backend.utils.get_password_hash import get_password_hash
 

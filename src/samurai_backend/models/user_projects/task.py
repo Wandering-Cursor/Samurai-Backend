@@ -4,7 +4,7 @@ import pydantic
 import sqlalchemy as sa
 from sqlmodel import Field, Relationship
 
-from samurai_backend.enums import TaskState
+from samurai_backend.enums.task_state import TaskState
 from samurai_backend.models.projects.task import BaseTask, CreateTask, TaskRepresentation
 from samurai_backend.models.user_projects.comment import CommentModel
 from samurai_backend.models.user_projects.project import UserProjectModel

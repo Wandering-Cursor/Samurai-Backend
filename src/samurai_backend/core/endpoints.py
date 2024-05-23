@@ -3,25 +3,31 @@ from typing import Annotated
 from urllib.parse import quote
 
 import pydantic
-from fastapi import Body, Cookie, Depends, Form, UploadFile
+from fastapi import BackgroundTasks, Body, Cookie, Depends, Form, UploadFile
 from fastapi.responses import JSONResponse, StreamingResponse
+from sqlmodel import Session
 
-from samurai_backend.core.dependencies import authenticate, authenticate_by_refresh_token
+from samurai_backend.account import operations as account_operations
+from samurai_backend.account.schemas.account.account import AccountSimpleSearchSchema
+from samurai_backend.core.dependencies import (
+    authenticate,
+    authenticate_by_refresh_token,
+    check_password,
+)
 from samurai_backend.core.get import get_file_by_id, get_file_iterator
 from samurai_backend.core.operations import store_file
 from samurai_backend.core.router import auth_router, common_router
-from samurai_backend.core.schemas import GetToken, RefreshTokenInput, Token
-from samurai_backend.core.schemas.common import FileRepresentation
-from samurai_backend.dependencies import (
-    account_type,
-    database_session,
-    database_session_type,
-)
-from samurai_backend.enums import Permissions
+from samurai_backend.db import get_db_session_async
+from samurai_backend.enums.permissions import Permissions
+from samurai_backend.errors import SamuraiInvalidRequestError, SamuraiNotFoundError
+from samurai_backend.models.account.account import AccountModel
+from samurai_backend.schemas import GetToken, RefreshTokenInput, Token
+from samurai_backend.schemas import password as password_schemas
+from samurai_backend.schemas.common import FileRepresentation
 from samurai_backend.settings import security_settings
 
 
-def perform_login(db: database_session_type, auth_data: GetToken) -> JSONResponse:
+def perform_login(db: Session, auth_data: GetToken) -> JSONResponse:
     try:
         token, refresh = authenticate(
             db=db,
@@ -66,7 +72,7 @@ def perform_login(db: database_session_type, auth_data: GetToken) -> JSONRespons
     },
 )
 async def login(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[Session, Depends(get_db_session_async)],
     auth_data: Annotated[GetToken, Body()],
 ) -> JSONResponse:
     return perform_login(db, auth_data)
@@ -77,7 +83,7 @@ async def login(
     include_in_schema=False,
 )
 async def login_form(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[Session, Depends(get_db_session_async)],
     username: str = Form(),
     password: str = Form(),
     access_token_ttl_min: int = Form(None),
@@ -108,7 +114,7 @@ refresh_body = Body(
     },
 )
 async def refresh_token(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[Session, Depends(get_db_session_async)],
     refresh_token: str | None = Cookie(default=None),
     refresh_body: RefreshTokenInput | None = refresh_body,
 ) -> JSONResponse:
@@ -164,6 +170,73 @@ async def logout() -> JSONResponse:
     return response
 
 
+@auth_router.post("/reset-password")
+async def reset_password(
+    body: Annotated[password_schemas.ResetPasswordInputScheme, Body()],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    background_tasks: BackgroundTasks,
+) -> password_schemas.ResetPasswordResponseScheme:
+    """Reset password. Requires entering the email address."""
+    account_operations.start_password_reset(
+        session=session,
+        background_tasks=background_tasks,
+        account_search=AccountSimpleSearchSchema(
+            email=body.email,
+            username=body.username,
+        ),
+    )
+
+    return password_schemas.ResetPasswordResponseScheme()
+
+
+@auth_router.post("/reset-password/confirm")
+async def reset_password_confirm(
+    body: Annotated[password_schemas.ResetPasswordConfirmInputScheme, Body()],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    background_tasks: BackgroundTasks,
+) -> password_schemas.ResetPasswordResponseScheme:
+    """Confirm the password reset. Requires entering the code sent to the email."""
+    is_password_reset = account_operations.reset_password(
+        session=session,
+        email_code=body.code,
+        new_password=body.new_password,
+        background_tasks=background_tasks,
+    )
+
+    if not is_password_reset:
+        raise SamuraiNotFoundError("Confirmation code is invalid or expired")
+
+    return password_schemas.ResetPasswordResponseScheme()
+
+
+@auth_router.post(
+    "/change-password",
+)
+async def change_password(
+    account: Annotated[AccountModel, Permissions.blank_security()],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    body: Annotated[password_schemas.ChangePasswordInputScheme, Body()],
+    background_tasks: BackgroundTasks,
+) -> password_schemas.ChangePasswordResponseScheme:
+    """Change password while being authorized. Requires entering the old password, and a new one."""
+    is_password_valid = check_password(
+        account=account,
+        password=body.old_password,
+    )
+
+    if not is_password_valid:
+        raise SamuraiInvalidRequestError("Incorrect password")
+
+    account_operations.change_password(
+        session=session,
+        account=account,
+        new_password=body.new_password,
+        background_tasks=background_tasks,
+    )
+
+    return password_schemas.ChangePasswordResponseScheme()
+
+
 @common_router.get(
     "/file/{file_id}",
     dependencies=[
@@ -171,7 +244,7 @@ async def logout() -> JSONResponse:
     ],
 )
 async def get_file(
-    db_session: Annotated[database_session_type, Depends(database_session)],
+    db_session: Annotated[Session, Depends(get_db_session_async)],
     file_id: pydantic.UUID4,
 ) -> StreamingResponse:
     """Download a file by its ID."""
@@ -193,7 +266,7 @@ async def get_file(
     "/file/{file_id}/info",
 )
 async def get_file_info(
-    db_session: Annotated[database_session_type, Depends(database_session)],
+    db_session: Annotated[Session, Depends(get_db_session_async)],
     file_id: pydantic.UUID4,
 ) -> FileRepresentation:
     """Get information about a file by its ID."""
@@ -209,8 +282,8 @@ async def get_file_info(
     "/file",
 )
 async def create_file(
-    user_dependency: Annotated[account_type, Permissions.blank_security()],
-    db_session: Annotated[database_session_type, Depends(database_session)],
+    user_dependency: Annotated[AccountModel, Permissions.blank_security()],
+    db_session: Annotated[Session, Depends(get_db_session_async)],
     file: UploadFile,
 ) -> FileRepresentation:
     """Upload a new file."""

@@ -2,15 +2,13 @@ from typing import Annotated
 
 import pydantic
 from fastapi import Body, Depends
+from sqlmodel import Session
 
-from samurai_backend.dependencies import (
-    account_type,
-    database_session,
-    database_session_type,
-    get_current_account,
-)
-from samurai_backend.enums import Permissions
+from samurai_backend.db import get_db_session_async
+from samurai_backend.dependencies.get_current_account import get_current_account
+from samurai_backend.enums.permissions import Permissions
 from samurai_backend.errors import SamuraiNotFoundError
+from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.user_projects.task import UserTaskCreate, UserTaskModel
 from samurai_backend.organization.get import user_task as task_get
 from samurai_backend.organization.schemas.user_task import (
@@ -34,8 +32,8 @@ from samurai_backend.user_projects.router import user_projects_router
 async def get_project_tasks(
     project_id: pydantic.UUID4,
     search_input: Annotated[UserTaskSearchInput, Depends()],
-    session: Annotated[database_session_type, Depends(database_session)],
-    account: Annotated[account_type, Depends(get_current_account)],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    account: Annotated[AccountModel, Depends(get_current_account)],
 ) -> UserTaskSearchOutput:
     return task_get.search_tasks(
         session,
@@ -56,8 +54,8 @@ async def get_project_tasks(
 )
 async def get_task(
     task_id: pydantic.UUID4,
-    session: Annotated[database_session_type, Depends(database_session)],
-    account: Annotated[account_type, Depends(get_current_account)],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    account: Annotated[AccountModel, Depends(get_current_account)],
 ) -> UserTaskRepresentation:
     task_entity = task_get.get_task_by_id(
         session=session,
@@ -84,8 +82,8 @@ async def get_task(
 async def update_task_status(
     task_id: pydantic.UUID4,
     update: Annotated[UserTaskStatusUpdateInput, Body()],
-    session: Annotated[database_session_type, Depends(database_session)],
-    account: Annotated[account_type, Depends(get_current_account)],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    account: Annotated[AccountModel, Depends(get_current_account)],
 ) -> UserTaskRepresentation:
     task_entity = task_get.get_task_by_id(
         session=session,
@@ -118,8 +116,8 @@ async def update_task_status(
 async def update_task(
     task_id: pydantic.UUID4,
     update: Annotated[UserTaskCreate, Body()],
-    session: Annotated[database_session_type, Depends(database_session)],
-    account: Annotated[account_type, Depends(get_current_account)],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    account: Annotated[AccountModel, Depends(get_current_account)],
 ) -> UserTaskRepresentation:
     task_entity = task_get.get_task_by_id(
         session=session,
@@ -151,8 +149,8 @@ async def update_task(
 )
 async def delete_task(
     task_id: pydantic.UUID4,
-    session: Annotated[database_session_type, Depends(database_session)],
-    account: Annotated[account_type, Depends(get_current_account)],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    account: Annotated[AccountModel, Depends(get_current_account)],
 ) -> None:
     task_entity = task_get.get_task_by_id(
         session=session,
@@ -177,7 +175,7 @@ async def delete_task(
 )
 async def create_task(
     task: Annotated[UserTaskCreate, Body()],
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[Session, Depends(get_db_session_async)],
 ) -> UserTaskRepresentation:
     task_entity = UserTaskModel.model_validate(
         task,

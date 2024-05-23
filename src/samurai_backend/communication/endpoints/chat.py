@@ -7,13 +7,10 @@ from samurai_backend.communication.get import chat as chat_get
 from samurai_backend.communication.operations import chat as chat_ops
 from samurai_backend.communication.router import communication_router
 from samurai_backend.communication.schemas import chat as chat_schemas
-from samurai_backend.dependencies import (
-    account_type,
-    database_session,
-    database_session_type,
-    get_current_active_account,
-)
-from samurai_backend.enums import Permissions
+from samurai_backend.db import get_db_session_async
+from samurai_backend.dependencies.get_current_active_account import get_current_active_account
+from samurai_backend.enums.permissions import Permissions
+from samurai_backend.models.account.account import AccountModel
 
 
 @communication_router.post(
@@ -23,14 +20,14 @@ from samurai_backend.enums import Permissions
     ],
 )
 async def create_chat(
-    session: Annotated[database_session_type, Depends(database_session)],
-    create_chat: Annotated[chat_schemas.ChatCreate, Body()],
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    session: Annotated[get_db_session_async, Depends(get_db_session_async)],
+    body: Annotated[chat_schemas.ChatCreate, Body()],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> chat_schemas.ChatRepresentation:
     """Create a chat with (or without) some users."""
     chat_entity = await chat_ops.create_chat(
         session=session,
-        create_chat=create_chat,
+        body=body,
         current_user=current_user,
     )
 
@@ -47,8 +44,8 @@ async def create_chat(
     ],
 )
 async def get_chats(
-    session: Annotated[database_session_type, Depends(database_session)],
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    session: Annotated[get_db_session_async, Depends(get_db_session_async)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
     search_params: Annotated[chat_schemas.ChatsSearchSchema, Depends()],
 ) -> chat_schemas.ChatsSearchResponse:
     """Get all chats that the user is a member of."""
@@ -66,9 +63,9 @@ async def get_chats(
     ],
 )
 async def get_chat(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[get_db_session_async, Depends(get_db_session_async)],
     chat_id: pydantic.UUID4,
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> chat_schemas.ChatRepresentation:
     """Get a chat by its ID. If the user is not a member of the chat, raise 404."""
     chat_entity = await chat_get.get_related_chat(
@@ -90,9 +87,9 @@ async def get_chat(
     ],
 )
 async def get_chat_participants(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[get_db_session_async, Depends(get_db_session_async)],
     chat_id: pydantic.UUID4,
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
     search_schema: Annotated[chat_schemas.ChatsSearchSchema, Depends()],
 ) -> chat_schemas.ChatParticipantsResponse:
     """
@@ -118,10 +115,10 @@ async def get_chat_participants(
     ],
 )
 async def update_chat(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[get_db_session_async, Depends(get_db_session_async)],
     chat_id: pydantic.UUID4,
     chat_update: Annotated[chat_schemas.ChatUpdate, Body()],
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> chat_schemas.ChatRepresentation:
     """Update a chat by its ID. If the user is not a member of the chat, raise 404."""
     chat = await chat_get.get_related_chat(
@@ -149,10 +146,10 @@ async def update_chat(
     ],
 )
 async def add_chat_member(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[get_db_session_async, Depends(get_db_session_async)],
     chat_id: pydantic.UUID4,
     add_member_input: Annotated[chat_schemas.ChatAddMember, Body()],
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> chat_schemas.ChatRepresentation:
     """
     Add a member to a chat by its ID. If the user is not a member of the chat, raise 404.
@@ -180,9 +177,9 @@ async def add_chat_member(
     "/chat/{chat_id}/leave",
 )
 async def leave_chat(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[get_db_session_async, Depends(get_db_session_async)],
     chat_id: pydantic.UUID4,
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
     background_tasks: BackgroundTasks,
 ) -> chat_schemas.ChatLeaveResponse:
     """Leave a chat by its ID. If the user is not a member of the chat, raise 404."""
@@ -201,7 +198,7 @@ async def leave_chat(
     if left:
         background_tasks.add_task(
             chat_ops.remove_empty_chat,
-            session=database_session(),
+            session=get_db_session_async(),
             chat_id=chat_entity.chat_id,
         )
 

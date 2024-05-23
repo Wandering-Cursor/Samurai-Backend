@@ -1,6 +1,6 @@
 import pydantic
 
-from samurai_backend.core.schemas import BaseSchema
+from samurai_backend.schemas import BaseSchema
 
 
 class BaseAccount(BaseSchema):

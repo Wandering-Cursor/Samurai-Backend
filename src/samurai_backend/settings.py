@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     events_logging_level: str = "DEBUG"
     email_service_api_key: str | None = None
 
+    registration_code_template_id: int = 1
+    reset_password_template_id: int = 2
+    change_password_template_id: int = 3
+
     otel_exporter_endpoint: str = "http://localhost:4318/v1/traces"
     otel_auth_header: str | None = None
 

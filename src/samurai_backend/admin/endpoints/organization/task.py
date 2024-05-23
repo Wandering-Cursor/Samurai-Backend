@@ -2,10 +2,11 @@ from typing import Annotated
 
 import pydantic
 from fastapi import Body, Depends
+from sqlmodel import Session as DatabaseSessionType
 
 from samurai_backend.admin.router import admin_router
 from samurai_backend.core.operations import delete_entity, store_entity, update_entity
-from samurai_backend.dependencies import database_session, database_session_type
+from samurai_backend.db import get_db_session_async
 from samurai_backend.errors import SamuraiNotFoundError
 from samurai_backend.models.projects.task import CreateTask, TaskModel, TaskRepresentation
 from samurai_backend.organization.get import task as task_get
@@ -15,7 +16,7 @@ from samurai_backend.organization.get import task as task_get
     "/task",
 )
 async def create_task(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     task: Annotated[CreateTask, Body()],
 ) -> TaskRepresentation:
     entity = TaskModel.model_validate(task, from_attributes=True)
@@ -29,7 +30,7 @@ async def create_task(
     "/task/{task_id}",
 )
 async def get_task(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     task_id: pydantic.UUID4,
 ) -> TaskRepresentation:
     task = task_get.get_task_by_id(
@@ -49,7 +50,7 @@ async def get_task(
     "/tasks",
 )
 async def search_tasks(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     search: Annotated[task_get.TaskSearchInput, Depends()],
 ) -> task_get.TaskSearchOutput:
     return task_get.search_tasks(
@@ -62,7 +63,7 @@ async def search_tasks(
     "/task/{task_id}",
 )
 async def update_task(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     task_id: pydantic.UUID4,
     task: Annotated[CreateTask, Body()],
 ) -> TaskRepresentation:
@@ -91,7 +92,7 @@ async def update_task(
     status_code=204,
 )
 async def delete_task(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     task_id: pydantic.UUID4,
 ) -> None:
     entity = task_get.get_task_by_id(

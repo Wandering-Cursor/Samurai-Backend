@@ -5,9 +5,10 @@ from typing import TYPE_CHECKING
 from sqlalchemy import or_
 from sqlmodel import select
 
-from samurai_backend.core.schemas import PaginationMetaInformation
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.account.connection import ConnectionModel
+from samurai_backend.models.account.email_code import EmailCodeModel
+from samurai_backend.schemas import PaginationMetaInformation
 from samurai_backend.utils.get_count import get_count
 
 if TYPE_CHECKING:
@@ -20,7 +21,8 @@ if TYPE_CHECKING:
         AccountSearchSchema,
         AccountSimpleSearchSchema,
     )
-    from samurai_backend.enums import AccountType
+    from samurai_backend.enums.account_type import AccountType
+    from samurai_backend.enums.email_code_type import EmailCodeType
 
 
 def get_account_by_id(
@@ -183,5 +185,26 @@ def get_account_by_simple_search(
 
     if search.username:
         query = query.filter(AccountModel.username == search.username)
+
+    return session.exec(query).first()
+
+
+def get_email_code(
+    session: Session,
+    email_code: str,
+    code_type: EmailCodeType,
+) -> EmailCodeModel | None:
+    query = (
+        select(EmailCodeModel)
+        .filter(
+            EmailCodeModel.hashed_code_value == EmailCodeModel.get_hashed_value(email_code),
+        )
+        .filter(
+            EmailCodeModel.is_used == False,  # noqa: E712
+        )
+        .filter(
+            EmailCodeModel.code_type == code_type,
+        )
+    )
 
     return session.exec(query).first()

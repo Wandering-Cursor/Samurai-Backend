@@ -6,7 +6,7 @@ from samurai_backend.account.get.account import (
     get_all_accounts_by_group,
 )
 from samurai_backend.admin.schemas.project import BatchCreateProject
-from samurai_backend.enums import AccountType
+from samurai_backend.enums.account_type import AccountType
 from samurai_backend.log import events_logger
 from samurai_backend.models.projects.project import ProjectModel
 from samurai_backend.models.projects.task import TaskModel

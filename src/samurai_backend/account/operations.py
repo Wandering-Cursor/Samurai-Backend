@@ -3,12 +3,15 @@ from __future__ import annotations
 import secrets
 from typing import TYPE_CHECKING
 
+from samurai_backend.account.get import account as account_get
 from samurai_backend.core.operations import store_entity
 from samurai_backend.db import get_db_session_object
+from samurai_backend.enums.email_code_type import EmailCodeType
 from samurai_backend.log import events_logger
+from samurai_backend.models import account as account_models
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.account.registration_code import RegistrationEmailCode
-from samurai_backend.third_party.email.tasks import send_registration_code_email
+from samurai_backend.third_party.email import tasks as email_tasks
 
 from .get.registration_code import get_registration_code
 
@@ -44,7 +47,7 @@ def register_account(
     )
     store_entity(db, registration_code)
     tasks.add_task(
-        send_registration_code_email,
+        email_tasks.send_registration_code_email,
         account.email,
         registration_code.code,
     )
@@ -114,3 +117,93 @@ def create_batch_accounts(
         events_logger.info(f"Account created: {account.account_id} ({index + 1}/{accounts_count})")
 
     session.commit()
+
+
+def change_password(
+    session: Session,
+    account: AccountModel,
+    new_password: str,
+    background_tasks: BackgroundTasks,
+) -> None:
+    account.set_password(new_password)
+    store_entity(session, account)
+    events_logger.info(f"Password changed for account: {account.account_id}")
+
+    background_tasks.add_task(
+        email_tasks.send_notify_password_changed_email,
+        to=account.email,
+    )
+
+
+def start_password_reset(
+    session: Session,
+    background_tasks: BackgroundTasks,
+    account_search: account_schemas.AccountSimpleSearchSchema,
+) -> bool:
+    account = account_get.get_account_by_simple_search(
+        session=session,
+        search=account_search,
+    )
+
+    if not account:
+        events_logger.info("Password reset: Account not found.")
+        return False
+
+    new_email_code = account_models.email_code.EmailCodeModel(
+        account_id=account.account_id,
+        code_type=EmailCodeType.RESET_PASSWORD,
+    )
+    email_code = new_email_code.set_value(None)
+    new_email_code.set_expiration_date()
+
+    store_entity(session, new_email_code)
+    session.commit()
+
+    background_tasks.add_task(
+        email_tasks.send_reset_password_code_email,
+        to=account.email,
+        code=email_code,
+    )
+
+    events_logger.info(f"Password reset started for account: {account.account_id}")
+
+    return True
+
+
+def reset_password(
+    session: Session,
+    email_code: str,
+    new_password: str,
+    background_tasks: BackgroundTasks,
+) -> bool:
+    email_code_entity = account_get.get_email_code(
+        session=session,
+        email_code=email_code,
+        code_type=EmailCodeType.RESET_PASSWORD,
+    )
+
+    if not email_code_entity:
+        return False
+
+    if email_code_entity.is_expired:
+        return False
+
+    account = account_get.get_account_by_id(
+        session=session,
+        account_id=email_code_entity.account_id,
+    )
+
+    if not account:
+        return False
+
+    account.set_password(new_password)
+    store_entity(session, account)
+    email_code_entity.is_used = True
+    store_entity(session, email_code_entity)
+
+    background_tasks.add_task(
+        email_tasks.send_notify_password_changed_email,
+        to=account.email,
+    )
+
+    return True

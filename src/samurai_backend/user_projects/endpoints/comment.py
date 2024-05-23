@@ -2,15 +2,13 @@ from typing import Annotated
 
 import pydantic
 from fastapi import Body, Depends
+from sqlmodel import Session
 
-from samurai_backend.dependencies import (
-    account_type,
-    database_session,
-    database_session_type,
-    get_current_active_account,
-)
-from samurai_backend.enums import Permissions
+from samurai_backend.db import get_db_session_async
+from samurai_backend.dependencies.get_current_active_account import get_current_active_account
+from samurai_backend.enums.permissions import Permissions
 from samurai_backend.errors import SamuraiNotFoundError
+from samurai_backend.models.account.account import AccountModel
 from samurai_backend.user_projects.get import comment as comment_get
 from samurai_backend.user_projects.operations import comment as comment_operations
 from samurai_backend.user_projects.router import user_projects_router
@@ -26,9 +24,9 @@ from samurai_backend.user_projects.schemas import comment as comment_schemas
 )
 async def create_comment(
     task_id: pydantic.UUID4,
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[Session, Depends(get_db_session_async)],
     comment: Annotated[comment_schemas.CreateComment, Body()],
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> comment_schemas.CommentRepresentation:
     comment.task_id = task_id
     comment.sender_id = current_user.account_id
@@ -50,9 +48,9 @@ async def create_comment(
     tags=["student"],
 )
 async def get_comments(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[Session, Depends(get_db_session_async)],
     search: Annotated[comment_schemas.CommentSearchSchema, Depends()],
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
     task_id: pydantic.UUID4,
 ) -> comment_schemas.CommentPaginatedResponse:
     search.task_id = task_id
@@ -73,8 +71,8 @@ async def get_comments(
 )
 async def get_comment(
     comment_id: pydantic.UUID4,
-    session: Annotated[database_session_type, Depends(database_session)],
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> comment_schemas.CommentRepresentation:
     comment = comment_get.get_comment_by_id(
         session=session,
@@ -99,9 +97,9 @@ async def get_comment(
 )
 async def update_comment(
     comment_id: pydantic.UUID4,
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[Session, Depends(get_db_session_async)],
     comment: Annotated[comment_schemas.CreateComment, Body()],
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> comment_schemas.CommentRepresentation:
     comment = comment_operations.update_comment(
         session=session,
@@ -128,8 +126,8 @@ async def update_comment(
 )
 async def delete_comment(
     comment_id: pydantic.UUID4,
-    session: Annotated[database_session_type, Depends(database_session)],
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> None:
     comment = comment_operations.delete_comment(
         session=session,

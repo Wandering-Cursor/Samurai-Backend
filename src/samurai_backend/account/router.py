@@ -1,13 +1,15 @@
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Body, Depends
+from sqlmodel import Session as DatabaseSessionType
 
 from samurai_backend.account import operations as account_operations
 from samurai_backend.account.get import account as account_get
 from samurai_backend.account.schemas.account import account as account_schema
-from samurai_backend.dependencies import account_type, database_session, database_session_type
-from samurai_backend.enums import Permissions
+from samurai_backend.db import get_db_session_async
+from samurai_backend.enums.permissions import Permissions
 from samurai_backend.errors import SamuraiErrorModel, SamuraiNotFoundError
+from samurai_backend.models.account.account import AccountModel
 
 from .schemas.register import (
     ConfirmEmail,
@@ -30,7 +32,7 @@ account_router = APIRouter(
     description="Register a new account.",
 )
 async def register_account(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     body: Annotated[RegisterAccount, Body()],
     background_tasks: BackgroundTasks,
 ) -> RegisterAccountResponse:
@@ -57,7 +59,7 @@ async def register_account(
     description="Confirm the registration email.",
 )
 async def confirm_email(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     body: Annotated[ConfirmEmail, Body()],
 ) -> ConfirmEmailResponse:
     account_operations.confirm_email(
@@ -72,8 +74,8 @@ async def confirm_email(
     "/me",
 )
 async def get_me(
-    user_dependency: Annotated[account_type, Permissions.blank_security()],
-    db: Annotated[database_session_type, Depends(database_session)],
+    user_dependency: Annotated[AccountModel, Permissions.blank_security()],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
 ) -> account_schema.VerboseAccountRepresentation:
     account_entity = account_get.get_account_by_id(
         session=db,
@@ -94,7 +96,7 @@ async def get_me(
 )
 async def search_accounts(
     search: Annotated[account_schema.AccountSimpleSearchSchema, Depends()],
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
 ) -> account_schema.VerboseAccountRepresentation:
     """
     This endpoint allows anyone with authorization to look for another user,

@@ -2,7 +2,7 @@
 
 from samurai_backend.core.operations import store_entity
 from samurai_backend.db import get_db_session
-from samurai_backend.enums import Permissions
+from samurai_backend.enums.permissions import Permissions
 from samurai_backend.errors import SamuraiIntegrityError
 from samurai_backend.models.account.account_permission import AccountPermission
 from samurai_backend.scripts._base import colored_print
