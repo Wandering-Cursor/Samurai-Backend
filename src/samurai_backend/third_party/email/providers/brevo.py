@@ -62,7 +62,7 @@ class BrevoIntegration(BaseEmailIntegration):
             "templateId": template_id,
         }
         if template_data:
-            json_data["templateData"] = template_data
+            json_data["params"] = template_data
 
         if self.test_mode:
             json_data["X-Sib-Sandbox"] = "drop"
