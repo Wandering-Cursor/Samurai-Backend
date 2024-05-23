@@ -16,6 +16,6 @@ class BaseEmailIntegration:
         self: "BaseEmailIntegration",
         to: list[str] | str,
         template_id: int,
-        template_data: dict[str, str] | None = None,
+        template_data: dict[str, str] | None = None,  # noqa: ARG002
     ) -> None:
-        events_logger.debug(f"Sending email to {to=}, {template_id=}, {template_data=}")
+        events_logger.debug(f"Sending email to {to=}, {template_id=}")
