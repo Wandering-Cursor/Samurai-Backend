@@ -65,6 +65,7 @@ def search_comments(
                 ),
             ),
         ),
+        CommentModel.task_id == search_input.task_id,
     )
 
     total_count = get_count(session, query)

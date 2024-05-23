@@ -53,7 +53,10 @@ async def get_comments(
     session: Annotated[database_session_type, Depends(database_session)],
     search: Annotated[comment_schemas.CommentSearchSchema, Depends()],
     current_user: Annotated[account_type, Depends(get_current_active_account)],
+    task_id: pydantic.UUID4,
 ) -> comment_schemas.CommentPaginatedResponse:
+    search.task_id = task_id
+
     return comment_get.search_comments(
         session=session,
         search_input=search,
