@@ -4,12 +4,12 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import select
 
-from samurai_backend.core.schemas import PaginationMetaInformation
 from samurai_backend.models.organization.department import DepartmentModel, DepartmentRepresentation
 from samurai_backend.organization.schemas.department import (
     DepartmentSearchInput,
     DepartmentSearchOutput,
 )
+from samurai_backend.schemas import PaginationMetaInformation
 from samurai_backend.utils.get_count import get_count
 
 if TYPE_CHECKING:

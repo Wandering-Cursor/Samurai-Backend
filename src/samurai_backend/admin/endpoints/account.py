@@ -2,6 +2,7 @@ from typing import Annotated
 
 import pydantic
 from fastapi import BackgroundTasks, Body, Depends
+from sqlmodel import Session as DatabaseSessionType
 
 from samurai_backend.account.get import account as account_get
 from samurai_backend.account.operations import create_batch_accounts
@@ -11,7 +12,7 @@ from samurai_backend.admin.operations.connections import add_connections
 from samurai_backend.admin.operations.permissions import set_permissions
 from samurai_backend.admin.router import admin_router
 from samurai_backend.core.operations import store_entity
-from samurai_backend.dependencies import database_session, database_session_type
+from samurai_backend.db import get_db_session_async
 from samurai_backend.models.account.account import AccountModel, CreateAccountModel
 
 
@@ -20,7 +21,7 @@ from samurai_backend.models.account.account import AccountModel, CreateAccountMo
     description="Create a new account.",
 )
 async def create_account(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     account_data: Annotated[CreateAccountModel, Body()],
 ) -> AccountModelSchema:
     account = AccountModel.from_create_model(account_data)
@@ -48,7 +49,7 @@ async def create_account(
     description="Get account by ID.",
 )
 async def get_account(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     search: Annotated[account_schemas.AccountSearchSchema, Depends()],
 ) -> AccountModelSchema:
     return AccountModelSchema.model_validate(
@@ -62,7 +63,7 @@ async def get_account(
     description="Search for accounts.",
 )
 async def get_all_accounts(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     search_query: Annotated[account_schemas.AccountSearchPaginationSchema, Depends()],
 ) -> account_schemas.AccountSearchResultVerbose:
     return account_get.get_accounts(db, search=search_query)
@@ -72,7 +73,7 @@ async def get_all_accounts(
     "/account/{account_id}/permissions",
 )
 async def set_permissions_endpoint(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     account_id: pydantic.UUID4,
     permission_input: Annotated[account_schemas.AccountSetPermissionsInput, Body()],
 ) -> AccountModelSchema:
@@ -101,7 +102,7 @@ async def set_permissions_endpoint(
     "/account/{account_id}/connections",
 )
 async def set_connections_endpoint(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     account_id: pydantic.UUID4,
     connection_input: Annotated[account_schemas.AccountSetConnectionsInput, Body()],
 ) -> AccountModelSchema:

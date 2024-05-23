@@ -1,10 +1,12 @@
 from typing import Annotated
 
 from fastapi import Depends
+from sqlmodel import Session
 
-from samurai_backend.dependencies import account_type, database_session, database_session_type
-from samurai_backend.enums import Permissions
+from samurai_backend.db import get_db_session_async
+from samurai_backend.enums.permissions import Permissions
 from samurai_backend.errors import SamuraiInvalidRequestError
+from samurai_backend.models.account.account import AccountModel
 from samurai_backend.organization.get import user_project as project_get
 from samurai_backend.organization.schemas import user_project as user_project_schemas
 from samurai_backend.user_projects.router import stats_projects_router
@@ -14,8 +16,8 @@ from samurai_backend.user_projects.router import stats_projects_router
     "/teachers",
 )
 async def get_stats_per_teacher(
-    session: Annotated[database_session_type, Depends(database_session)],
-    account: Annotated[account_type, Permissions.PROJECTS_STATS.as_security],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    account: Annotated[AccountModel, Permissions.PROJECTS_STATS.as_security],
 ) -> user_project_schemas.ProjectsStatsByTeacher:
     faculty_id = None
 
@@ -37,8 +39,8 @@ async def get_stats_per_teacher(
     "/tasks",
 )
 async def get_stats_by_tasks(
-    session: Annotated[database_session_type, Depends(database_session)],
-    account: Annotated[account_type, Permissions.PROJECTS_STATS.as_security],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    account: Annotated[AccountModel, Permissions.PROJECTS_STATS.as_security],
     query: Annotated[user_project_schemas.ProjectsStatsByTaskInput, Depends()],
 ) -> user_project_schemas.ProjectsStatsByTask:
     faculty_id = None

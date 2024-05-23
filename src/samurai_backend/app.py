@@ -38,25 +38,25 @@ servers += [
 ]
 
 
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, None]:
     main_logger.info("Starting up...")
 
     main_logger.debug("Mounting static files")
-    app.mount(
+    fastapi_app.mount(
         "/static",
         StaticFiles(directory="static"),
         name="static",
     )
 
     main_logger.debug("Including routers")
-    app.include_router(auth_router)
-    app.include_router(ws_router)
-    app.include_router(admin_router)
-    app.include_router(account_router)
+    fastapi_app.include_router(auth_router)
+    fastapi_app.include_router(ws_router)
+    fastapi_app.include_router(admin_router)
+    fastapi_app.include_router(account_router)
     user_projects_router.include_router(stats_projects_router)
-    app.include_router(user_projects_router)
-    app.include_router(communication_router)
-    app.include_router(common_router)
+    fastapi_app.include_router(user_projects_router)
+    fastapi_app.include_router(communication_router)
+    fastapi_app.include_router(common_router)
 
     yield
 

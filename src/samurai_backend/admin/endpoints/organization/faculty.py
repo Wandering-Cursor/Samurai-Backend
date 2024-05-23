@@ -2,10 +2,11 @@ from typing import Annotated
 
 import pydantic
 from fastapi import Body, Depends
+from sqlmodel import Session as DatabaseSessionType
 
 from samurai_backend.admin.router import admin_router
 from samurai_backend.core.operations import delete_entity, store_entity, update_entity
-from samurai_backend.dependencies import database_session, database_session_type
+from samurai_backend.db import get_db_session_async
 from samurai_backend.models.organization.faculty import CreateFaculty, Faculty, FacultyModel
 from samurai_backend.organization.dependencies import faculty_exists
 from samurai_backend.organization.get.faculty import get_faculty_search
@@ -14,7 +15,7 @@ from samurai_backend.organization.schemas.faculty import FacultySearchInput, Fac
 
 @admin_router.post("/faculty")
 async def create_faculty(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     faculty_data: Annotated[CreateFaculty, Body()],
 ) -> Faculty:
     faculty_instance = FacultyModel.model_validate(faculty_data, from_attributes=True)
@@ -29,7 +30,7 @@ async def create_faculty(
 
 @admin_router.get("/faculty")
 async def get_faculties(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     search_data: Annotated[FacultySearchInput, Depends()],
 ) -> FacultySearchOutput:
     return get_faculty_search(
@@ -47,7 +48,7 @@ async def get_faculty(
 
 @admin_router.put("/faculty/{faculty_id}")
 async def update_faculty(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     faculty_id: pydantic.UUID4,
     faculty_data: Annotated[CreateFaculty, Body()],
 ) -> Faculty:
@@ -68,7 +69,7 @@ async def update_faculty(
     status_code=204,
 )
 async def delete_faculty(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     faculty: Annotated[FacultyModel, Depends(faculty_exists)],
 ) -> None:
     delete_entity(session=db, entity=faculty)

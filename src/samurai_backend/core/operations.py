@@ -1,22 +1,25 @@
 import os
-from typing import TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
-from fastapi import UploadFile
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
-from sqlmodel import Session, SQLModel, update
+from sqlmodel import SQLModel, update
 
 from samurai_backend.core.get import generate_file_path
-from samurai_backend.dependencies import (
-    account_type,
-)
 from samurai_backend.errors import SamuraiIntegrityError, SamuraiInvalidRequestError
 from samurai_backend.models.common.file_or_text import FileModel
+
+if TYPE_CHECKING:
+    from fastapi import UploadFile
+    from sqlmodel import Session
+
+    from samurai_backend.models.account.account import AccountModel
+
 
 T = TypeVar("T", bound=SQLModel)
 
 
 def store_entity(
-    db: Session,
+    db: "Session",
     entity: T,
 ) -> T:
     try:
@@ -30,7 +33,7 @@ def store_entity(
 
 
 def update_entity(
-    session: Session,
+    session: "Session",
     entity: T,
     primary_key: str,
 ) -> T:
@@ -51,7 +54,7 @@ def update_entity(
 
 
 def delete_entity(
-    session: Session,
+    session: "Session",
     entity: T,
     commit: bool = True,
 ) -> None:
@@ -66,9 +69,9 @@ def delete_entity(
 
 
 def store_file(
-    session: Session,
-    upload: UploadFile,
-    user: account_type,
+    session: "Session",
+    upload: "UploadFile",
+    user: "AccountModel",
 ) -> FileModel:
     prohibited_file_types = [
         "",

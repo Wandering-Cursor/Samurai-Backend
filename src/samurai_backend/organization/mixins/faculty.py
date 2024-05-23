@@ -9,11 +9,15 @@ class FacultyRepresentationMixin(pydantic.BaseModel):
     @pydantic.computed_field
     @property
     def faculty_details(self: "FacultyRepresentationMixin") -> FacultyRepresentation | None:
+        from samurai_backend.db import get_db_session
         from samurai_backend.organization.get.faculty import get_faculty_by_id
+
+        generator = get_db_session()
+        session = next(generator)
 
         if not self.faculty_id:
             return None
         return FacultyRepresentation.model_validate(
-            get_faculty_by_id(self.faculty_id),
+            get_faculty_by_id(session, self.faculty_id),
             from_attributes=True,
         )

@@ -2,7 +2,8 @@ import pydantic
 from sqlmodel import Session
 
 from samurai_backend.core.operations import delete_entity, store_entity, update_entity
-from samurai_backend.enums import Permissions, TaskState
+from samurai_backend.enums.permissions import Permissions
+from samurai_backend.enums.task_state import TaskState
 from samurai_backend.errors import SamuraiInvalidRequestError, SamuraiNotFoundError
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.user_projects.task import UserTaskModel

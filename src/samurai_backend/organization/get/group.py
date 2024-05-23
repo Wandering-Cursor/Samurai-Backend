@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import select
 
-from samurai_backend.core.schemas import PaginationMetaInformation
 from samurai_backend.models.organization.group import GroupModel
 from samurai_backend.organization.schemas.group import GroupSearchInput, GroupSearchOutput
+from samurai_backend.schemas import PaginationMetaInformation
 from samurai_backend.utils.get_count import get_count
 
 if TYPE_CHECKING:

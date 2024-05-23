@@ -15,12 +15,33 @@ def provider_builder() -> BaseEmailIntegration:
 def send_registration_code_email(
     to: str,
     code: str,
-    template_id: int = 1,
 ) -> None:
     provider_builder().send_template_email(
         to=to,
-        template_id=template_id,
+        template_id=settings.email_registration_code_template_id,
         template_data={
             "code": code,
         },
+    )
+
+
+def send_reset_password_code_email(
+    to: str,
+    code: str,
+) -> None:
+    provider_builder().send_template_email(
+        to=to,
+        template_id=settings.email_reset_password_code_template_id,
+        template_data={
+            "code": code,
+        },
+    )
+
+
+def send_notify_password_changed_email(
+    to: str,
+) -> None:
+    provider_builder().send_template_email(
+        to=to,
+        template_id=settings.email_password_changed_template_id,
     )

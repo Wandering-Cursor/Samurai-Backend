@@ -2,15 +2,14 @@ from typing import Annotated
 
 import pydantic
 from fastapi import Body, Depends
+from sqlmodel import Session
 
-from samurai_backend.dependencies import (
-    account_type,
-    database_session,
-    database_session_type,
-    get_current_active_account,
-)
-from samurai_backend.enums import AccountType, Permissions
+from samurai_backend.db import get_db_session_async
+from samurai_backend.dependencies.get_current_active_account import get_current_active_account
+from samurai_backend.enums.account_type import AccountType as AccountTypeEnum
+from samurai_backend.enums.permissions import Permissions
 from samurai_backend.errors import SamuraiInvalidRequestError, SamuraiNotFoundError
+from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.user_projects.project import CreateUserProject, UserProjectModel
 from samurai_backend.organization.get import user_project as project_get
 from samurai_backend.organization.schemas.user_project import (
@@ -30,14 +29,14 @@ from samurai_backend.user_projects.router import user_projects_router
     tags=["student"],
 )
 async def get_projects(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[Session, Depends(get_db_session_async)],
     search: Annotated[ProjectSearchInput, Depends()],
-    account: Annotated[account_type, Depends(get_current_active_account)],
+    account: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> UserProjectSearchOutput:
     """
     Get all available projects by specifying the search criteria.
     """
-    if search.account_id and account.account_type == AccountType.STUDENT:
+    if search.account_id and account.account_type == AccountTypeEnum.STUDENT:
         raise SamuraiInvalidRequestError(
             detail_override="You are not allowed to search by account_id.",
         )
@@ -46,7 +45,7 @@ async def get_projects(
     account_id = None
     if search.account_id:
         account_id = search.account_id
-    if account.account_type != AccountType.ADMIN:
+    if account.account_type != AccountTypeEnum.ADMIN:
         account_id = account.account_id
 
     return project_get.search_projects(
@@ -64,8 +63,8 @@ async def get_projects(
     tags=["student"],
 )
 async def get_current_projects(
-    session: Annotated[database_session_type, Depends(database_session)],
-    account: Annotated[account_type, Depends(get_current_active_account)],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    account: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> UserProjectRepresentation:
     """
     Get all available projects linked to the student.
@@ -93,9 +92,9 @@ async def get_current_projects(
     tags=["student"],
 )
 async def get_project(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[Session, Depends(get_db_session_async)],
     project_id: pydantic.UUID4,
-    account: Annotated[account_type, Depends(get_current_active_account)],
+    account: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> UserProjectRepresentation:
     """
     Get a specific project (if it's linked to you).
@@ -121,7 +120,7 @@ async def get_project(
     ],
 )
 async def create_project(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[Session, Depends(get_db_session_async)],
     project: Annotated[CreateUserProject, Body()],
 ) -> UserProjectRepresentation:
     """
@@ -153,7 +152,7 @@ async def create_project(
     ],
 )
 async def delete_project(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[Session, Depends(get_db_session_async)],
     project_id: pydantic.UUID4,
 ) -> dict[str, str]:
     """

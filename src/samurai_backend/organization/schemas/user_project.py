@@ -4,13 +4,14 @@ from typing import Annotated
 import pydantic
 
 from samurai_backend.account.schemas.account_by_account_id_mixin import AccountByAccountIdMixin
-from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
-from samurai_backend.enums import OrderDirection, TaskState
+from samurai_backend.enums.order_direction import OrderDirection
+from samurai_backend.enums.task_state import TaskState
 from samurai_backend.models.projects.project import (
     ProjectRepresentation,
     ShortProjectRepresentation,
 )
 from samurai_backend.models.user_projects.task import UserTaskRepresentation
+from samurai_backend.schemas import BasePaginatedResponse, PaginationSearchSchema
 from samurai_backend.user_projects.schemas.user_project_link import UserProjectLinkRepresentation
 
 

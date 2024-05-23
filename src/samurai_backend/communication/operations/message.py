@@ -1,30 +1,30 @@
 from pydantic.types import UUID4
-from sqlmodel import delete
+from sqlmodel import Session, delete
 
 from samurai_backend.communication.schemas import message as message_schema
 from samurai_backend.core.web_socket.manager import web_socket_manager
 from samurai_backend.core.web_socket.types import MessageEvent, TyperData, WSKeys
-from samurai_backend.dependencies import account_type, database_session_type
 from samurai_backend.errors import (
     SamuraiForbiddenError,
     SamuraiNotFoundError,
 )
 from samurai_backend.log import events_logger
+from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.communication.message import MessageModel, MessageSeenBy
 
 
 async def create_message(
-    session: database_session_type,
-    create_message: message_schema.MessageCreate,
-    current_user: account_type,
+    session: Session,
+    body: message_schema.MessageCreate,
+    current_user: AccountModel,
 ) -> MessageModel:
     """Create a message."""
     message_entity = MessageModel(
-        chat_id=create_message.chat_id,
+        chat_id=body.chat_id,
         sender_id=current_user.account_id,
-        file_id=create_message.file_id,
+        file_id=body.file_id,
     )
-    message_entity.set_text(create_message.text)
+    message_entity.set_text(body.text)
 
     message_entity.add_seen_by(current_user.account_id)
 
@@ -37,7 +37,7 @@ async def create_message(
 
 
 async def remove_all_messages_by_chat_id(
-    session: database_session_type,
+    session: Session,
     chat_id: UUID4,
     commit: bool = True,
 ) -> None:
@@ -62,10 +62,10 @@ async def remove_all_messages_by_chat_id(
 
 
 async def update_message(
-    session: database_session_type,
+    session: Session,
     message_id: UUID4,
-    update_message: message_schema.MessageUpdate,
-    current_user: account_type,
+    body: message_schema.MessageUpdate,
+    current_user: AccountModel,
 ) -> MessageModel:
     """Update a message."""
     message_entity = session.get(MessageModel, message_id)
@@ -75,8 +75,8 @@ async def update_message(
     if message_entity.sender_id != current_user.account_id:
         raise SamuraiForbiddenError("You can only update your own messages.")
 
-    message_entity.set_text(update_message.text)
-    message_entity.file_id = update_message.file_id
+    message_entity.set_text(body.text)
+    message_entity.file_id = body.file_id
     message_entity.update_time()
 
     session.add(message_entity)
@@ -88,9 +88,9 @@ async def update_message(
 
 
 async def mark_message_seen(
-    session: database_session_type,
+    session: Session,
     message_id: UUID4,
-    current_user: account_type,
+    current_user: AccountModel,
 ) -> tuple[MessageModel, MessageSeenBy | None]:
     """Mark a message as seen."""
     message_entity = session.get(MessageModel, message_id)
@@ -157,7 +157,7 @@ async def send_message_read_ws_event(
 
 async def send_typing_ws_event(
     chat_id: UUID4,
-    current_user: account_type,
+    current_user: AccountModel,
 ) -> None:
     """Send a typing WebSocket event."""
     await web_socket_manager.broadcast(

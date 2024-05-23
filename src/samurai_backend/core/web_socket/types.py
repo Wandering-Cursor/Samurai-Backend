@@ -19,8 +19,8 @@ class WSKeys:
         return f"messages:{chat_id}"
 
 
-chat_event = Literal["created", "updated", "member_added", "member_left"]
-message_events = Literal["created", "updated", "typing", "read"]
+ChatEvent = Literal["created", "updated", "member_added", "member_left"]
+MessageEvent = Literal["created", "updated", "typing", "read"]
 
 
 class WebSocketCommand(pydantic.BaseModel):
@@ -41,7 +41,7 @@ class WSError(pydantic.BaseModel):
 class ChatEvent(pydantic.BaseModel):
     chat_entity: object = pydantic.Field(exclude=True)
 
-    event_type: chat_event
+    event_type: ChatEvent
     additional_context: dict | None = None
 
     @pydantic.computed_field
@@ -63,7 +63,7 @@ class MessageEvent(pydantic.BaseModel):
     seen_by: MessageSeenByRepresentation | None = pydantic.Field(None)
     typer: TyperData | None = pydantic.Field(None)
 
-    event_type: message_events
+    event_type: MessageEvent
 
     @pydantic.field_validator("seen_by", mode="before")
     @classmethod

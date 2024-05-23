@@ -16,6 +16,6 @@ def get_registration_code(db: Session, code_value: str) -> RegistrationEmailCode
         or_(
             RegistrationEmailCode.code == code_value,
         ),
-        RegistrationEmailCode.is_used == False,  # noqa: E712
+        RegistrationEmailCode.is_used is False,
     )
     return db.exec(query).first()

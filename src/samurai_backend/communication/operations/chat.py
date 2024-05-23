@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING
 
+from sqlmodel import Session
+
 from samurai_backend.account.get.account import get_account_by_id
 from samurai_backend.account.schemas.account_by_account_id_mixin import AccountByAccountIdMixin
 from samurai_backend.communication.get.chat import get_chat
@@ -7,9 +9,9 @@ from samurai_backend.communication.operations.message import remove_all_messages
 from samurai_backend.communication.schemas import chat as chat_schemas
 from samurai_backend.core.operations import delete_entity
 from samurai_backend.core.web_socket.manager import web_socket_manager
-from samurai_backend.core.web_socket.types import ChatEvent, WSKeys, chat_event
-from samurai_backend.dependencies import account_type, database_session_type
+from samurai_backend.core.web_socket.types import ChatEvent, WSKeys
 from samurai_backend.log import events_logger
+from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.communication.chat import ChatModel
 
 if TYPE_CHECKING:
@@ -20,7 +22,7 @@ if TYPE_CHECKING:
 
 async def chat_updated_event(
     chat: ChatModel,
-    event: chat_event,
+    event: ChatEvent,
     additional_context: dict | None = None,
 ) -> None:
     for link in chat.participant_links:
@@ -36,17 +38,17 @@ async def chat_updated_event(
 
 
 async def create_chat(
-    session: database_session_type,
-    create_chat: chat_schemas.ChatCreate,
-    current_user: account_type,
+    session: Session,
+    body: chat_schemas.ChatCreate,
+    current_user: AccountModel,
 ) -> ChatModel:
     entity = ChatModel(
-        name=create_chat.name,
+        name=body.name,
     )
     session.add(entity)
     session.commit()
 
-    participants = [current_user.account_id] + (create_chat.participants or [])
+    participants = [current_user.account_id] + (body.participants or [])
     for account_id in participants:
         account = get_account_by_id(session=session, account_id=account_id)
         entity.create_link(account=account, session=session)
@@ -59,7 +61,7 @@ async def create_chat(
 
 
 async def update_chat(
-    session: database_session_type,
+    session: Session,
     chat: ChatModel,
     chat_update: chat_schemas.ChatUpdate,
 ) -> ChatModel:
@@ -75,7 +77,7 @@ async def update_chat(
 
 
 async def add_chat_member(
-    session: database_session_type,
+    session: Session,
     chat: ChatModel,
     add_member_input: chat_schemas.ChatAddMember,
 ) -> ChatModel:
@@ -109,9 +111,9 @@ async def add_chat_member(
 
 
 async def leave_chat(
-    session: database_session_type,
+    session: Session,
     chat: ChatModel,
-    account: account_type,
+    account: AccountModel,
 ) -> bool:
     link = next(
         (link for link in chat.participant_links if link.account_id == account.account_id),
@@ -139,10 +141,10 @@ async def leave_chat(
 
 
 async def remove_empty_chat(
-    session: "AsyncGenerator[database_session_type, None]",
+    session: "AsyncGenerator[Session, None]",
     chat_id: "UUID4",
 ) -> None:
-    session: database_session_type = await session.__anext__()
+    session: Session = await anext(session)
 
     chat = await get_chat(session=session, chat_id=chat_id)
     if not chat:

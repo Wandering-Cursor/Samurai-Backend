@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import select
 
-from samurai_backend.core.schemas import PaginationMetaInformation
 from samurai_backend.models.user_projects.comment import CommentModel
 from samurai_backend.models.user_projects.project import UserProjectModel
 from samurai_backend.models.user_projects.task import UserTaskModel
 from samurai_backend.models.user_projects.user_project_link import UserProjectLinkModel
+from samurai_backend.schemas import PaginationMetaInformation
 from samurai_backend.user_projects.schemas.comment import (
     CommentPaginatedResponse,
     CommentSearchSchema,

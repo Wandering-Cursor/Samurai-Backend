@@ -1,7 +1,8 @@
 from samurai_backend.admin.get.permissions import get_permissions
 from samurai_backend.core.operations import store_entity
 from samurai_backend.db import get_db_session
-from samurai_backend.enums import AccountType, Permissions
+from samurai_backend.enums.account_type import AccountType
+from samurai_backend.enums.permissions import Permissions
 from samurai_backend.models.account.account import AccountModel
 from samurai_backend.models.account.account_permission import AccountPermission
 

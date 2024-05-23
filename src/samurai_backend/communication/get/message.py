@@ -13,12 +13,12 @@ from samurai_backend.utils.get_count import get_count
 
 if TYPE_CHECKING:
     from pydantic.types import UUID4
+    from sqlmodel import Session
 
     from samurai_backend.communication.schemas.message import MessagesSearchSchema
-    from samurai_backend.dependencies import database_session_type
 
 
-async def get_message(session: database_session_type, message_id: UUID4) -> MessageModel:
+async def get_message(session: Session, message_id: UUID4) -> MessageModel:
     query = select(MessageModel).where(
         MessageModel.message_id == message_id,
     )
@@ -27,7 +27,7 @@ async def get_message(session: database_session_type, message_id: UUID4) -> Mess
 
 
 async def get_messages(
-    session: database_session_type,
+    session: Session,
     search_schema: MessagesSearchSchema,
 ) -> MessagesSearchResponse:
     query = select(MessageModel).where(
@@ -35,7 +35,7 @@ async def get_messages(
     )
 
     if search_schema.file_only:
-        query = query.where(MessageModel.file_id != None)  # noqa: E711
+        query = query.where(MessageModel.file_id is not None)
 
     if search_schema.text:
         query = query.where(MessageModel.text.icontains(search_schema.text))

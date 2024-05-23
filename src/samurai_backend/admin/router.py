@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from samurai_backend.enums import Permissions
+from samurai_backend.enums.permissions import Permissions
 
 admin_router = APIRouter(
     prefix="/admin",

@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from sqlmodel import Session
 
     from samurai_backend.communication.schemas.chat import ChatsSearchSchema
-    from samurai_backend.dependencies import account_type
+    from samurai_backend.models.account.account import AccountModel
 
 
 async def get_chat(
@@ -42,7 +42,7 @@ async def get_chat(
 async def get_related_chat(
     session: Session,
     chat_id: UUID4,
-    current_user: account_type,
+    current_user: AccountModel,
 ) -> ChatModel:
     chat = await get_chat(
         session=session,
@@ -57,7 +57,7 @@ async def get_related_chat(
 
 async def get_user_chats(
     session: Session,
-    current_user: account_type,
+    current_user: AccountModel,
     search_params: ChatsSearchSchema,
 ) -> ChatsSearchResponse:
     search = select(ChatModel).filter(

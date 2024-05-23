@@ -5,12 +5,12 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from samurai_backend.account.get.account import get_account
-from samurai_backend.core.schemas import Token, TokenData
-from samurai_backend.dependencies import (
-    create_access_token,
-    create_refresh_token,
+from samurai_backend.dependencies.create_access_token import create_access_token
+from samurai_backend.dependencies.create_refresh_token import create_refresh_token
+from samurai_backend.dependencies.decode_refresh_token import (
     decode_refresh_token,
 )
+from samurai_backend.schemas import Token, TokenData
 from samurai_backend.settings import security_settings
 from samurai_backend.utils.verify_password import verify_password
 
@@ -18,6 +18,19 @@ MAX_TOKEN_TLL = security_settings.max_access_token_ttl
 
 if TYPE_CHECKING:
     from sqlmodel import Session
+
+    from samurai_backend.models.account.account import AccountModel
+
+
+def check_password(
+    account: AccountModel,
+    password: str,
+) -> bool:
+    return verify_password(
+        salt=account.salt,
+        plain_password=password,
+        hashed_password=account.hashed_password,
+    )
 
 
 def authenticate(
@@ -44,11 +57,7 @@ def authenticate(
         logging.error(f"Could not find account with username: {username}")
         raise auth_error
 
-    is_password_valid = verify_password(
-        salt=account.salt,
-        plain_password=password,
-        hashed_password=account.hashed_password,
-    )
+    is_password_valid = check_password(account, password)
     if not is_password_valid:
         raise auth_error
 

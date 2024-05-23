@@ -3,6 +3,7 @@ from typing import Annotated
 
 import pydantic
 from fastapi import Depends, Security, WebSocket, WebSocketDisconnect, WebSocketException
+from sqlmodel import Session
 
 from samurai_backend.communication.get.chat import get_related_chat
 from samurai_backend.communication.operations.message import mark_message_seen, send_typing_ws_event
@@ -14,14 +15,11 @@ from samurai_backend.core.web_socket.types import (
     WSError,
     WSKeys,
 )
-from samurai_backend.dependencies import (
-    account_type,
-    database_session,
-    database_session_type,
-    ws_get_current_active_account,
-)
-from samurai_backend.enums import Permissions
+from samurai_backend.db import get_db_session_async
+from samurai_backend.dependencies.ws_get_current_active_account import ws_get_current_active_account
+from samurai_backend.enums.permissions import Permissions
 from samurai_backend.log import events_logger
+from samurai_backend.models.account.account import AccountModel
 
 
 @ws_router.websocket(
@@ -31,7 +29,7 @@ from samurai_backend.log import events_logger
 async def chats_list_endpoint(
     websocket: WebSocket,
     account: Annotated[
-        account_type,
+        AccountModel,
         Security(
             ws_get_current_active_account,
             scopes=[Permissions.CHATS_READ.value],
@@ -81,14 +79,14 @@ async def chats_list_endpoint(
 async def chats_messages_endpoint(
     websocket: WebSocket,
     account: Annotated[
-        account_type,
+        AccountModel,
         Security(
             ws_get_current_active_account,
             scopes=[Permissions.CHATS_READ.value],
         ),
     ],
     chat_id: pydantic.UUID4,
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[Session, Depends(get_db_session_async)],
 ) -> None:
     # Raises NotFoundException if chat is not found
     await get_related_chat(

@@ -1,6 +1,6 @@
 [project]
 name = "Samurai-Backend"
-version = "0.15.3"
+version = "0.16.0"
 description = "Backend part of the Samurai project"
 authors = [
     {name = "Pavlo Pohorieltsev", email = "hdydpavel@gmail.com"},
@@ -35,9 +35,10 @@ license = {text = "MIT"}
 
 [project.optional-dependencies]
 dev = [
-    "ruff>=0.4.4",
+    "ruff>=0.4.5",
     "pre-commit>=3.7.0",
     "pyright>=1.1.357",
+    "pylint[spelling]>=3.2.2",
 ]
 [build-system]
 requires = ["pdm-backend"]
@@ -121,4 +122,20 @@ include = [
 ]
 exclude = [
   "src/samurai_backend/migrations",
+]
+
+
+[tool.pylint.MASTER]
+ignore-paths = [
+  "src/samurai_backend/migrations/"
+]
+
+[tool.pylint.'MESSAGES CONTROL']
+max-line-length = 100
+disable = [
+  "missing-module-docstring",
+  "missing-function-docstring",
+  "missing-class-docstring",
+  "logging-fstring-interpolation",
+  "import-outside-toplevel",
 ]

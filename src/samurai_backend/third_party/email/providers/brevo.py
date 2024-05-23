@@ -39,7 +39,7 @@ class BrevoIntegration(BaseEmailIntegration):
         self: "BrevoIntegration",
         to: list[str] | str,
         template_id: int,
-        template_data: dict[str, str],
+        template_data: dict[str, str] | None,
     ) -> None:
         if isinstance(to, str):
             to = [
@@ -60,8 +60,9 @@ class BrevoIntegration(BaseEmailIntegration):
         json_data = {
             "to": to,
             "templateId": template_id,
-            "params": template_data,
         }
+        if template_data:
+            json_data["templateData"] = template_data
 
         if self.test_mode:
             json_data["X-Sib-Sandbox"] = "drop"

@@ -2,20 +2,18 @@ from typing import Annotated
 
 import pydantic
 from fastapi import Body, Depends
+from sqlmodel import Session
 
 from samurai_backend.communication.get import message as message_get
 from samurai_backend.communication.get.chat import get_related_chat
 from samurai_backend.communication.operations import message as message_ops
 from samurai_backend.communication.router import communication_router
 from samurai_backend.communication.schemas import message as message_schema
-from samurai_backend.dependencies import (
-    account_type,
-    database_session,
-    database_session_type,
-    get_current_active_account,
-)
-from samurai_backend.enums import Permissions
+from samurai_backend.db import get_db_session_async
+from samurai_backend.dependencies.get_current_active_account import get_current_active_account
+from samurai_backend.enums.permissions import Permissions
 from samurai_backend.errors import SamuraiNotFoundError
+from samurai_backend.models.account.account import AccountModel
 
 
 @communication_router.get(
@@ -23,9 +21,9 @@ from samurai_backend.errors import SamuraiNotFoundError
     dependencies=[Permissions.MESSAGES_READ.as_security],
 )
 async def get_messages(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[Session, Depends(get_db_session_async)],
     search_schema: Annotated[message_schema.MessagesSearchSchema, Depends()],
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> message_schema.MessagesSearchResponse:
     """Get messages."""
     # Raises exception if chat does not exist or user is not a member
@@ -47,7 +45,7 @@ async def get_messages(
 )
 async def get_message(
     message_id: pydantic.UUID4,
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[Session, Depends(get_db_session_async)],
 ) -> message_schema.MessageRepresentation:
     """Get a message."""
     message_entity = await message_get.get_message(
@@ -70,7 +68,7 @@ async def get_message(
 )
 async def get_message_seen_by(
     message_id: pydantic.UUID4,
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[Session, Depends(get_db_session_async)],
 ) -> message_schema.MessageSeenByResponse:
     """Get message seen by."""
     message_entity = await message_get.get_message(
@@ -90,14 +88,14 @@ async def get_message_seen_by(
     status_code=201,
 )
 async def create_message(
-    session: Annotated[database_session_type, Depends(database_session)],
-    create_message: Annotated[message_schema.MessageCreate, Body()],
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    body: Annotated[message_schema.MessageCreate, Body()],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> message_schema.MessageRepresentation:
     """Create a message."""
     message_entity = await message_ops.create_message(
         session=session,
-        create_message=create_message,
+        body=body,
         current_user=current_user,
     )
 
@@ -113,15 +111,15 @@ async def create_message(
 )
 async def update_message(
     message_id: pydantic.UUID4,
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[Session, Depends(get_db_session_async)],
     update_message: Annotated[message_schema.MessageUpdate, Body()],
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> message_schema.MessageRepresentation:
     """Update a message."""
     message_entity = await message_ops.update_message(
         session=session,
         message_id=message_id,
-        update_message=update_message,
+        body=update_message,
         current_user=current_user,
     )
 
@@ -138,8 +136,8 @@ async def update_message(
 )
 async def mark_message_seen(
     message_id: pydantic.UUID4,
-    session: Annotated[database_session_type, Depends(database_session)],
-    current_user: Annotated[account_type, Depends(get_current_active_account)],
+    session: Annotated[Session, Depends(get_db_session_async)],
+    current_user: Annotated[AccountModel, Depends(get_current_active_account)],
 ) -> None:
     """Mark message as seen."""
     await message_ops.mark_message_seen(

@@ -1,12 +1,13 @@
 from typing import Annotated
 
 from fastapi import Depends
+from sqlmodel import Session as DatabaseSessionType
 
 from samurai_backend.admin.get import connections as connections_get
 from samurai_backend.admin.router import admin_router
 from samurai_backend.admin.schemas import connections as connections_schemas
 from samurai_backend.core.operations import store_entity
-from samurai_backend.dependencies import database_session, database_session_type
+from samurai_backend.db import get_db_session_async
 from samurai_backend.models.account.connection import (
     ConnectionBase,
     ConnectionCreate,
@@ -18,7 +19,7 @@ from samurai_backend.models.account.connection import (
     "/connections",
 )
 async def get_connections(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     search: Annotated[connections_schemas.ConnectionsFilter, Depends()],
 ) -> connections_schemas.ConnectionsPaginatedResponse:
     "Execute a search among connections"
@@ -32,7 +33,7 @@ async def get_connections(
     "/connections",
 )
 async def create_connection(
-    db: Annotated[database_session_type, Depends(database_session)],
+    db: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     connection: ConnectionCreate,
 ) -> ConnectionBase:
     """Create a new connection"""

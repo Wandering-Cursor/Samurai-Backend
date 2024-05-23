@@ -1,10 +1,11 @@
 from typing import Annotated
 
 from fastapi import Body, Depends
+from sqlmodel import Session as DatabaseSessionType
 
 from samurai_backend.admin.router import admin_router
 from samurai_backend.core.operations import delete_entity, store_entity, update_entity
-from samurai_backend.dependencies import database_session, database_session_type
+from samurai_backend.db import get_db_session_async
 from samurai_backend.models.organization.group import Group, GroupCreate, GroupModel
 from samurai_backend.organization.dependencies import group_exists
 from samurai_backend.organization.get.group import get_group_search
@@ -15,7 +16,7 @@ from samurai_backend.organization.schemas.group import GroupSearchInput, GroupSe
     "/group",
 )
 async def get_groups(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     search: Annotated[GroupSearchInput, Depends()],
 ) -> GroupSearchOutput:
     """Returns a list of groups found by the search parameters."""
@@ -39,7 +40,7 @@ async def get_group(
     "/group",
 )
 async def create_group(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     body: Annotated[GroupCreate, Body(...)],
 ) -> Group:
     """Creates a new group."""
@@ -52,7 +53,7 @@ async def create_group(
     "/group/{group_id}",
 )
 async def update_group(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     body: Annotated[GroupCreate, Body(...)],
     original_group: Annotated[GroupModel, Depends(group_exists)],
 ) -> Group:
@@ -69,7 +70,7 @@ async def update_group(
     status_code=204,
 )
 async def delete_group(
-    session: Annotated[database_session_type, Depends(database_session)],
+    session: Annotated[DatabaseSessionType, Depends(get_db_session_async)],
     group: Annotated[GroupModel, Depends(group_exists)],
 ) -> None:
     delete_entity(

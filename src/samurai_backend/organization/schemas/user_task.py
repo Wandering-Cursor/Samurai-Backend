@@ -1,8 +1,8 @@
 import pydantic
 
-from samurai_backend.core.schemas import BasePaginatedResponse, PaginationSearchSchema
-from samurai_backend.enums import TaskState
+from samurai_backend.enums.task_state import TaskState
 from samurai_backend.models.user_projects.task import UserTaskRepresentation
+from samurai_backend.schemas import BasePaginatedResponse, PaginationSearchSchema
 
 
 class UserTaskSearchInput(PaginationSearchSchema):
