@@ -50,6 +50,8 @@ def search_tasks(
     query = select(
         UserTaskModel,
     ).order_by(
+        UserTaskModel.priority.asc(),
+        UserTaskModel.due_date.asc(),
         UserTaskModel.updated_at.desc(),
     )
 
