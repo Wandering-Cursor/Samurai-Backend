@@ -54,7 +54,9 @@ class ProjectRepresentationFull(BaseProject):
 
 
 class ProjectRepresentation(ProjectRepresentationFull):
-    @pydantic.field_validator("tasks", mode="before")
+    @pydantic.field_validator(
+        "tasks", mode="after"
+    )  # If this doesn't work, add a property to get all tasks
     @classmethod
     def convert_tasks(
         cls, value: list[TaskRepresentationShortDescription | dict]
