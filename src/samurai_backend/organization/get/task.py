@@ -34,6 +34,8 @@ def search_tasks(
     query = select(
         TaskModel,
     ).order_by(
+        TaskModel.priority.asc(),
+        TaskModel.due_date.asc(),
         TaskModel.updated_at.desc(),
     )
 
