@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from typing import TYPE_CHECKING
 
-from sqlmodel import select
+from sqlmodel import func, select
 
+from samurai_backend.db import get_db_session_object
+from samurai_backend.enums.task_state import TaskState
 from samurai_backend.models.user_projects.project import UserProjectModel
 from samurai_backend.models.user_projects.task import UserTaskModel
 from samurai_backend.models.user_projects.user_project_link import UserProjectLinkModel
@@ -82,3 +85,36 @@ def search_tasks(
         ),
         content=rows,
     )
+
+
+def tasks_count_by_status(
+    project_id: pydantic.UUID4,
+    session: Session = None,
+) -> dict[TaskState, int]:
+    if session is None:
+        session = get_db_session_object()
+
+    result = defaultdict(int)
+
+    for state in TaskState:
+        result[state.value] = 0
+
+    query = (
+        select(
+            UserTaskModel.state,
+            func.count(UserTaskModel.state),
+        )
+        .where(
+            UserTaskModel.project_id == project_id,
+        )
+        .group_by(
+            UserTaskModel.state,
+        )
+    )
+
+    rows = session.exec(query)
+
+    for state, count in rows:
+        result[state] = count
+
+    return result

@@ -1,4 +1,3 @@
-from collections import defaultdict
 from typing import Annotated
 
 import pydantic
@@ -34,15 +33,9 @@ class ShortUserProjectRepresentation(ShortProjectRepresentation):
     @pydantic.computed_field
     @property
     def tasks_count(self: "ShortUserProjectRepresentation") -> dict[TaskState, int]:
-        result = defaultdict(int)
+        from samurai_backend.organization.get.user_task import tasks_count_by_status
 
-        for state in TaskState:
-            result[state.value] = 0
-
-        for task in self.tasks:
-            result[task.state] += 1
-
-        return result
+        return tasks_count_by_status(project_id=self.project_id)
 
     @pydantic.computed_field
     @property
@@ -77,14 +70,9 @@ class UserProjectRepresentation(ProjectRepresentation):
     @pydantic.computed_field
     @property
     def tasks_count_by_status(self: "UserProjectRepresentation") -> dict[TaskState, int]:
-        result = defaultdict(int)
-        for state in TaskState:
-            result[state.value] = 0
+        from samurai_backend.organization.get.user_task import tasks_count_by_status
 
-        for task in self.tasks:
-            result[task.state] += 1
-
-        return result
+        return tasks_count_by_status(project_id=self.project_id)
 
 
 class UserProjectSearchOutput(BasePaginatedResponse):
