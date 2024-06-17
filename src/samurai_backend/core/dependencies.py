@@ -66,6 +66,7 @@ def authenticate(
     token_data = TokenData(
         sub=account.account_id,
         scopes=[permission.name for permission in account.permissions],
+        account_type=account.account_type,
     )
     return Token(
         access_token=create_access_token(
