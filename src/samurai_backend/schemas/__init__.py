@@ -40,6 +40,8 @@ class TokenData(pydantic.BaseModel):
     scopes: list[str] = []
     type: str = "access"
 
+    account_type: str | None = None
+
 
 class PaginationSearchSchema(pydantic.BaseModel):
     page: int = pydantic.Field(
