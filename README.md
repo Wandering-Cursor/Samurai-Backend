@@ -2,11 +2,6 @@
 
 ## About
 
-# TODO:
-- [ ] Add a proper description
-- [ ] Recreate CI/CD workflow
-- [ ] Add docker file for backend
-
 ## Installation
 
 For this project we need:
